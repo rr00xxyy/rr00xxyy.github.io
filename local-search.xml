@@ -20,13 +20,13 @@
     
     <tags>
       
-      <tag>os</tag>
-      
-      <tag>操作系统</tag>
+      <tag>heap</tag>
       
       <tag>lua</tag>
       
-      <tag>heap</tag>
+      <tag>os</tag>
+      
+      <tag>操作系统</tag>
       
       <tag>llvm</tag>
       
@@ -138,9 +138,9 @@
     
     <tags>
       
-      <tag>lua</tag>
-      
       <tag>heap</tag>
+      
+      <tag>lua</tag>
       
       <tag>CPU</tag>
       
@@ -541,9 +541,9 @@
   
   
   <entry>
-    <title>nonsense</title>
-    <link href="/2026/02/21/nonsense/"/>
-    <url>/2026/02/21/nonsense/</url>
+    <title>CS-nonsense</title>
+    <link href="/2026/02/21/CS-nonsense/"/>
+    <url>/2026/02/21/CS-nonsense/</url>
     
     <content type="html"><![CDATA[<p>今天闲着实在无聊简单了解了一下<code>计算机组成原理</code>，不过也有一些好奇心的因素在就是了</p><p>但是其中具体电路的实现我实在是看不懂，电学本来就没学好，遂放弃理解电路实际组成，只关注抽象的过程，也因此不得不赞叹<strong>抽象</strong>的力量，使得我们不用过多关注于这些复杂的实现</p><p>取名为nonsense，也算是一种自嘲吧</p><hr><p>你有没有想过，你写的c语言程序计算机是怎么运行的?</p><p>根据panorama这篇(其实我还没写完)，可以得知c代码经过<strong>编译器</strong>变为汇编代码，再经过<code>汇编器</code>转化为机器语言，也就是CPU能直接理解的二进制指令，接着，<strong>链接器</strong>把目标文件和<code>共享库</code>整合成一个完整的可执行文件</p><p>当你决定要运行它，这个可执行文件会通过操作系统从<code>硬盘</code>加载到主存(<code>RAM</code>)中，CPU的程序计数器(PC&#x2F;IP)会指向机器代码的起始地址，然后开始一条条执行:取指、译码、执行，再取下一条，循环往复…</p><p>但是等等，二进制指令计算机这个<strong>福瑞</strong>又是怎么看懂的?</p><hr><p>再深入一点吧</p><p>从<code>晶体管</code>开始</p><p>晶体管简单来说可以理解为一个微型开关，只有两种状态:通电即为1，断电即为0</p><p>单个晶体管虽然简单，但可以通过电路组合成<strong>逻辑门</strong>:与门(串联)、或门(并联)、非门和异或门(复杂的电路组合,我反正懵了)</p><p><code>与门</code>是两个输入都为1输出才为1，<code>或门</code>是任意一个输入为1输出就为1，<code>非门</code>则是输入取反，<code>异或门</code>是两个输入不同时输出1，相同则输出0，也就是c语言学过的<strong>位运算</strong>，很好理解</p><p>这些逻辑门就是数字电路的语言，所有后续的计算都建立在它们之上</p><p>直觉来看这些逻辑门似乎能做的事情很有限，但并非如此，我们继续抽象</p><p>先来看看加法是如何实现的，先考虑两位二进制的加法，只需要考虑<code>和</code>和<code>进位</code></p><p>和可以抽象为</p><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs basic"><span class="hljs-symbol">1 </span><span class="hljs-number">1</span> -&gt; <span class="hljs-number">0</span><br><span class="hljs-symbol">0 </span><span class="hljs-number">0</span> -&gt; <span class="hljs-number">0</span><br><span class="hljs-symbol">1 </span><span class="hljs-number">0</span> -&gt; <span class="hljs-number">1</span><br><span class="hljs-symbol">0 </span><span class="hljs-number">1</span> -&gt; <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure><p>是不是就是一个<code>异或门</code>便能处理</p><p>再考虑进位</p><figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs basic"><span class="hljs-symbol">1 </span><span class="hljs-number">1</span> -&gt; <span class="hljs-number">1</span><br><span class="hljs-symbol">0 </span><span class="hljs-number">0</span> -&gt; <span class="hljs-number">0</span><br><span class="hljs-symbol">0 </span><span class="hljs-number">1</span> -&gt; <span class="hljs-number">0</span><br><span class="hljs-symbol">1 </span><span class="hljs-number">0</span> -&gt; <span class="hljs-number">0</span><br></code></pre></td></tr></table></figure><p>这个也简单，就是<code>与门</code>吧</p><p>恭喜你，发明了<strong>半加器</strong></p><hr><p>然而两位能表示的信息还是太有限了，在真实多位计算中，单个半加器无法处理来自低位的进位，于是我们引入<strong>全加器</strong></p><p>全加器在半加器的基础上，额外考虑了前一位的进位，我们进一步抽象，当多个全加器首尾相连时，就可以构成8位，32位甚至64位的多位加法器</p><p>具体电路的实现请原谅我直接忽略了，若好奇请自行查阅资料</p><p>当然也要考虑最高位的进位，这便是后面标志位寄存器的工作了</p><p>众所周知，实现了加法，便也实现了减法，减法本质上就是<strong>补码</strong>加法，即</p><p><code>A − B &lt;=&gt; A + (~B + 1)</code></p><p>左右移位操作在电路中是很简单基础的逻辑，但是在数学上，左移一位，就相当于乘以2；右移一位，就相当于除以2</p><p>于是通过移位和加减操作的结合，又能分别实现乘法和除法</p><p>加、减、乘、除、与、或、异或、移位，这些在高级语言里看起来完全不同的操作，在硬件里竟然都可以归结为对少数几种基础电路的组合和控制，太神秘了</p><p>最后，这些运算电路被统一封装在一个模块中，这个模块就是<strong>ALU</strong>，即<code>算数逻辑单元</code></p><p>不得不再次提到<code>抽象</code>的力量，你可以不用关注复杂的晶体管与电路实现，只需要封装+抽象即可</p><hr><p>现在计算机拥有了<code>运算</code>的能力，但如何获得<strong>记住</strong>的能力?</p><p>很容易想到，<strong>电容</strong>可以实现记住的功能，但电容会随时间逐渐损失(<strong>漏电</strong>)，因此需要不断刷新来保持数据，用在CPU中似乎并不合适，CPU的运算节奏极快，它需要的是一种几乎可以<code>随取随用</code>的存储单元，而不是隔一段时间就要维护一次状态的电容，但其结构简单，容量大且成本低，因此主存便通常采取这样的方式，也就是<strong>DRAM</strong>，<code>动态随机存取存储器</code></p><p>区别于此，CPU中通过晶体管电路的精妙实现，组成一个带<code>反馈</code>的逻辑结构，把输出重新送回输入，构成一个稳定的逻辑状态，一旦被写入0或1，只要电源存在，它就能一直保持这个值不变，这便是<code>SRAM</code>，<code>静态随机存取存储器</code>，常用于CPU<strong>寄存器</strong>与L1，L2<strong>缓存</strong>，需要更多的晶体管，成本更高，更复杂，容量也做不大，但换来的，是极高的速度和稳定性，称为<strong>锁存器</strong>(latch)</p><p>同理，多个锁存器组合起来便是喜闻乐见的<code>寄存器</code>了</p><p>寄存器用于在CPU内部保存当前指令执行过程中最关键，最频繁访问的数据</p><p>相比主存，寄存器容量极小，但访问速度极快</p><p>为了让寄存器在复杂的电路中正常工作，还需要配合<code>读使能</code>和<code>写使能</code>信号，写使能决定当前时钟边沿是否把数据写入寄存器，读使能则决定寄存器的内容是否被送上数据总线，这些信号由控制单元统一调度</p><p>出现了许多概念</p><p>先解释一下<strong>时钟</strong></p><p>时钟是一个周期性跳变的信号，CPU内部几乎所有状态的更新，都严格发生在时钟的某一个边沿上，这里的状态，指的就是寄存器，程序计数器，标志位等由锁存器构成的存储单元，组合逻辑可以在一个周期内自由变化，但只有在时钟边沿到来时，这些变化才会被采样并真正写入寄存器</p><p><code>数据总线</code>则可以理解为将ALU，寄存器，主存<strong>串联</strong>起来的传输数据的共享线路，除此之外还有<code>地址总线</code>，用来告诉主存我要访问的是哪个位置，以及<code>控制总线</code>，用来传递读写使能，时钟相关信号等控制信息</p><p>等等，CPU是怎么在主存中找到地址的?</p><p>从CPU的视角来看，主存被抽象为一个巨大的，线性编号的存储空间，每一个存储单元都有一个唯一的地址，CPU只需要给出一个地址，就能通过地址总线访问对应的位置，但是主存是将地址解码成行，列等更底层的电路结构，用来选中具体的存储单元，太复杂的实现，我们抽象掉</p><p>CPU又是怎么识别如<code>add</code>，<code>mov</code>等指令的呢，CPU并不理解<code>add</code>，<code>mov</code>这样的助记符，这些只是汇编语言中为了方便人类阅读而引入的名字，尽管似乎对于人类来说还是很难理解(x_x)，在机器层面，指令就是一串固定格式的二进制比特</p><p>这似乎取决于具体架构，但离不开<strong>译码器</strong>，当一条指令被从主存取到CPU后，它会被送入指令寄存器(即<strong>取指</strong>)，随后，控制单元开始对这串比特进行解析，即<strong>译码</strong></p><p>译码的核心是<code>译码器</code>，译码器本质上也是一个组合逻辑电路，它根据指令中不同字段的比特模式，产生一组控制信号，这些控制信号会告诉 CPU这是哪一类指令，需要使用哪些寄存器，ALU要执行什么运算以及结果是否需要写回寄存器或内存等等</p><p>在<strong>执行</strong>阶段，这些控制信号会被真正送达各个<strong>硬件</strong>模块，相关寄存器的读使能被打开，操作数被送上数据总线，ALU根据译码结果选择对应的运算路径，若需要访问主存，相应的地址和读写信号也会被同时发出</p><p>当运算完成后，在下一个<strong>时钟</strong>边沿，如果写使能信号有效，结果就会被写回到目标寄存器或内存中，与此同时，程序计数器也会根据指令类型被更新，要么顺序指向下一条指令，要么被改写为跳转目标地址</p><p>至此，一条指令的<strong>生命周期</strong>才算结束</p><p>随后，CPU再次进入取指阶段，重复取指、译码、执行这一循环，程序也就以这种方式一条一条地向前推进…</p><p>让我们重点看看<strong>程序计数器</strong>(IP&#x2F;PC)，其始终指向<code>当前即将执行的那一条指令在主存中的地址</code></p><p>在取指阶段，CPU会根据IP给出的地址，通过地址总线从主存中取出对应的指令，并送入<strong>指令寄存器</strong>(IR)</p><p>当一条指令执行完成后，IP会被更新，对于顺序执行的指令，IP 通常会自动增加，指向下一条指令的位置，而对于跳转(jmp)，调用(call)等控制流指令，IP则会被直接改写为新的目标地址</p><p>也正是通过不断地读取和更新IP，CPU才能沿着程序设定的执行路径不断向前推进，看似只是一个简单的寄存器，却决定了程序接下来要做什么，是整个指令执行流程中最关键的状态之一</p><p>ps:所以在<code>pwn</code>中，hacker们的目标通常就是控制IP</p><p>当然，这似乎只是最简单的实现，尽管其已经让我彻底懵了</p><p>在更复杂的CPU中，这些阶段甚至会被流水线化(x_x)，不同指令的不同阶段可以在同一个时钟周期内<strong>并行</strong>进行，后面再来探索吧…</p><p>同时，如你所见，由于频繁访问主存会带来较大的延迟和性能开销，现代CPU内部会集成高速<strong>缓存</strong>(Cache)系统，从而减少每次访问主存的等待时间，提高CPU整体运行效率</p><p>待补充</p><hr><p>最后总结一下</p><p>在CPU内部，最核心的组成包括几部分</p><p>首先是<code>运算逻辑单元</code>，即<strong>ALU</strong>，负责执行加减、逻辑运算和移位等基本计算</p><p>其次是<code>寄存器系统</code>，由大量基于<strong>锁存器</strong>构成的寄存器组成，用来保存指令执行过程中最关键、最频繁使用的数据，其中也包括程序计数器<strong>IP</strong>，用来指向下一条即将执行的指令</p><p>为了让这些部件在高速下仍然能够有序协作，CPU还依赖统一的<code>时钟信号</code></p><p>时钟把连续变化的电路切分成一个个离散的周期，使寄存器只在特定的时刻更新状态，保证整个系统的确定性</p><p>而控制单元则通过<code>译码器</code>，把指令中的二进制比特翻译成一组控制信号，统一调度寄存器读写，ALU运算以及访存行为</p><p>在存储层面，CPU内部使用的是基于<strong>SRAM</strong>的寄存器和高速缓存，追求极致的访问速度</p><p>而主存则采用<strong>DRAM</strong>，负责提供大容量的数据存储</p><p>两者之间通过<code>总线</code>相连，形成清晰的分工</p><p>当CPU需要与主存交互时，会由IP给出指令地址，或由指令本身给出数据地址</p><p>CPU将目标地址放到<code>地址总线</code>上，同时通过控制总线发出读或写信号</p><p>主存在接收到地址和控制信号后，把对应的数据放到数据总线上，CPU 再将这些数据读入寄存器，供后续运算使用，或将计算结果写回主存</p><p>最终，CPU 正是通过不断重复<code>取指</code>、<code>译码</code>、<code>执行</code>这一循环，在<code>时钟</code>的约束下，对寄存器和主存中的状态进行有序更新</p><p>看似抽象复杂的程序执行过程，本质上就是这些基础部件在硬件层面一次次精确协作的结果</p><div class="note note-success">            <p>最后 借用YS-os中的一句话 — 善用 LLM 进行学习! (´・ω・)つ旦</p>           </div><hr><p>so free~</p><p>感谢阅读</p><p>生活愉快…</p><hr><p>补充:</p><p>我觉得有必要补充一下<code>寄存器</code>相关的知识</p><p>掌握了寄存器</p><p>汇编便也不再晦涩难懂(你确定??? (´⊙ω⊙&#96;) )</p><p>我以我熟悉的linux x86-64 为例</p><p>首先，有哪些寄存器?</p><p>1.通用寄存器</p><p>比如</p><p><code>rdi rsi rdx rcx rbx rax r8-r15</code></p><p>用于整数运算，函数参数传递，临时存储等</p><p>2.栈相关寄存器</p><figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs x86asm"><span class="hljs-built_in">rbp</span> 栈帧基址寄存器<br><span class="hljs-built_in">rsp</span> 栈顶指针寄存器<br></code></pre></td></tr></table></figure><p><strong>栈帧</strong></p><p>3.程序计数器</p><p><code>rip</code></p><p>保存下一条即将执行的指令地址</p><p>4.标志寄存器(<code>RFLAGS</code>&#x2F;<code>EFLAGS</code>)</p><p>保存运算结果状态，例如零标志<code>ZF</code>，进位标志<code>CF</code>，溢出标志<code>OF</code>，符号标志<code>SF</code>等等，用于<strong>条件跳转</strong>和ALU决策</p><p>5.浮点与向量寄存器</p><p>涉及二进制浮点数表示，暂时不管</p><p>6.段寄存器</p><p><code>CS DS ES FS GS SS</code></p><p>用于<code>内存段选择</code>，现代用户态程序基本不操作，不管</p><p>7.控制寄存器(CR0–CR4等)</p><p>用于控制CPU工作模式，分页，保护等机制，主要在内核态使用</p><p>8.调试寄存器(DR0–DR7)</p><p>用于硬件断点设置(硬件中断)，gdb的底层原理</p><p>最后，是一套寄存器调用约定(ABI)</p><ul><li><p>函数前6个整型参数依次放在寄存器 RDI RSI RDX RCX R8 R9</p></li><li><p>caller-saved <code>RAX RCX RDX RSI RDI R8–R11</code></p></li><li><p>callee-saved <code>RBX RBP R12–R15</code></p></li><li><p>返回值放在寄存器 <strong>RAX</strong></p></li><li><p>栈16字节对齐(<strong>RSP</strong>)</p></li></ul><p>熟悉吗孩子们</p><p>哈哈哈哈哈哈哈</p><div class="note note-danger">            <p>pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn pwn</p>           </div><p>启航2026!</p>]]></content>
     
@@ -962,11 +962,11 @@
       
       <tag>LeetCode</tag>
       
-      <tag>算法</tag>
-      
       <tag>异或</tag>
       
       <tag>trick</tag>
+      
+      <tag>算法</tag>
       
     </tags>
     
@@ -1107,9 +1107,9 @@
       
       <tag>LeetCode</tag>
       
-      <tag>双指针</tag>
-      
       <tag>算法</tag>
+      
+      <tag>双指针</tag>
       
     </tags>
     
@@ -1118,9 +1118,9 @@
   
   
   <entry>
-    <title>twoSum</title>
-    <link href="/2026/01/17/twoSum/"/>
-    <url>/2026/01/17/twoSum/</url>
+    <title>TwoSum</title>
+    <link href="/2026/01/17/TwoSum/"/>
+    <url>/2026/01/17/TwoSum/</url>
     
     <content type="html"><![CDATA[<p>起因:coding能力太差导致期末考试被制裁</p><p>因此</p><p>今天从<code>LeetCode</code>的第一题<code>两数之和</code>开始<code>数据结构与算法</code>的学习</p><p>首先给出题目</p><p><img src="/images/14.png" alt="6"></p><p>第一个想法是直接两层for循环暴力枚举所有可能</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">twoSum</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> target)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n =nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++)&#123;<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = i + <span class="hljs-number">1</span>; j &lt; n; j++)&#123;<br>                <span class="hljs-keyword">if</span>(nums[i] + nums[j] == target)&#123;<br>                    <span class="hljs-keyword">return</span> &#123;i, j&#125;;<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> &#123;&#125;;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure><p><img src="/images/15.png" alt="6"></p><p>虽然空间复杂度为<code>O(1)</code>，但是这样的话引入了很多无意义比较，比如某个<code>nums[i]</code>可能很小，却和很多不可能匹配的数相加，浪费了许多时间，因此时间复杂度达到了$O(n^2)$，太低效了…</p><p>看看能不能尝试优化一下，减少无意义的搜索</p><p>可以想到先对其进行排序，然后用左右双指针法根据两数之和与<code>target</code>的大小关系移动指针，使其更高效</p><p>代码如下</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">twoSum</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> target)</span> </span>&#123;<br>        vector &lt;pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt; a;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; nums.<span class="hljs-built_in">size</span>(); i++)&#123;<br>            a.<span class="hljs-built_in">push_back</span>(&#123;nums[i],i&#125;);<br>        &#125;<br>        <span class="hljs-built_in">sort</span>(a.<span class="hljs-built_in">begin</span>(),a.<span class="hljs-built_in">end</span>());<br><br>        <span class="hljs-type">int</span> l = <span class="hljs-number">0</span>, r = a.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span>(l &lt; r)&#123;<br>            <span class="hljs-type">int</span> sum = a[l].first + a[r].first;<br>            <span class="hljs-keyword">if</span>(sum == target)&#123;<br>                <span class="hljs-keyword">return</span> &#123;a[l].second,a[r].second&#125;;<br>            &#125;<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(sum &lt; target)&#123;<br>                l++;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                r--;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> &#123;&#125;;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure><p><img src="/images/16.png" alt="6"></p><p>此时空间复杂度是<code>O(n)</code></p><p>可以看到确实快了一些，但是还不够，排序的时间复杂度为$O(n \log n)$，能不能不排序，直接实现快速查找?</p><p>这便要引出今天的数据结构:<strong>哈希表</strong></p><p>我们对题目再重新思考一下，题目其实在问，对于每个数<code>x</code>，是否存在一个数<code>y = target - x</code>?</p><p>这本质其实是一个<code>查找</code>问题，而不是<code>枚举</code>问题</p><p>我们可以这样做</p><p>先遍历数组，对当前<code>nums[i]</code>计算<code>need = target - nums[i]</code>，如果<code>need</code>已经出现过，那么直接返回，否则就把 <code>nums[i]</code>存进<code>哈希表</code></p><p>这样时间复杂度便能达到<code>O(n)</code>，甚至是<code>O(1)</code></p><p>代码如下</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">twoSum</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> target)</span> </span>&#123;<br>        unordered_map &lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; mp; <span class="hljs-comment">//值，索引</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; nums.<span class="hljs-built_in">size</span>(); i++)&#123;<br>            <span class="hljs-type">int</span> need = target - nums[i];<br>            <span class="hljs-keyword">if</span>(mp.<span class="hljs-built_in">count</span>(need))&#123;<br>                <span class="hljs-keyword">return</span> &#123;mp[need],i&#125;;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                mp[nums[i]] = i;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> &#123;&#125;;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure><p><img src="/images/17.png" alt="6"></p><p>时间复杂度完美，空间复杂度仍然是<code>O(n)</code>，因为哈希表本质就是空间换时间(不绝对)</p><p>待补充…</p><p>2026.1.19</p><p>仅记录一下做过的题目的代码…</p><p>49.字母异位词分组</p><p><img src="/images/18.png" alt="如图"></p><p>解法:</p><p><strong>哈希表</strong></p><p>我们通过对字符串字符<code>排序</code>，将字母组成相同的字符串映射到同一个<code>键</code>，从而利用哈希表实现异位词分组</p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    vector&lt;vector&lt;string&gt;&gt; <span class="hljs-built_in">groupAnagrams</span>(vector&lt;string&gt;&amp; strs) &#123;<br>        unordered_map&lt;string, vector&lt;string&gt;&gt; mp;<br><br>        <span class="hljs-keyword">for</span>(string s : strs) &#123;<br>            string key =  s;<br>            <span class="hljs-built_in">sort</span>(key.<span class="hljs-built_in">begin</span>(),key.<span class="hljs-built_in">end</span>()); <span class="hljs-comment">//排序</span><br>            mp[key].<span class="hljs-built_in">push_back</span>(s); <span class="hljs-comment">//值，索引</span><br>        &#125;<br><br>        vector&lt;vector&lt;string&gt;&gt; result;<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp; p : mp)&#123;<br>            result.<span class="hljs-built_in">push_back</span>(p.second);<br>        &#125;<br>        <span class="hljs-keyword">return</span> result;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure><p>128.最长连续序列</p><p><img src="/images/19.png" alt="如图所示"></p><p>解法:</p><p><code>哈希表</code></p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">longestConsecutive</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-function">unordered_set&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">st</span><span class="hljs-params">(nums.begin(), nums.end())</span></span>;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-comment">//思考...</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> x : st) &#123;<br>            <span class="hljs-keyword">if</span> (!st.<span class="hljs-built_in">count</span>(x - <span class="hljs-number">1</span>)) &#123;<br>                <span class="hljs-type">int</span> cur = x;<br>                <span class="hljs-type">int</span> len = <span class="hljs-number">1</span>;<br><br>                <span class="hljs-keyword">while</span> (st.<span class="hljs-built_in">count</span>(cur + <span class="hljs-number">1</span>)) &#123;<br>                    cur++;<br>                    len++;<br>                &#125;<br>                ans = <span class="hljs-built_in">max</span>(ans, len); <span class="hljs-comment">//举一反三</span><br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure><p>注意一下<code>unordered_map</code>和<code>unordered_set</code>的区别</p><p><code>unordered_set</code>只有key(只关心元素存不存在)，<code>unordered_map</code>则存在key-&gt;value的<strong>映射</strong>关系</p><p>哈希表的<code>底层</code>原理:</p><p>桶数组(bucket array) + 哈希函数(<strong>映射</strong>关系) + 链表&#x2F;树?(处理<strong>哈希冲突</strong>) + 负载因子扩容(rehash)</p><p>待补充…</p><p>2026.2.11吐槽:</p><p>最近尝试用cpp手搓一个stl</p><p>被cpp的逆天语法击败了</p><p>怎么会有这么抽象的语言…</p><p>后面写到 map set unordered_map unordered_set 再说</p><p>我才知道这些的底层原理原来还不一样</p><p>还好之前写过红黑树，在密码学中也接触过hash</p><p>拜拜</p><p>对了</p><p>感谢阅读</p>]]></content>
     
@@ -1147,9 +1147,9 @@
   
   
   <entry>
-    <title>panorama</title>
-    <link href="/2026/01/16/panorama/"/>
-    <url>/2026/01/16/panorama/</url>
+    <title>CS-panorama</title>
+    <link href="/2026/01/16/CS-panorama/"/>
+    <url>/2026/01/16/CS-panorama/</url>
     
     <content type="html"><![CDATA[<p>计算机专业的同学应该都听过一本书，<code>深入理解计算机系统(CSAPP)</code></p><p>其实我很早就开始读了，但是只是囫囵吞枣，根本不知所云，于是便放弃了一段时间。</p><p>现在经历了许多(并非)，对许多名词有了一些概念后，我又重新翻开了这本书，发现许多地方豁然开朗，今天将第一章，<code>计算机系统漫游</code>，也就是标题所说的<code>panorama</code>，总结一下，以遍展开后续的学习。</p><p>以这本书的方式，从你的第一个程序<code>hello</code>的生命周期说起，我们来开始对系统的学习</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span>&#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Hello,World!\n&quot;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure><p><code>hello</code>这个程序，从被你用编辑器创建，到在系统运行，再到输出信息，最后中止，中间发生了什么？</p><p>首先你用某个编辑器创建了文件<code>hello.c</code>，写下代码，并保存，其被称为<strong>源程序</strong>，储存在<code>磁盘</code>中，实际上就是一个由值0和1组成的<strong>位</strong>(又称比特bit)序列，每8个位被称为一个<strong>字节</strong>，每个字节表示程序中的某些文本字符。</p><p>字符如何和字节所代表的数字序列对应呢，通常采用<code>ASCII标准</code>用数字来表示文本字符，二者一一对应</p><p><img src="/images/10.png" alt="如图所示"></p><p>现在，你应该理解了一个基本思想，计算机系统中所有的信息，无论是磁盘文件，内存中的程序，还是网络上传送的数据，都不过是一串<code>比特</code>。区分不同数据对象的唯一方法是我们读到的这些数据的<code>上下文</code>，在不同的上下文中，一个同样的字节序列可能会有不同的含义，这点要注意。</p><p>那么hello.c是怎么变成可执行文件hello的呢？</p><p><img src="/images/11.png" alt="编译系统"></p><p>如图所示，hello.c经过预处理，编译，汇编，链接，最终得到我们的可执行文件hello</p><p>我就直接引用原文了</p><p><img src="/images/12.png" alt="预处理，编译"></p><p><img src="/images/13.png" alt="汇编，链接"></p><p>其中，编译涉及到优化程序的<strong>性能</strong>，链接过程我是通过<code>pwn</code>中<code>ret2dlresolve</code>这种攻击方式才得以理解，涉及链接过程的细节与机制，以及各种安全问题，可以参考我的另一篇博客，虽然我还没写…</p><p>到这里，便得到了可执行文件<code>hello</code>，接下来运行它时发生了什么？</p><p>在终端中可以看到</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">linux&gt; ./hello<br>Hello,World!<br>linux&gt; <br></code></pre></td></tr></table></figure><p>累了，休息，有空再写…</p><hr><p>暂时懒得写</p><p>以后再说…</p><hr><p>2026.3.22</p><p>似乎目前来看有点过于基础了</p><p>以后再说…</p>]]></content>
     
@@ -1300,9 +1300,9 @@
     
     <tags>
       
-      <tag>ret2GOT</tag>
-      
       <tag>fmt</tag>
+      
+      <tag>ret2GOT</tag>
       
     </tags>
     
@@ -1383,13 +1383,13 @@
       
       <tag>ORW</tag>
       
-      <tag>内存布局</tag>
-      
       <tag>SROP</tag>
       
       <tag>ret2libc</tag>
       
       <tag>寄存器</tag>
+      
+      <tag>内存布局</tag>
       
     </tags>
     
@@ -1416,9 +1416,9 @@
       
       <tag>栈迁移</tag>
       
-      <tag>内存布局</tag>
-      
       <tag>ret2libc</tag>
+      
+      <tag>内存布局</tag>
       
     </tags>
     
@@ -1443,9 +1443,9 @@
     
     <tags>
       
-      <tag>gdb</tag>
-      
       <tag>内存布局</tag>
+      
+      <tag>gdb</tag>
       
     </tags>
     
