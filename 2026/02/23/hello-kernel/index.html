@@ -1,0 +1,945 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
+  <link rel="icon" href="/img/666.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff">
+  <meta name="author" content="roxy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="hello kernel!introduction最近被朋友推荐进入了一个vx群，是关于学长前辈们打造的一个项目，从零实现一个操作系统内核，目标是逐步迭代，以实现各种功能，我感觉还是很有意思的，遂打算实践一番，但是发现，lab1就把我干倒了，所以我先简化一些步骤，基于别的有详细教程的项目先熟悉一下原理再说 详情请参考: https:&#x2F;&#x2F;rcore-os.cn&#x2F;rCore-Tutorial-Book">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hello kernel!">
+<meta property="og:url" content="https://rr00xxyy.github.io/2026/02/23/hello-kernel/index.html">
+<meta property="og:site_name" content="roxy&#39;s blog">
+<meta property="og:description" content="hello kernel!introduction最近被朋友推荐进入了一个vx群，是关于学长前辈们打造的一个项目，从零实现一个操作系统内核，目标是逐步迭代，以实现各种功能，我感觉还是很有意思的，遂打算实践一番，但是发现，lab1就把我干倒了，所以我先简化一些步骤，基于别的有详细教程的项目先熟悉一下原理再说 详情请参考: https:&#x2F;&#x2F;rcore-os.cn&#x2F;rCore-Tutorial-Book">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/60.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/61.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/62.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/63.png">
+<meta property="article:published_time" content="2026-02-23T13:18:05.000Z">
+<meta property="article:modified_time" content="2026-04-15T15:59:05.390Z">
+<meta property="article:author" content="roxy">
+<meta property="article:tag" content="QEMU">
+<meta property="article:tag" content="risc-v">
+<meta property="article:tag" content="rust">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://rr00xxyy.github.io/images/60.png">
+  
+  
+  
+  <title>hello kernel! - roxy&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/mui-fluid.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"rr00xxyy.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body class="post-page post-page">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/a.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="hello kernel!"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-02-23 21:18" pubdate>
+          2026年2月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          17k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          143 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">hello kernel!</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="hello-kernel"><a href="#hello-kernel" class="headerlink" title="hello kernel!"></a>hello kernel!</h1><h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>最近被朋友推荐进入了一个vx群，是关于学长前辈们打造的一个项目，从零实现一个操作系统内核，目标是逐步迭代，以实现各种功能，我感觉还是很有意思的，遂打算实践一番，但是发现，lab1就把我干倒了，所以我先简化一些步骤，基于别的有详细教程的项目先熟悉一下原理再说</p>
+<p>详情请参考: <a target="_blank" rel="noopener" href="https://rcore-os.cn/rCore-Tutorial-Book-v3/">https://rcore-os.cn/rCore-Tutorial-Book-v3/</a></p>
+<p>github仓库: <a target="_blank" rel="noopener" href="https://github.com/rcore-os/rCore-Tutorial-v3">https://github.com/rcore-os/rCore-Tutorial-v3</a></p>
+<p>基于<code>rust</code>语言与<code>risc-v</code>架构在<code>QEMU</code>上，从零实现<code>kernel</code>的各种功能，构建一个小型操作系统</p>
+<p>学长的项目链接: <a target="_blank" rel="noopener" href="https://github.com/YatSenOS/YatSenOS-Tutorial-Volume-2">https://github.com/YatSenOS/YatSenOS-Tutorial-Volume-2</a></p>
+<p>指导教程: <a target="_blank" rel="noopener" href="https://ysos.gzti.me/">https://ysos.gzti.me/</a></p>
+<p>先来看看什么是QEMU</p>
+<p>在这之前似乎需要先了解一下真实计算机的加电启动流程</p>
+<p>在你打开电脑电源后</p>
+<p>发生了什么?</p>
+<p>首先，加电(自检)后CPU的PC寄存器被设置为计算机内部只读存储器(ROM Read-only Memory)的物理地址，随后CPU开始运行ROM内的软件，我们一般将该软件称为<code>固件</code>(Firmware)，它的功能是对CPU进行一些初始化操作，将后续阶段的<strong>bootloader</strong>的代码，数据从硬盘载入到物理内存，最后跳转到适当的地址将计算机控制权转移给<code>bootloader</code></p>
+<p>随后，bootloader同样完成一些CPU的初始化工作，然后将操作系统镜像从硬盘加载到物理内存中，最后跳转到适当地址将控制权转移给操作系统</p>
+<p>至此，操作系统彻底接管电脑，向下管理并控制计算机硬件和各种外设，同时向上管理应用软件并提供各种服务，使得计算机能够正确而高效地运行</p>
+<p>我正是被手写bootloader和ELF parse(elf解析)所击败，所以，先放一放，直接用现有的bootloader</p>
+<p>而且我才发现这个的是固件是<code>BIOS</code>,而学长提供的是<code>UEFI</code>，似乎<code>UEFI</code>目前为主流选择，不过依旧先忽略</p>
+<p>知识点似乎有点密集，慢慢学吧</p>
+<p>吐槽: risc-v架构也不是我所熟悉的(x_x)，不过从x86迁移过去还是很容易的，思路是通用的</p>
+<p>我们先聚焦于写kernel</p>
+<hr>
+<h2 id="QEMU"><a href="#QEMU" class="headerlink" title="QEMU"></a>QEMU</h2><p>现在来看QEMU</p>
+<p>它的功能为利用宿主机提供的资源，<code>模拟</code>一台64位risc-v架构的计算机，包含了CPU，物理内存以及若干I&#x2F;O外设</p>
+<p>运行指令参考:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ qemu-system-riscv64 \<br>    -machine virt \<br>    -nographic \<br>    -bios ../bootloader/rustsbi-qemu.bin \<br>    -device loader,file=target/riscv64gc-unknown-none-elf/release/os.bin,addr=0x80200000<br></code></pre></td></tr></table></figure>
+
+<p>在其模拟的这个virt硬件平台上，我们需要加载预编译好的<code>rustsbi-qemu.bin</code>，即现有的bootloader，以及os.bin，即<strong>内核镜像</strong>，我们先聚焦于此</p>
+<p>与真实计算机类似，运行上述命令后，其会模拟这样一个过程</p>
+<p>首先将必要的文件载入到QEMU的物理内存之后，QEMU CPU的程序计数器(PC)会被初始化为<code>0x1000</code>(固件firmware)，因此QEMU实际执行的第一条指令位于物理地址<code>0x1000</code>，接下来它将执行寥寥数条指令并跳转到物理地址<code>0x80000000</code>对应的指令处，因此我们需要将负责<code>bootloader</code>的<code>rustsbi-qemu.bin</code>放在以物理地址<code>0x80000000</code>开头的物理内存中，这样就能保证<code>0x80000000</code>处正好保存<code>bootloader</code>的第一条指令</p>
+<p>随后<code>bootloader</code>负责对计算机进行一些初始化工作，并跳转到下一阶段软件的入口，在QEMU上即可实现将计算机控制权移交给我们的内核镜像<code>os.bin</code>，我们选用的<code>RustSBI</code>是将下一阶段的入口地址预先约定为固定的<code>0x80200000</code>，所以在<code>RustSBI</code>的初始化工作完成之后，它会跳转到该地址并将计算机控制权移交给下一阶段的软件，即我们的内核镜像</p>
+<p>为了正确地和上一阶段的<code>RustSBI</code>对接，我们需要保证内核的第一条指令位于物理地址<code>0x80200000</code>处，为此，我们需要将内核镜像预先加载到QEMU物理内存以地址<code>0x80200000</code>开头的区域上，一旦CPU开始执行内核的第一条指令，证明计算机的控制权已经被移交给我们的内核</p>
+<p>这样其执行流就为我们所控了，现在我们可以开始编写内核代码了</p>
+<p>先从打印<code>hello world</code>开始</p>
+<hr>
+<h2 id="先跑起来再说"><a href="#先跑起来再说" class="headerlink" title="先跑起来再说"></a>先跑起来再说</h2><p>众所周知，在c语言中这是很简单的事情，但是实际上这是因为有着多层硬件和软件工具和支撑环境隐藏在它背后，才让我们不必付出那么多努力就能够创造出功能强大的应用程序</p>
+<p>但由于我们这个是建立在裸机(bare metal)上的执行环境，所以我们没有编译器，运行时库和操作系统的支持</p>
+<p>一切都得从零开始</p>
+<p><img src="/images/60.png" srcset="/img/loading.gif" lazyload alt="应用程序执行环境栈"></p>
+<p>所以目前并没有<code>println!</code>宏供我们使用，我们先看看怎样至少能让应用跑起来，先注释掉<code>println!(&quot;hello world&quot;)</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ cargo build<br>   Compiling os v0.1.0 (/home/shinbokuow/workspace/v3/rCore-Tutorial-v3/os)<br>error: `#[panic_handler]` <span class="hljs-keyword">function</span> required, but not found<br></code></pre></td></tr></table></figure>
+
+<p>在使用rust编写应用程序的时候，我们常常在遇到了一些无法恢复的致命错误(panic)，导致程序无法继续向下运行</p>
+<p>这时手动或自动调用<code>panic!</code>宏来打印出错的位置，让软件能够意识到它的存在，并进行一些后续处理，在标准库<code>std</code>中提供了关于<code>panic!</code>宏的具体实现，然而我们也并没有</p>
+<p>因此我们通过<code>#[panic_handler]</code>这种编译指导属性自己实现一个简陋的panic处理函数</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// os/src/lang_items.rs</span><br><span class="hljs-keyword">use</span> core::panic::PanicInfo;<br><br><span class="hljs-meta">#[panic_handler]</span><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">panic</span>(_info: &amp;PanicInfo) <span class="hljs-punctuation">-&gt;</span> ! &#123;<br>    <span class="hljs-keyword">loop</span> &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// os/src/main.rs</span><br><span class="hljs-meta">#![no_std]</span><br><span class="hljs-keyword">mod</span> lang_items;<br><span class="hljs-comment">// ... other code</span><br></code></pre></td></tr></table></figure>
+
+<p>再次编译，又产生了新的问题</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ cargo build<br>      Compiling os v0.1.0 (/home/shinbokuow/workspace/v3/rCore-Tutorial-v3/os)<br>   error: requires `start` lang_item<br></code></pre></td></tr></table></figure>
+
+<p>编译器提醒我们缺少一个名为<code>start</code>的语义项</p>
+<p>语言标准库和三方库作为应用程序的执行环境，需要负责在执行应用程序之前进行一些初始化工作，然后才跳转到应用程序的入口点(也就是跳转到我们编写的main函数)开始执行</p>
+<p>事实上start语义项代表了标准库<code>std</code>在执行应用程序之前需要进行的一些初始化工作，由于我们禁用了标准库，编译器也就找不到这项功能的实现了</p>
+<p>因此我们直接不让编译器使用这项功能</p>
+<p>我们在main.rs的开头加入设置<code>#![no_main]</code>告诉编译器我们没有一般意义上的main函数，并将原来的main函数删除</p>
+<p>在失去了main函数的情况下，编译器也就不需要完成所谓的初始化工作了</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scss">$ cargo build<br>   Compiling os v0<span class="hljs-selector-class">.1</span><span class="hljs-selector-class">.0</span> (/home/shinbokuow/workspace/v3/rCore-Tutorial-v3/os)<br>    Finished dev <span class="hljs-selector-attr">[unoptimized + debuginfo]</span> <span class="hljs-built_in">target</span>(s) in <span class="hljs-number">0.06s</span><br></code></pre></td></tr></table></figure>
+
+<p>至此，编译成功</p>
+<p>我们脱离了标准库，通过了编译器的检验，但距离打印<code>hello world</code>似乎还有一定距离</p>
+<p>接下来我们会以自己的方式来重塑这些基本功能，并最终完成我们的目标</p>
+<hr>
+<h2 id="调试与验证"><a href="#调试与验证" class="headerlink" title="调试与验证"></a>调试与验证</h2><p>首先我们需要编写进入内核后的第一条指令，方便我们验证我们的内核镜像是否正确对接到QEMU上</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs asm"># os/src/entry.asm<br>    .section .text.entry<br>    .globl _start<br>_start:<br>    li x1, 100<br></code></pre></td></tr></table></figure>
+
+<p>这可能需要一些汇编和内存布局的知识，就不展开了</p>
+<p>然后在<code>main.rs</code>中嵌入这段汇编代码</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// os/src/main.rs</span><br><span class="hljs-meta">#![no_std]</span><br><span class="hljs-meta">#![no_main]</span><br><br><span class="hljs-keyword">mod</span> lang_items;<br><br><span class="hljs-keyword">use</span> core::arch::global_asm;<br>global_asm!(<span class="hljs-built_in">include_str!</span>(<span class="hljs-string">&quot;entry.asm&quot;</span>));<br></code></pre></td></tr></table></figure>
+
+<p>由于<code>链接器</code>默认的内存布局并不能符合我们的要求，为了实现与QEMU正确对接，我们可以通过链接脚本(Linker Script)调整链接器的行为，使得最终生成的可执行文件的内存布局符合QEMU的预期，即内核第一条指令的地址应该位于<code>0x80200000</code></p>
+<p>我们修改<code>cargo</code>的配置文件来使用我们自己的链接脚本<code>os/src/linker.ld</code>而非使用默认的内存布局</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs aspectj"><span class="hljs-comment">// os/.cargo/config</span><br>[build]<br><span class="hljs-keyword">target</span> = <span class="hljs-string">&quot;riscv64gc-unknown-none-elf&quot;</span><br><br>[<span class="hljs-keyword">target</span>.riscv64gc-unknown-none-elf]<br>rustflags = [<br>    <span class="hljs-string">&quot;-Clink-arg=-Tsrc/linker.ld&quot;</span>, <span class="hljs-string">&quot;-Cforce-frame-pointers=yes&quot;</span><br>]<br></code></pre></td></tr></table></figure>
+
+<p>链接脚本<code>os/src/linker.ld</code>如下:</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs armasm"><span class="hljs-symbol">OUTPUT_ARCH</span>(riscv)<br><span class="hljs-symbol">ENTRY</span>(_start)<br><span class="hljs-symbol">BASE_ADDRESS</span> = <span class="hljs-number">0x80200000</span><span class="hljs-comment">;</span><br><br><span class="hljs-symbol">SECTIONS</span><br>&#123;<br>    . = BASE_ADDRESS<span class="hljs-comment">;</span><br>    skernel = .<span class="hljs-comment">;</span><br><br>    stext = .<span class="hljs-comment">;</span><br>    <span class="hljs-meta">.text</span> : &#123;<br>        *(<span class="hljs-meta">.text</span>.entry)<br>        *(<span class="hljs-meta">.text</span> <span class="hljs-meta">.text</span>.*)<br>    &#125;<br><br>    . = <span class="hljs-meta">ALIGN</span>(<span class="hljs-number">4</span>K)<span class="hljs-comment">;</span><br>    etext = .<span class="hljs-comment">;</span><br>    srodata = .<span class="hljs-comment">;</span><br>    .rodata : &#123;<br>        *(.rodata .rodata.*)<br>        *(.srodata .srodata.*)<br>    &#125;<br><br>    . = <span class="hljs-meta">ALIGN</span>(<span class="hljs-number">4</span>K)<span class="hljs-comment">;</span><br>    erodata = .<span class="hljs-comment">;</span><br>    sdata = .<span class="hljs-comment">;</span><br>    <span class="hljs-meta">.data</span> : &#123;<br>        *(<span class="hljs-meta">.data</span> <span class="hljs-meta">.data</span>.*)<br>        *(.sdata .sdata.*)<br>    &#125;<br><br>    . = <span class="hljs-meta">ALIGN</span>(<span class="hljs-number">4</span>K)<span class="hljs-comment">;</span><br>    edata = .<span class="hljs-comment">;</span><br>    .bss : &#123;<br>        *(.bss.stack)<br>        sbss = .<span class="hljs-comment">;</span><br>        *(.bss .bss.*)<br>        *(.sbss .sbss.*)<br>    &#125;<br><br>    . = <span class="hljs-meta">ALIGN</span>(<span class="hljs-number">4</span>K)<span class="hljs-comment">;</span><br>    ebss = .<span class="hljs-comment">;</span><br>    ekernel = .<span class="hljs-comment">;</span><br><br>    /DISCARD/ : &#123;<br>        *(.eh_frame)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们将包含内核第一条指令的<code>.text.entry</code>段放在最终的<code>.text</code>段的最开头，同时由于在最终内存布局中代码段<code>.text</code>又是先于任何其它段的，因为所有的段都从<code>BASE_ADDRESS</code>也即<code>0x80200000</code>开始放置，这就能够保证内核的第一条指令正好放在<code>0x80200000</code>从而能够正确对接到QEMU上</p>
+<p>随后便能生成内核可执行文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ cargo build --release<br>Finished release [optimized] target(s) <span class="hljs-keyword">in</span> 0.10s<br></code></pre></td></tr></table></figure>
+
+<p>为了更直观，我们用gdb调试一下看一下这个过程</p>
+<p>先启动QEMU</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ qemu-system-riscv64 \<br>    -machine virt \<br>    -nographic \<br>    -bios ../bootloader/rustsbi-qemu.bin \<br>    -device loader,file=target/riscv64gc-unknown-none-elf/release/os.bin,addr=0x80200000 \<br>    -s -S<br></code></pre></td></tr></table></figure>
+
+<p>连接gdb</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs livescript">$ riscv64-unknown-elf-gdb <span class="hljs-string">\</span><br>    -ex <span class="hljs-string">&#x27;file target/riscv64gc-unknown-none-elf/release/os&#x27;</span> <span class="hljs-string">\</span><br>    -ex <span class="hljs-string">&#x27;set arch riscv:rv64&#x27;</span> <span class="hljs-string">\</span><br>    -ex <span class="hljs-string">&#x27;target remote localhost:1234&#x27;</span><br>[GDB output]<br><span class="hljs-number">0x0000000000001000</span> <span class="hljs-keyword">in</span> ?? ()<br></code></pre></td></tr></table></figure>
+
+<p>对上了吧，从<code>0x1000</code>开始执行，我们看一下具体的指令</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs nix">$ (gdb) x<span class="hljs-symbol">/10i</span> $pc<br><span class="hljs-operator">=</span><span class="hljs-operator">&gt;</span> <span class="hljs-number">0</span><span class="hljs-params">x1000:</span>  auipc   t0,<span class="hljs-number">0</span>x0<br><span class="hljs-number">0</span><span class="hljs-params">x1004:</span>     addi    a1,t0,<span class="hljs-number">32</span><br><span class="hljs-number">0</span><span class="hljs-params">x1008:</span>     csrr    a0,mhartid<br><span class="hljs-number">0</span><span class="hljs-params">x100c:</span>     ld      t0,<span class="hljs-number">24</span>(t0)<br><span class="hljs-number">0</span><span class="hljs-params">x1010:</span>     jr      t0<br><span class="hljs-number">0</span><span class="hljs-params">x1014:</span>     unimp<br><span class="hljs-number">0</span><span class="hljs-params">x1016:</span>     unimp<br><span class="hljs-number">0</span><span class="hljs-params">x1018:</span>     unimp<br><span class="hljs-number">0</span><span class="hljs-params">x101a:</span>     <span class="hljs-number">0</span>x8000<br><span class="hljs-number">0</span><span class="hljs-params">x101c:</span>     unimp<br></code></pre></td></tr></table></figure>
+
+<p>我们单步</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs ruby"><span class="hljs-variable">$ </span>(gdb) si<br><span class="hljs-number">0x0000000000001004</span> <span class="hljs-keyword">in</span> <span class="hljs-string">??</span> ()<br><span class="hljs-variable">$ </span>(gdb) si<br><span class="hljs-number">0x0000000000001008</span> <span class="hljs-keyword">in</span> <span class="hljs-string">??</span> ()<br><span class="hljs-variable">$ </span>(gdb) si<br><span class="hljs-number">0x000000000000100c</span> <span class="hljs-keyword">in</span> <span class="hljs-string">??</span> ()<br><span class="hljs-variable">$ </span>(gdb) si<br><span class="hljs-number">0x0000000000001010</span> <span class="hljs-keyword">in</span> <span class="hljs-string">??</span> ()<br><span class="hljs-variable">$ </span>(gdb) p/x <span class="hljs-variable">$t0</span><br><span class="hljs-number">1</span> = <span class="hljs-number">0x80000000</span><br><span class="hljs-variable">$ </span>(gdb) si<br><span class="hljs-number">0x0000000080000000</span> <span class="hljs-keyword">in</span> <span class="hljs-string">??</span> ()<br></code></pre></td></tr></table></figure>
+
+<p>来到了<code>0x80000000</code>，这意味着我们即将把控制权转交给<code>RustSBI</code></p>
+<p>大致看一下</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs x86asm">$ (gdb) x/10i $pc<br>=&gt; <span class="hljs-number">0x80000000</span>:      auipc   <span class="hljs-built_in">sp</span>,<span class="hljs-number">0x28</span><br><span class="hljs-number">0x80000004</span>: mv      <span class="hljs-built_in">sp</span>,<span class="hljs-built_in">sp</span><br><span class="hljs-number">0x80000008</span>: lui     t0,<span class="hljs-number">0x4</span><br><span class="hljs-number">0x8000000a</span>: addi    t1,a0,<span class="hljs-number">1</span><br><span class="hljs-number">0x8000000e</span>: <span class="hljs-keyword">add</span>     <span class="hljs-built_in">sp</span>,<span class="hljs-built_in">sp</span>,t0<br><span class="hljs-number">0x80000010</span>: addi    t1,t1,-<span class="hljs-number">1</span><br><span class="hljs-number">0x80000012</span>: bnez    t1,<span class="hljs-number">0x8000000e</span><br><span class="hljs-number">0x80000016</span>: j       <span class="hljs-number">0x8001125a</span><br><span class="hljs-number">0x8000001a</span>: unimp<br><span class="hljs-number">0x8000001c</span>: addi    <span class="hljs-built_in">sp</span>,<span class="hljs-built_in">sp</span>,-<span class="hljs-number">48</span><br>$ (gdb) <span class="hljs-built_in">si</span><br><span class="hljs-number">0x0000000080000004</span> <span class="hljs-keyword">in</span> ?? ()<br>$ (gdb) <span class="hljs-built_in">si</span><br><span class="hljs-number">0x0000000080000008</span> <span class="hljs-keyword">in</span> ?? ()<br>$ (gdb) <span class="hljs-built_in">si</span><br><span class="hljs-number">0x000000008000000a</span> <span class="hljs-keyword">in</span> ?? ()<br>$ (gdb) <span class="hljs-built_in">si</span><br><span class="hljs-number">0x000000008000000e</span> <span class="hljs-keyword">in</span> ?? ()<br></code></pre></td></tr></table></figure>
+
+<p>随后我们在<code>0x80200000</code>打上断点，然后continue执行至此，检查控制权能否被移交给我们的内核</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">$ (gdb) <span class="hljs-keyword">b </span>*<span class="hljs-number">0x80200000</span><br><span class="hljs-keyword">Breakpoint </span><span class="hljs-number">1</span> <span class="hljs-built_in">at</span> <span class="hljs-number">0x80200000</span><br>$ (gdb) c<br>Continuing.<br><br><span class="hljs-keyword">Breakpoint </span><span class="hljs-number">1</span>, <span class="hljs-number">0x0000000080200000</span> in ?? ()<br></code></pre></td></tr></table></figure>
+
+<p>ok了没问题</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs ruby"><span class="hljs-variable">$ </span>(gdb) x/<span class="hljs-number">5i</span> <span class="hljs-variable">$pc</span><br>=&gt; <span class="hljs-number">0x80200000</span>:      li      ra,<span class="hljs-number">100</span><br><span class="hljs-number">0x80200004</span>: unimp<br><span class="hljs-number">0x80200006</span>: unimp<br><span class="hljs-number">0x80200008</span>: unimp<br><span class="hljs-number">0x8020000a</span>: unimp<br><span class="hljs-variable">$ </span>(gdb) si<br><span class="hljs-number">0x0000000080200004</span> <span class="hljs-keyword">in</span> <span class="hljs-string">??</span> ()<br><span class="hljs-variable">$ </span>(gdb) p/d <span class="hljs-variable">$x1</span><br><span class="hljs-number">2</span> = <span class="hljs-number">100</span><br><span class="hljs-variable">$ </span>(gdb) p/x <span class="hljs-variable">$sp</span><br><span class="hljs-number">3</span> = <span class="hljs-number">0x0</span><br></code></pre></td></tr></table></figure>
+
+<p>一切正常</p>
+<p>进入下一阶段</p>
+<hr>
+<h2 id="asm-to-rust"><a href="#asm-to-rust" class="headerlink" title="asm to rust"></a>asm to rust</h2><p>先回顾一下</p>
+<p>我们成功在QEMU上执行了内核的第一条指令，它是我们在<code>entry.asm</code>中手写汇编代码得到的</p>
+<p>然而，我们无论如何也不想仅靠手写汇编代码的方式编写我们的内核，绝大部分功能我们都想使用rust语言来实现，不过为了将控制权转交给我们使用rust语言编写的内核入口函数，我们确实需要手写若干行汇编代码进行一定的初始化工作</p>
+<p>和之前一样，这些汇编代码放在<code>entry.asm</code>中，并在控制权被转交给内核相关函数前最先被执行，但它们的功能会更加复杂</p>
+<p>首先需要<code>设置栈空间</code>，来在内核内使能函数调用，随后直接调用使用rust编写的内核入口函数，从而将控制权移交给rust代码</p>
+<p>我们在<code>entry.asm</code>中分配启动栈空间，并在控制权被转交给rust入口之前将栈指针sp设置为栈顶的位置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs asm"># os/src/entry.asm<br>    .section .text.entry<br>    .globl _start<br>_start:<br>    la sp, boot_stack_top<br>    call rust_main<br><br>    .section .bss.stack<br>    .globl boot_stack_lower_bound<br>boot_stack_lower_bound:<br>    .space 4096 * 16<br>    .globl boot_stack_top<br>boot_stack_top:<br></code></pre></td></tr></table></figure>
+
+<p>我们在内核的内存布局中预留了一块大小为<code>4096 * 16</code>字节也就是$64KiB$的空间用作接下来要运行的程序的栈空间</p>
+<p>在risc-v架构上，栈是从高地址向低地址增长</p>
+<p>因此，最开始的时候栈为空，栈顶和栈底位于相同的位置，我们用更高地址的符号<code>boot_stack_top</code>来标识栈顶的位置</p>
+<p>同时，我们用更低地址的符号<code>boot_stack_lower_bound</code>来标识栈能够增长到的下限位置，它们都被设置为全局符号供其他目标文件使用</p>
+<p><img src="/images/61.png" srcset="/img/loading.gif" lazyload alt="如图所示"></p>
+<p>我们可以看到我们将这块空间放置在一个名为<code>.bss.stack</code>的段中，在链接脚本<code>linker.ld</code>中可以看到<code>.bss.stack</code>段最终会被汇集到<code>.bss</code>段中</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">.<span class="hljs-keyword">bss </span>: &#123;<br>    *(.<span class="hljs-keyword">bss.stack)</span><br><span class="hljs-keyword"></span>    <span class="hljs-keyword">sbss </span>= .;<br>    *(.<span class="hljs-keyword">bss </span>.<span class="hljs-keyword">bss.*)</span><br><span class="hljs-keyword"></span>    *(.<span class="hljs-keyword">sbss </span>.<span class="hljs-keyword">sbss.*)</span><br><span class="hljs-keyword"></span>&#125;<br>ebss = .;<br></code></pre></td></tr></table></figure>
+
+<p>同时全局符号<code>sbss</code>和<code>ebss</code>分别指向<code>.bss</code>段除<code>.bss.stack</code>以外的起始和终止地址，我们在使用这部分数据之前需要将它们初始化为零</p>
+<p>我们将栈指针<strong>sp</strong>设置为先前分配的启动栈栈顶地址，这样rust代码在进行函数调用和返回的时候就可以正常在启动栈上分配和回收栈帧了</p>
+<div class="note note-danger">
+            <p>然而如果发生栈溢出就会很诡异了，先不管 ( ´•̥̥̥ω•̥̥̥&#96; )</p> 
+          </div>
+
+<p>至此，我们通过伪指令<code>call</code>调用rust编写的内核入口点<code>rust_main</code>将控制权转交给rust代码，该入口点在<code>main.rs</code>中实现</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// os/src/main.rs</span><br><span class="hljs-meta">#[no_mangle]</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">rust_main</span>() <span class="hljs-punctuation">-&gt;</span> ! &#123;<br>    <span class="hljs-keyword">loop</span> &#123;&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里需要注意的是需要通过宏将rust_main标记为<code>#[no_mangle]</code>以避免编译器对它的名字进行混淆，不然在链接的时候，entry.asm将找不到main.rs提供的外部符号rust_main从而导致链接失败</p>
+<p>同时在rust_main函数的开场白中，我们将第一次在栈上分配栈帧并保存函数调用上下文，它也是内核运行全程中最底层的栈帧</p>
+<p>当然，在内核初始化中，需要先完成对<code>.bss</code>段的清零，这是内核很重要的一部分初始化工作，在使用任何被分配到.bss段的全局变量之前我们需要确保.bss段已被清零</p>
+<p>我们就在rust_main的开头完成这一工作，由于控制权已经被转交给rust，我们终于不用手写汇编代码而是可以用rust来实现这一功能了</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// os/src/main.rs</span><br><span class="hljs-meta">#[no_mangle]</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">rust_main</span>() <span class="hljs-punctuation">-&gt;</span> ! &#123;<br>    <span class="hljs-title function_ invoke__">clear_bss</span>();<br>    <span class="hljs-keyword">loop</span> &#123;&#125;<br>&#125;<br><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">clear_bss</span>() &#123;<br>    <span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> &#123;<br>        <span class="hljs-keyword">fn</span> <span class="hljs-title function_">sbss</span>();<br>        <span class="hljs-keyword">fn</span> <span class="hljs-title function_">ebss</span>();<br>    &#125;<br>    (sbss <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>..ebss <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>).for_each(|a| &#123;<br>        <span class="hljs-keyword">unsafe</span> &#123; (a <span class="hljs-keyword">as</span> *<span class="hljs-keyword">mut</span> <span class="hljs-type">u8</span>).<span class="hljs-title function_ invoke__">write_volatile</span>(<span class="hljs-number">0</span>) &#125;<br>    &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>涉及的rust语法:</p>
+<ul>
+<li><p>外部符号引用</p>
+</li>
+<li><p>迭代器与闭包</p>
+</li>
+<li><p>unsafe!</p>
+</li>
+</ul>
+<div class="note note-success">
+            <p>tips: 我们将.bss段内的一个地址转化为一个<strong>裸指针</strong>(Raw Pointer)，并将它指向的值修改为0，这在c语言中是一种司空见惯的操作，但在rust中我们需要将其包裹在unsafe块中。这是因为，rust认为对于裸指针的<strong>解引用</strong>(Dereference)是一种unsafe行为。相比c语言，rust进行了更多的语义约束来保证安全性(内存安全&#x2F;类型安全&#x2F;并发安全)，这在编译期和运行期都有所体现。但在某些时候，尤其是与底层硬件打交道的时候，在rust的语义约束之内没法满足我们的需求，这个时候我们就需要将超出了rust语义约束的行为包裹在<strong>unsafe</strong>块中，告知编译器不需要对它进行完整的约束检查，而是由程序员自己负责保证它的安全性。当代码不能正常运行的时候，我们往往也是最先去检查<code>unsafe</code>块中的代码，因为它没有受到编译器的保护，出错的概率更大</p> 
+          </div>
+
+<p>至此，我们通过分配栈空间并正确设置栈指针在内核中使能了函数调用并成功将控制权转交给了rust代码，从此我们终于可以利用强大的rust语言来编写内核的各项功能了</p>
+<hr>
+<h2 id="实现helloworld"><a href="#实现helloworld" class="headerlink" title="实现helloworld!"></a>实现helloworld!</h2><p>接下来我们终于迎来最后一步</p>
+<p>基于<code>RustSBI</code>提供的服务成功在屏幕上打印<code>Hello, world!</code></p>
+<p>之前我们对<strong>RustSBI</strong>的了解仅限于它会在计算机启动时进行它所负责的环境初始化工作，并将计算机控制权移交给内核。但实际上作为内核的执行环境，它还有另一项职责：即在内核运行时响应内核的请求为内核提供服务。当内核发出请求时，计算机会转由RustSBI控制来响应内核的请求，待请求处理完毕后，计算机控制权会被交还给内核</p>
+<p>我们将利用它实现打印字符串与退出程序的操作</p>
+<p>先在<code>Cargo.toml</code>中引入<code>sbi_rt</code>依赖</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-comment">// os/Cargo.toml</span><br><span class="hljs-selector-attr">[dependencies]</span><br>sbi-rt = &#123; version = <span class="hljs-string">&quot;0.0.2&quot;</span>, features = <span class="hljs-selector-attr">[<span class="hljs-string">&quot;legacy&quot;</span>]</span> &#125;<br></code></pre></td></tr></table></figure>
+
+<p>随后在<code>os/src/sbi.rs</code>中，我们直接调用<code>sbi_rt</code>提供的接口来将输出字符，并实现关机功能</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-meta">#![allow(unused)]</span><br><span class="hljs-comment">/// 允许当前文件里存在未使用的函数、导入、变量</span><br><span class="hljs-comment">/// usize 64位</span><br><br><span class="hljs-comment">/// use sbi call to putchar in console (qemu uart handler)</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">console_putchar</span>(c: <span class="hljs-type">usize</span>) &#123;<br>    <span class="hljs-meta">#[allow(deprecated)]</span><br>    sbi_rt::legacy::<span class="hljs-title function_ invoke__">console_putchar</span>(c);<br>&#125;<br><br><span class="hljs-comment">/// use sbi call to getchar from console (qemu uart handler)</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">console_getchar</span>() <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">usize</span> &#123;<br>    <span class="hljs-meta">#[allow(deprecated)]</span><br>    sbi_rt::legacy::<span class="hljs-title function_ invoke__">console_getchar</span>()<br>&#125;<br><br><span class="hljs-comment">/// use sbi call to shutdown the kernel</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">shutdown</span>(failure: <span class="hljs-type">bool</span>) <span class="hljs-punctuation">-&gt;</span> ! &#123;<br>    <span class="hljs-keyword">use</span> sbi_rt::&#123;NoReason, Shutdown, SystemFailure, system_reset&#125;;<br>    <span class="hljs-keyword">if</span> !failure &#123;<br>        <span class="hljs-comment">/// 正常退出</span><br>        <span class="hljs-title function_ invoke__">system_reset</span>(Shutdown, NoReason);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">/// 系统异常 / panic</span><br>        <span class="hljs-title function_ invoke__">system_reset</span>(Shutdown, SystemFailure);<br>    &#125;<br>    <span class="hljs-comment">/// ! 永不返回</span><br>    <span class="hljs-built_in">unreachable!</span>()<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但是<code>console_putchar</code>的功能过于受限，如果想打印一行<code>Hello world!</code>的话需要进行多次调用，因此我们将尝试自己编写基于<code>console_putchar</code>的<code>println!</code>宏</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// os/src/main.rs</span><br><span class="hljs-meta">#[macro_use]</span><br><span class="hljs-keyword">mod</span> console;<br><br><span class="hljs-comment">// os/src/console.rs</span><br><span class="hljs-keyword">use</span> crate::sbi::console_putchar;<br><span class="hljs-keyword">use</span> core::fmt::&#123;<span class="hljs-keyword">self</span>, Write&#125;;<br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Stdout</span>;<br><br><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Write</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">Stdout</span> &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">write_str</span>(&amp;<span class="hljs-keyword">mut</span> <span class="hljs-keyword">self</span>, s: &amp;<span class="hljs-type">str</span>) <span class="hljs-punctuation">-&gt;</span> fmt::<span class="hljs-type">Result</span> &#123;<br>        <span class="hljs-keyword">for</span> <span class="hljs-variable">c</span> <span class="hljs-keyword">in</span> s.<span class="hljs-title function_ invoke__">chars</span>() &#123;<br>            <span class="hljs-title function_ invoke__">console_putchar</span>(c <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>);<br>        &#125;<br>        <span class="hljs-title function_ invoke__">Ok</span>(())<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">print</span>(args: fmt::Arguments) &#123;<br>    Stdout.<span class="hljs-title function_ invoke__">write_fmt</span>(args).<span class="hljs-title function_ invoke__">unwrap</span>();<br>&#125;<br><br><span class="hljs-comment">//定义宏</span><br><span class="hljs-meta">#[macro_export]</span><br><span class="hljs-built_in">macro_rules!</span> print &#123;<br>    ($fmt: literal $(, $($arg: tt)+)?) =&gt; &#123;<br>        $crate::console::<span class="hljs-title function_ invoke__">print</span>(<span class="hljs-built_in">format_args!</span>($fmt $(, $($arg)+)?));<br>    &#125;<br>&#125;<br><br><span class="hljs-meta">#[macro_export]</span><br><span class="hljs-built_in">macro_rules!</span> println &#123;<br>    ($fmt: literal $(, $($arg: tt)+)?) =&gt; &#123;<br>        $crate::console::<span class="hljs-title function_ invoke__">print</span>(<span class="hljs-built_in">format_args!</span>(<span class="hljs-built_in">concat!</span>($fmt, <span class="hljs-string">&quot;\n&quot;</span>) $(, $($arg)+)?));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这样我们就实现了直接调用<code>println!</code>就能实现打印字符串的操作</p>
+<div class="note note-info">
+            <p><strong>Rust Tips：Rust Trait</strong></p> <p>在rust语言中，trait(中文翻译:特质，特征)是一种类型，用于描述一组方法的集合。trait可以用来定义接口(interface)，并可以被其他类型实现。 举个例子，假设我们有一个简单的rust程序，其中有一个名为Shape的trait，用于描述形状:</p> <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">trait</span> <span class="hljs-title class_">Shape</span> &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">area</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">f64</span>;<br>&#125;<br></code></pre></td></tr></table></figure>  <p>我们可以使用这个trait来定义一个圆形类型:</p> <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Circle</span> &#123;<br>    radius: <span class="hljs-type">f64</span>,<br>&#125;<br><br><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Shape</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">Circle</span> &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">area</span>(&amp;<span class="hljs-keyword">self</span>) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">f64</span> &#123;<br>        <span class="hljs-number">3.14</span> * <span class="hljs-keyword">self</span>.radius * <span class="hljs-keyword">self</span>.radius<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>  <p>这样，我们就可以使用Circle类型的实例调用area方法了</p> <figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-keyword">let</span> <span class="hljs-variable">c</span> = Circle &#123; radius: <span class="hljs-number">1.0</span> &#125;;<br><span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Circle area: &#123;&#125;&quot;</span>, c.<span class="hljs-title function_ invoke__">area</span>());  <span class="hljs-comment">// 输出: Circle area: 3.14</span><br></code></pre></td></tr></table></figure>
+          </div>
+
+<hr>
+<h2 id="完善"><a href="#完善" class="headerlink" title="完善"></a>完善</h2><p><strong>错误处理</strong>是编程的重要一环，它能够保证程序的可靠性和可用性，使得程序能够从容应对更多突发状况而不至于过早崩溃，rust将错误分为可恢复和不可恢复错误两大类，这里我们主要关心不可恢复错误，在rust中遇到不可恢复错误，程序会直接报错退出</p>
+<p>例如，使用<code>panic!</code>宏便会直接触发一个不可恢复错误并使程序退出</p>
+<p>不过在我们的内核中，目前不可恢复错误的处理机制还不完善</p>
+<p>现在我们借助前面实现的<code>println!</code>宏和<code>shutdown</code>函数，完善<code>#[panic_handler]</code>，在<code>panic</code>函数中打印错误信息并关机</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// os/src/main.rs</span><br><span class="hljs-meta">#![feature(panic_info_message)]</span><br><br><span class="hljs-comment">// os/src/lang_item.rs</span><br><span class="hljs-keyword">use</span> crate::sbi::shutdown;<br><span class="hljs-keyword">use</span> core::panic::PanicInfo;<br><br><span class="hljs-meta">#[panic_handler]</span><br><span class="hljs-keyword">fn</span> <span class="hljs-title function_">panic</span>(info: &amp;PanicInfo) <span class="hljs-punctuation">-&gt;</span> ! &#123;<br>    <span class="hljs-keyword">if</span> <span class="hljs-keyword">let</span> <span class="hljs-variable">Some</span>(location) = info.<span class="hljs-title function_ invoke__">location</span>() &#123;<br>        <span class="hljs-built_in">println!</span>(<br>            <span class="hljs-string">&quot;Panicked at &#123;&#125;:&#123;&#125; &#123;&#125;&quot;</span>,<br>            location.<span class="hljs-title function_ invoke__">file</span>(),<br>            location.<span class="hljs-title function_ invoke__">line</span>(),<br>            info.<span class="hljs-title function_ invoke__">message</span>().<span class="hljs-title function_ invoke__">unwrap</span>()<br>        );<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Panicked: &#123;&#125;&quot;</span>, info.<span class="hljs-title function_ invoke__">message</span>().<span class="hljs-title function_ invoke__">unwrap</span>());<br>    &#125;<br>    <span class="hljs-title function_ invoke__">shutdown</span>(<span class="hljs-literal">true</span>)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>测试一下</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">// os/src/main.rs</span><br><span class="hljs-meta">#[no_mangle]</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">rust_main</span>() <span class="hljs-punctuation">-&gt;</span> ! &#123;<br>    <span class="hljs-title function_ invoke__">clear_bss</span>();<br>    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;Hello, world!&quot;</span>);<br>    <span class="hljs-built_in">panic!</span>(<span class="hljs-string">&quot;Shutdown machine!&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>成功</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-selector-attr">[RustSBI output]</span><br>Hello, world!<br>Panicked at <span class="hljs-attribute">src</span>/<span class="hljs-selector-tag">main</span><span class="hljs-selector-class">.rs</span>:<span class="hljs-number">26</span> Shutdown machine!<br></code></pre></td></tr></table></figure>
+
+<div class="note note-success">
+            <p><strong>Rust Tips：Rust 可恢复错误</strong></p> <p>在有可能出现错误时，rust函数的返回值可以属于一种特殊的类型，该类型可以涵盖两种情况:要么函数正常退出，则函数返回正常的返回值；要么函数执行过程中出错，则函数返回出错的类型。rust的类型系统保证这种返回值不会在程序员无意识的情况下被滥用，即程序员必须显式对其进行分支判断或者强制排除出错的情况。如果不进行任何处理，那么无法从中得到有意义的结果供后续使用或是无法通过编译。这样，就杜绝了很大一部分因程序员的疏忽产生的错误(如不加判断地使用某函数返回的空指针)</p> <p>在rust中有两种这样的特殊类型，它们都属于枚举结构:</p> <ul> <li><p><code>Option&lt;T&gt;</code>既可以有值<code>Option::Some&lt;T&gt;</code>，也有可能没有值 <code>Option::None</code></p> </li> <li><p><code>Result&lt;T, E&gt;</code>既可以保存某个操作的返回值<code>Result::Ok&lt;T&gt;</code>，也可以表明操作过程中出现了错误<code>Result::Err&lt;E&gt;</code></p> </li> </ul> <p>我们可以使用$Option&#x2F;Result$来保存一个不能确定存在&#x2F;不存在或是成功&#x2F;失败的值。之后可以通过匹配<em>if let</em>或是在能够确定的场合直接通过<strong>unwrap</strong>将里面的值取出，详细的内容可以参考rust官方文档</p> <p>链接: <a target="_blank" rel="noopener" href="https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html">https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html</a></p> 
+          </div>
+
+<p>最后，我们再来完善一下<code>日志输出</code>，并实现<strong>彩色打印</strong></p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">/*！</span><br><span class="hljs-comment">本模块利用 log crate 为你提供了日志功能，使用方式见 main.rs.</span><br><span class="hljs-comment">*/</span><br><br><span class="hljs-keyword">use</span> log::&#123;<span class="hljs-keyword">self</span>, Level, LevelFilter, Log, Metadata, Record&#125;;<br><br><span class="hljs-keyword">struct</span>  <span class="hljs-title class_">SimpleLogger</span>;<br><br><span class="hljs-keyword">impl</span> <span class="hljs-title class_">Log</span> <span class="hljs-keyword">for</span> <span class="hljs-title class_">SimpleLogger</span> &#123;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">enabled</span>(&amp;<span class="hljs-keyword">self</span>, _metadata: &amp;Metadata) <span class="hljs-punctuation">-&gt;</span> <span class="hljs-type">bool</span> &#123;<br>        <span class="hljs-comment">// whether</span><br>        <span class="hljs-literal">true</span><br>    &#125;<br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">log</span>(&amp;<span class="hljs-keyword">self</span>, record: &amp;Record) &#123;<br>        <span class="hljs-keyword">if</span> !<span class="hljs-keyword">self</span>.<span class="hljs-title function_ invoke__">enabled</span>(record.<span class="hljs-title function_ invoke__">metadata</span>()) &#123;<br>            <span class="hljs-comment">// 元信息</span><br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        <span class="hljs-keyword">let</span> <span class="hljs-variable">color</span> = <span class="hljs-keyword">match</span> record.<span class="hljs-title function_ invoke__">level</span>() &#123;<br>            Level::Error =&gt; <span class="hljs-number">31</span>, <span class="hljs-comment">//Red</span><br>            Level::Warn =&gt; <span class="hljs-number">93</span>, <span class="hljs-comment">// BrightYellow</span><br>            Level::Info =&gt; <span class="hljs-number">34</span>, <span class="hljs-comment">//Blue</span><br>            Level::<span class="hljs-built_in">Debug</span> =&gt; <span class="hljs-number">32</span>, <span class="hljs-comment">//Green</span><br>            Level::Trace =&gt; <span class="hljs-number">90</span>, <span class="hljs-comment">//BrightBlack</span><br>        &#125;;<br>        <span class="hljs-built_in">println!</span>(<br>            <span class="hljs-string">&quot;\u&#123;1B&#125;[&#123;&#125;m[&#123;:&gt;5&#125;] &#123;&#125;\u&#123;1B&#125;[0m&quot;</span>, <span class="hljs-comment">// 神秘</span><br>            color,<br>            record.<span class="hljs-title function_ invoke__">level</span>(), <span class="hljs-comment">// 日志等级</span><br>            record.<span class="hljs-title function_ invoke__">args</span>(), <span class="hljs-comment">// 格式化内容</span><br>        );<br>    &#125;<br>    <span class="hljs-comment">// 刷新</span><br>    <span class="hljs-keyword">fn</span> <span class="hljs-title function_">flush</span>(&amp;<span class="hljs-keyword">self</span>) &#123;&#125;<br>&#125;<br><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">init</span>() &#123;<br>    <span class="hljs-keyword">static</span> LOGGER: SimpleLogger = SimpleLogger;<br>    log::<span class="hljs-title function_ invoke__">set_logger</span>(&amp;LOGGER).<span class="hljs-title function_ invoke__">unwrap</span>();<br>    log::<span class="hljs-title function_ invoke__">set_max_level</span>(<span class="hljs-keyword">match</span> <span class="hljs-built_in">option_env!</span>(<span class="hljs-string">&quot;LOG&quot;</span>) &#123;<br>        <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-string">&quot;ERROR&quot;</span>) =&gt; LevelFilter::Error,<br>        <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-string">&quot;WARN&quot;</span>) =&gt; LevelFilter::Warn,<br>        <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-string">&quot;INFO&quot;</span>) =&gt; LevelFilter::Info,<br>        <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-string">&quot;DEBUG&quot;</span>) =&gt; LevelFilter::<span class="hljs-built_in">Debug</span>,<br>        <span class="hljs-title function_ invoke__">Some</span>(<span class="hljs-string">&quot;TRACE&quot;</span>) =&gt; LevelFilter::Trace,<br>        _ =&gt; LevelFilter::Info,<br>    &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h2><p>最后的最后，调整main函数，验证全过程</p>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><code class="hljs rust"><span class="hljs-comment">//! The main module and entrypoint</span><br><span class="hljs-comment">//!</span><br><span class="hljs-comment">//! The operating system and app also starts in this module. Kernel code starts</span><br><span class="hljs-comment">//! executing from `entry.asm`, after which [`rust_main()`] is called to</span><br><span class="hljs-comment">//! initialize various pieces of functionality [`clear_bss()`]. (See its source code for</span><br><span class="hljs-comment">//! details.)</span><br><span class="hljs-comment">//!</span><br><span class="hljs-comment">//! We then call [`println!`] to display `Hello, world!`.</span><br><br><span class="hljs-meta">#![deny(missing_docs)]</span><br><span class="hljs-meta">#![deny(warnings)]</span><br><span class="hljs-meta">#![no_main]</span><br><span class="hljs-meta">#![no_std]</span><br><br><span class="hljs-keyword">use</span> core::arch::global_asm;<br><span class="hljs-keyword">use</span> log::*;<br><br><span class="hljs-meta">#[macro_use]</span><br><span class="hljs-keyword">mod</span> console;<br><span class="hljs-keyword">mod</span> lang_items;<br><span class="hljs-keyword">mod</span> logging;<br><span class="hljs-keyword">mod</span> sbi;<br><br>global_asm!(<span class="hljs-built_in">include_str!</span>(<span class="hljs-string">&quot;entry.asm&quot;</span>));<br><br><span class="hljs-comment">/// clear BSS segment</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">clear_bss</span>() &#123;<br>    <span class="hljs-keyword">unsafe</span> <span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> &#123;<br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">sbss</span>();<br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">ebss</span>(); <br>    &#125;<br>    (sbss <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>..ebss <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>).for_each(|a| <span class="hljs-keyword">unsafe</span> &#123; (a <span class="hljs-keyword">as</span> *<span class="hljs-keyword">mut</span> <span class="hljs-type">u8</span>).<span class="hljs-title function_ invoke__">write_volatile</span>(<span class="hljs-number">0</span>) &#125;);<br>&#125;<br><br><span class="hljs-comment">/// the rust entry-point of os</span><br><span class="hljs-meta">#[unsafe(no_mangle)]</span><br><span class="hljs-keyword">pub</span> <span class="hljs-keyword">fn</span> <span class="hljs-title function_">rust_main</span>() <span class="hljs-punctuation">-&gt;</span> ! &#123;<br>    <span class="hljs-keyword">unsafe</span> <span class="hljs-keyword">extern</span> <span class="hljs-string">&quot;C&quot;</span> &#123;<br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">stext</span>(); <span class="hljs-comment">// begin addr of text segment</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">etext</span>(); <span class="hljs-comment">// end addr of text segment</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">srodata</span>(); <span class="hljs-comment">// start addr of Read-Only data segment</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">erodata</span>(); <span class="hljs-comment">// end addr of Read-Only data segment</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">sdata</span>(); <span class="hljs-comment">// start addr of data segment</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">edata</span>(); <span class="hljs-comment">// end addr of data segment</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">sbss</span>(); <span class="hljs-comment">// start addr of BSS segment</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">ebss</span>(); <span class="hljs-comment">// end addr of BSS segment</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">boot_stack_lower_bound</span>(); <span class="hljs-comment">// stack lower bound</span><br>        safe <span class="hljs-keyword">fn</span> <span class="hljs-title function_">boot_stack_top</span>(); <span class="hljs-comment">// stack top</span><br>    &#125;<br>    <span class="hljs-title function_ invoke__">clear_bss</span>();<br>    logging::<span class="hljs-title function_ invoke__">init</span>();<br>    <span class="hljs-built_in">println!</span>(<span class="hljs-string">&quot;[kernel] Hello World!!!!!&quot;</span>);<br>    trace!(<br>        <span class="hljs-string">&quot;[kernel] .text [&#123;:#x&#125;, &#123;:#x&#125;)&quot;</span>,<br>        stext <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>, etext <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span><br>    );<br>    debug!(<br>        <span class="hljs-string">&quot;[kernel] .rodata [&#123;:#x&#125;, &#123;:#x&#125;)&quot;</span>,<br>        srodata <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>, erodata <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span><br>    );<br>    info!(<br>        <span class="hljs-string">&quot;[kernel] .data [&#123;:#x&#125;, &#123;:#x&#125;)&quot;</span>,<br>        sdata <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>, edata <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span><br>    );<br>    warn!(<br>        <span class="hljs-string">&quot;[kernel] boot_stack top=bottom=&#123;:#x&#125;, lower_bound=&#123;:#x&#125;&quot;</span>,<br>        boot_stack_top <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>, boot_stack_lower_bound <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span><br>    );<br>    error!(<span class="hljs-string">&quot;[kernel] .bss [&#123;:#x&#125;, &#123;:#x&#125;)&quot;</span>, sbss <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>, ebss <span class="hljs-keyword">as</span> <span class="hljs-type">usize</span>);<br><br>    <span class="hljs-comment">// CI autotest success: sbi::shutdown(false)</span><br>    <span class="hljs-comment">// CI autotest failed : sbi::shutdown(true)</span><br>    <span class="hljs-comment">// 优雅退场~</span><br>    sbi::<span class="hljs-title function_ invoke__">shutdown</span>(<span class="hljs-literal">false</span>)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>因为提供了<code>Makefile</code>文件，所以直接运行<code>LOG=TRACE make run</code>即可</p>
+<p><img src="/images/62.png" srcset="/img/loading.gif" lazyload alt="如图!"></p>
+<p>终于，我们从零开始，逐步实现了$kernel hello world$</p>
+<p>并且还拥有了基础的日志打印与错误处理功能</p>
+<hr>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>最后再梳理一下这整个过程，如图所示</p>
+<p><img src="/images/63.png" srcset="/img/loading.gif" lazyload alt="总结"></p>
+<p>下面是项目结构</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs stylus">./os/<span class="hljs-attribute">src</span><br>Rust        <span class="hljs-number">4</span> Files   <span class="hljs-number">119</span> Lines<br>Assembly    <span class="hljs-number">1</span> Files    <span class="hljs-number">11</span> Lines<br><br>├── <span class="hljs-built_in">bootloader</span>(内核依赖的运行在 M 特权级的 SBI 实现，本项目中我们使用 RustSBI)<br>│   └── rustsbi-qemu<span class="hljs-selector-class">.bin</span>(可运行在 qemu 虚拟机上的预编译二进制版本)<br>├── LICENSE<br>├── <span class="hljs-built_in">os</span>(我们的内核实现放在 os 目录下)<br>│   ├── Cargo<span class="hljs-selector-class">.toml</span>(内核实现的一些配置文件)<br>│   ├── Makefile<br>│   └── <span class="hljs-attribute">src</span>(所有内核的源代码放在 os/src 目录下)<br>│       ├── console<span class="hljs-selector-class">.rs</span>(将打印字符的 SBI 接口进一步封装实现更加强大的格式化输出)<br>│       ├── entry<span class="hljs-selector-class">.asm</span>(设置内核执行环境的的一段汇编代码)<br>│       ├── lang_items<span class="hljs-selector-class">.rs</span>(需要我们提供给 Rust 编译器的一些语义项，目前包含内核 panic 时的处理逻辑)<br>│       ├── linker-qemu<span class="hljs-selector-class">.ld</span>(控制内核内存布局的链接脚本以使内核运行在 qemu 虚拟机上)<br>│       ├── <span class="hljs-selector-tag">main</span><span class="hljs-selector-class">.rs</span>(内核主函数)<br>│       └── sbi<span class="hljs-selector-class">.rs</span>(调用底层 SBI 实现提供的 SBI 接口)<br>├── README<span class="hljs-selector-class">.md</span><br>└── <span class="hljs-built_in">rust-toolchain</span>(控制整个项目的工具链版本)<br></code></pre></td></tr></table></figure>
+
+<p>这便是本篇blog的完整内容了</p>
+<p>感谢阅读</p>
+<hr>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p>补充:</p>
+<p>你可能需要一些前置知识:</p>
+<ul>
+<li>API vs ABI</li>
+<li>what is <strong>os</strong> and its function and history</li>
+<li>the concept of <code>abstract</code>(抽象)</li>
+<li><strong>exception control flow</strong> trap &amp; interrupt &amp; exception</li>
+<li><code>process</code> 进程 线程 context CPU</li>
+<li><strong>I&#x2F;O</strong> file system</li>
+<li>execution environment(执行环境)</li>
+<li><strong>address space</strong> virtual address &amp; physical address <code>MMU</code> memory</li>
+<li><strong>virtualization</strong> CPU &amp; memory &lt;&#x3D;&gt; time &amp; space</li>
+<li><strong>concurrency</strong> 并发 &amp; 并行</li>
+<li><code>异步性</code></li>
+<li><code>共享性</code></li>
+<li><code>持久性</code></li>
+</ul>
+<p>待补充</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/OS/" class="category-chain-item">OS</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        
+        
+          <a href="/tags/risc-v/" class="print-no-link">#risc-v</a>
+        
+      
+        
+        
+          <a href="/tags/QEMU/" class="print-no-link">#QEMU</a>
+        
+      
+        
+        
+          <a href="/tags/rust/" class="print-no-link">#rust</a>
+        
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>hello kernel!</div>
+      <div>https://rr00xxyy.github.io/2026/02/23/hello-kernel/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>roxy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年2月23日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年4月15日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/02/25/batch-system/" title="batch system">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">batch system</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/02/21/nonsense/" title="nonsense">
+                        <span class="hidden-mobile">nonsense</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      <span class="footer-quote">It is no use crying over spilt milk</span>
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/mui-fluid.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

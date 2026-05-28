@@ -1,0 +1,666 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" >
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
+  <link rel="icon" href="/img/666.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff">
+  <meta name="author" content="roxy">
+  <meta name="keywords" content="">
+  
+    <meta property="og:type" content="website">
+<meta property="og:title" content="roxy&#39;s blog">
+<meta property="og:url" content="https://rr00xxyy.github.io/index.html">
+<meta property="og:site_name" content="roxy&#39;s blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="roxy">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>roxy&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/mui-fluid.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"rr00xxyy.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body class="home-page">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/last.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text=""></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          >
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+<h1 class="sr-only">roxy&#39;s blog</h1>
+
+<section class="home-dog-showcase" aria-labelledby="dog-showcase-title">
+  <div class="showcase-copy dog-showcase-intro">
+    <p class="showcase-eyebrow dog-showcase-eyebrow">Furry Gallery</p>
+    <h2 id="dog-showcase-title">Soft launch, soft friends.</h2>
+    <p>Every soft friend gets a little spotlight.</p>
+  </div>
+
+  <div class="dog-showcase-sticky">
+    <div class="dog-showcase-stage" aria-label="Dog gallery">
+      <div class="dog-stage-copy">
+        <span>Today on Blog</span>
+        <strong>Furry field notes</strong>
+      </div>
+
+      
+        <article
+          class="dog-card dog-card-1"
+          data-start-x="-760"
+          data-start-y="360"
+          data-end-x="-390"
+          data-end-y="-20"
+          data-start-rot="-18"
+          data-end-rot="-5"
+          data-index="0"
+        >
+          <img src="/images/furry/white-pup.jpg" srcset="/img/loading.gif" lazyload alt="Mochi the White Pup" loading="lazy" decoding="async">
+          <div class="dog-card-caption">
+            <span>White Pup</span>
+            <strong>Mochi</strong>
+          </div>
+        </article>
+      
+        <article
+          class="dog-card dog-card-2"
+          data-start-x="720"
+          data-start-y="300"
+          data-end-x="430"
+          data-end-y="10"
+          data-start-rot="16"
+          data-end-rot="6"
+          data-index="1"
+        >
+          <img src="https://images.pexels.com/photos/1406874/pexels-photo-1406874.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" srcset="/img/loading.gif" lazyload alt="Pixel the 中华田园" loading="lazy" decoding="async">
+          <div class="dog-card-caption">
+            <span>中华田园</span>
+            <strong>Pixel</strong>
+          </div>
+        </article>
+      
+        <article
+          class="dog-card dog-card-3"
+          data-start-x="-520"
+          data-start-y="-420"
+          data-end-x="-180"
+          data-end-y="-145"
+          data-start-rot="14"
+          data-end-rot="4"
+          data-index="2"
+        >
+          <img src="https://images.pexels.com/photos/10916651/pexels-photo-10916651.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" srcset="/img/loading.gif" lazyload alt="Kuma the 牧羊犬" loading="lazy" decoding="async">
+          <div class="dog-card-caption">
+            <span>牧羊犬</span>
+            <strong>Kuma</strong>
+          </div>
+        </article>
+      
+        <article
+          class="dog-card dog-card-4"
+          data-start-x="560"
+          data-start-y="-380"
+          data-end-x="145"
+          data-end-y="-165"
+          data-start-rot="-12"
+          data-end-rot="-3"
+          data-index="3"
+        >
+          <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&amp;fit=crop&amp;w=900&amp;q=85" srcset="/img/loading.gif" lazyload alt="Latte the Golden Retriever" loading="lazy" decoding="async">
+          <div class="dog-card-caption">
+            <span>Golden Retriever</span>
+            <strong>Latte</strong>
+          </div>
+        </article>
+      
+        <article
+          class="dog-card dog-card-5"
+          data-start-x="-120"
+          data-start-y="520"
+          data-end-x="-110"
+          data-end-y="145"
+          data-start-rot="-7"
+          data-end-rot="2"
+          data-index="4"
+        >
+          <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?auto=format&amp;fit=crop&amp;w=900&amp;q=85" srcset="/img/loading.gif" lazyload alt="Nova the Border Collie" loading="lazy" decoding="async">
+          <div class="dog-card-caption">
+            <span>Border Collie</span>
+            <strong>Nova</strong>
+          </div>
+        </article>
+      
+        <article
+          class="dog-card dog-card-6"
+          data-start-x="180"
+          data-start-y="560"
+          data-end-x="310"
+          data-end-y="155"
+          data-start-rot="9"
+          data-end-rot="5"
+          data-index="5"
+        >
+          <img src="https://images.pexels.com/photos/17948248/pexels-photo-17948248.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" srcset="/img/loading.gif" lazyload alt="Yuki the 牧羊犬" loading="lazy" decoding="async">
+          <div class="dog-card-caption">
+            <span>牧羊犬</span>
+            <strong>Yuki</strong>
+          </div>
+        </article>
+      
+    </div>
+  </div>
+</section>
+
+<section class="furry-flow-section" aria-labelledby="flow-showcase-title">
+  <div class="showcase-copy flow-showcase-copy">
+    <p class="showcase-eyebrow">Slow Parade</p>
+    <h2 id="flow-showcase-title">Tiny paws, drifting by.</h2>
+    <p>A warm little current of fur, ears, tails, and quiet company.</p>
+  </div>
+
+  <div class="flow-viewport">
+    <div class="flow-track flow-track-a" data-flow-direction="-1">
+      
+        <figure class="flow-card flow-card-1">
+          <img src="https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" srcset="/img/loading.gif" lazyload alt="Fable the Fox" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Fox</span>
+            <strong>Fable</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-2">
+          <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" srcset="/img/loading.gif" lazyload alt="Nori the Cat" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Cat</span>
+            <strong>Nori</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-3">
+          <img src="https://images.unsplash.com/photo-1749414767955-0e4a9bda515e?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" srcset="/img/loading.gif" lazyload alt="Orbit the Raccoon" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Raccoon</span>
+            <strong>Orbit</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-4">
+          <img src="https://images.pexels.com/photos/6477263/pexels-photo-6477263.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1000" srcset="/img/loading.gif" lazyload alt="Moss the Capybara" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Capybara</span>
+            <strong>Moss</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-5">
+          <img src="https://images.pexels.com/photos/15968722/pexels-photo-15968722.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1000" srcset="/img/loading.gif" lazyload alt="Bun the Rabbit" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Rabbit</span>
+            <strong>Bun</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-6">
+          <img src="https://images.pexels.com/photos/25956520/pexels-photo-25956520.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1000" srcset="/img/loading.gif" lazyload alt="Mizu the Otter" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Otter</span>
+            <strong>Mizu</strong>
+          </figcaption>
+        </figure>
+      
+    </div>
+    <div class="flow-track flow-track-b" data-flow-direction="1">
+      
+        <figure class="flow-card flow-card-1">
+          <img src="https://images.pexels.com/photos/30526859/pexels-photo-30526859.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1000" srcset="/img/loading.gif" lazyload alt="Lumen the Wolf" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Wolf</span>
+            <strong>Lumen</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-2">
+          <img src="https://images.pexels.com/photos/4520483/pexels-photo-4520483.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1000" srcset="/img/loading.gif" lazyload alt="Pip the Hamster" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Hamster</span>
+            <strong>Pip</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-3">
+          <img src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" srcset="/img/loading.gif" lazyload alt="Timmy the Cat" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Cat</span>
+            <strong>Timmy</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-4">
+          <img src="https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" srcset="/img/loading.gif" lazyload alt="Sunny the Chow Chow" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Chow Chow</span>
+            <strong>Sunny</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-5">
+          <img src="https://images.unsplash.com/photo-1507666405895-422eee7d517f?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" srcset="/img/loading.gif" lazyload alt="Acorn the Squirrel" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Squirrel</span>
+            <strong>Acorn</strong>
+          </figcaption>
+        </figure>
+      
+        <figure class="flow-card flow-card-6">
+          <img src="https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" srcset="/img/loading.gif" lazyload alt="Clover the Longhair Cat" loading="lazy" decoding="async">
+          <figcaption>
+            <span>Longhair Cat</span>
+            <strong>Clover</strong>
+          </figcaption>
+        </figure>
+      
+    </div>
+  </div>
+</section>
+
+<section class="furry-reveal-section" aria-labelledby="reveal-showcase-title">
+  <div class="showcase-copy reveal-showcase-copy">
+    <p class="showcase-eyebrow">Pocket Stars</p>
+    <h2 id="reveal-showcase-title">Soft faces, bright moments.</h2>
+    <p>Small lights for soft hearts.</p>
+  </div>
+
+  <div class="reveal-stage">
+    
+      <figure
+        class="reveal-tile reveal-tile-1"
+        data-index="0"
+        data-x="-360"
+        data-y="-170"
+        data-rot="-9"
+      >
+        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&amp;fit=crop&amp;w=900&amp;q=85" srcset="/img/loading.gif" lazyload alt="Tango the Corgi Duo" loading="lazy" decoding="async">
+        <figcaption>
+          <span>Corgi Duo</span>
+          <strong>Tango</strong>
+        </figcaption>
+      </figure>
+    
+      <figure
+        class="reveal-tile reveal-tile-2"
+        data-index="1"
+        data-x="20"
+        data-y="-220"
+        data-rot="5"
+      >
+        <img src="https://images.unsplash.com/photo-1591946614720-90a587da4a36?auto=format&amp;fit=crop&amp;w=900&amp;q=85" srcset="/img/loading.gif" lazyload alt="Honey the Golden" loading="lazy" decoding="async">
+        <figcaption>
+          <span>Golden</span>
+          <strong>Honey</strong>
+        </figcaption>
+      </figure>
+    
+      <figure
+        class="reveal-tile reveal-tile-3"
+        data-index="2"
+        data-x="360"
+        data-y="-150"
+        data-rot="11"
+      >
+        <img src="https://images.pexels.com/photos/30526859/pexels-photo-30526859.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" srcset="/img/loading.gif" lazyload alt="Comet the Wolf" loading="lazy" decoding="async">
+        <figcaption>
+          <span>Wolf</span>
+          <strong>Comet</strong>
+        </figcaption>
+      </figure>
+    
+      <figure
+        class="reveal-tile reveal-tile-4"
+        data-index="3"
+        data-x="-255"
+        data-y="150"
+        data-rot="8"
+      >
+        <img src="https://images.pexels.com/photos/15968722/pexels-photo-15968722.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=900" srcset="/img/loading.gif" lazyload alt="Sprout the Rabbit" loading="lazy" decoding="async">
+        <figcaption>
+          <span>Rabbit</span>
+          <strong>Sprout</strong>
+        </figcaption>
+      </figure>
+    
+      <figure
+        class="reveal-tile reveal-tile-5"
+        data-index="4"
+        data-x="140"
+        data-y="160"
+        data-rot="-7"
+      >
+        <img src="https://images.unsplash.com/photo-1749414767955-0e4a9bda515e?auto=format&amp;fit=crop&amp;w=900&amp;q=85" srcset="/img/loading.gif" lazyload alt="Pebble the Raccoon" loading="lazy" decoding="async">
+        <figcaption>
+          <span>Raccoon</span>
+          <strong>Pebble</strong>
+        </figcaption>
+      </figure>
+    
+      <figure
+        class="reveal-tile reveal-tile-6"
+        data-index="5"
+        data-x="455"
+        data-y="110"
+        data-rot="-3"
+      >
+        <img src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&amp;fit=crop&amp;w=900&amp;q=85" srcset="/img/loading.gif" lazyload alt="Biscuit the Pup" loading="lazy" decoding="async">
+        <figcaption>
+          <span>Pup</span>
+          <strong>Biscuit</strong>
+        </figcaption>
+      </figure>
+    
+  </div>
+</section>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      <span class="footer-quote">It is no use crying over spilt milk</span>
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/mui-fluid.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
