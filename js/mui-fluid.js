@@ -178,6 +178,30 @@
       return
     }
 
+    var viewport = section.querySelector('.flow-viewport')
+    var tracks = Array.prototype.slice.call(section.querySelectorAll('.flow-track'))
+
+    function updateFlowDistance() {
+      if (!viewport) {
+        return
+      }
+
+      var viewportWidth = viewport.clientWidth
+      var edgePadding = Math.min(36, Math.max(18, viewportWidth * 0.025))
+
+      tracks.forEach(function (track, index) {
+        var overflow = Math.max(track.scrollWidth - viewportWidth, 0)
+        var start = index % 2 === 0 ? edgePadding : -(overflow + edgePadding)
+        var end = index % 2 === 0 ? -(overflow + edgePadding) : edgePadding
+
+        track.style.setProperty('--flow-start', start + 'px')
+        track.style.setProperty('--flow-end', end + 'px')
+      })
+    }
+
+    updateFlowDistance()
+    window.addEventListener('resize', updateFlowDistance)
+    window.setTimeout(updateFlowDistance, 600)
     section.classList.add('is-flow-ready')
   }
 

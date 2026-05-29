@@ -1,3 +1,13 @@
+@import url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5.2.7/index.css");
+
+@font-face {
+  font-display: swap;
+  font-family: "Smiley Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: url("https://cdn.jsdelivr.net/npm/font-smiley-sans@latest/SmileySans-Oblique.otf.woff2") format("woff2");
+}
+
 :root {
   color-scheme: light;
   --mui-primary: #1976d2;
@@ -19,6 +29,7 @@ body {
 }
 
 body {
+  font-family: "Geist Mono Variable", "Geist Mono", "Smiley Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-feature-settings: "kern";
 }
 
@@ -229,9 +240,9 @@ body.home-page #board {
   background:
     linear-gradient(180deg, #f7f9fc 0%, #ffffff 28%, #eef6ff 100%);
   color: var(--mui-text);
-  min-height: 162vh;
+  min-height: 138vh;
   overflow: clip;
-  padding: clamp(2rem, 5vw, 4rem) 0 clamp(1.25rem, 3vw, 2.5rem);
+  padding: clamp(2rem, 5vw, 4rem) 0 clamp(0.5rem, 1.6vw, 1.25rem);
   position: relative;
 }
 
@@ -395,8 +406,8 @@ body.home-page #board {
 
 .furry-flow-section {
   background: linear-gradient(180deg, #eef6ff 0%, #ffffff 45%, #f7f9fc 100%);
-  min-height: 102vh;
-  padding: clamp(2rem, 4vw, 3.5rem) 0 clamp(1.25rem, 3vw, 2.25rem);
+  min-height: 92vh;
+  padding: clamp(1.2rem, 3vw, 2.5rem) 0 clamp(0.8rem, 2vw, 1.75rem);
 }
 
 .flow-showcase-copy,
@@ -447,11 +458,11 @@ body.home-page #board {
 }
 
 .flow-track-a {
-  animation: furry-flow-left 18s ease-in-out infinite alternate;
+  animation: furry-flow-left 32s ease-in-out infinite alternate;
 }
 
 .flow-track-b {
-  animation: furry-flow-right 22s ease-in-out infinite alternate;
+  animation: furry-flow-right 36s ease-in-out infinite alternate;
 }
 
 .links {
@@ -603,8 +614,8 @@ body.home-page #board {
 
 .furry-reveal-section {
   background: linear-gradient(180deg, #f7f9fc 0%, #ffffff 38%, #eef6ff 100%);
-  min-height: 148vh;
-  padding: clamp(2.5rem, 5vw, 4.5rem) 0 clamp(2.25rem, 5vw, 4rem);
+  min-height: 126vh;
+  padding: clamp(1.5rem, 3.5vw, 3rem) 0 clamp(0.75rem, 2vw, 1.5rem);
 }
 
 .reveal-stage {
@@ -630,6 +641,22 @@ body.home-page #board {
   width: min(980px, 84vw);
 }
 
+.reveal-center-note {
+  color: var(--mui-primary);
+  font-size: clamp(0.95rem, 1.4vw, 1.18rem);
+  font-weight: 850;
+  left: 50%;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  max-width: min(520px, 60vw);
+  opacity: 0.82;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
 .reveal-tile {
   aspect-ratio: 1 / 1;
   border: 1px solid rgba(255, 255, 255, 0.76);
@@ -644,6 +671,7 @@ body.home-page #board {
   transform: translate(-50%, -50%) scale(0.68);
   width: clamp(150px, 18vw, 260px);
   will-change: clip-path, opacity, transform;
+  z-index: 2;
 }
 
 .post-content figure.highlight,
@@ -676,6 +704,20 @@ figure.highlight .mui-code-scroll {
   overflow-x: auto;
   overflow-y: hidden;
   width: 100%;
+}
+
+.markdown-body :not(pre) > code,
+.post-content :not(pre) > code {
+  background: #eef6ff;
+  border: 1px solid #cfe1ff;
+  border-radius: 6px;
+  color: var(--mui-primary-dark);
+  font-family: "Geist Mono Variable", "Geist Mono", "Cascadia Code", "JetBrains Mono", Consolas, "SFMono-Regular", monospace !important;
+  font-size: 0.9em;
+  font-weight: 720;
+  margin: 0 0.12em;
+  padding: 0.12em 0.34em;
+  white-space: break-spaces;
 }
 
 figure.highlight .code-widget {
@@ -749,7 +791,7 @@ figure.highlight code {
   background: transparent !important;
   border: 0;
   color: var(--code-text);
-  font-family: "Cascadia Code", "JetBrains Mono", Consolas, "SFMono-Regular", monospace;
+  font-family: "Geist Mono Variable", "Geist Mono", "Cascadia Code", "JetBrains Mono", Consolas, "SFMono-Regular", monospace;
   font-size: 0.95rem;
   line-height: 1.75;
   margin: 0;
@@ -1197,21 +1239,21 @@ figure.highlight.is-collapsed .mui-code-scroll {
 
 @keyframes furry-flow-left {
   from {
-    transform: translate3d(-4vw, 0, 0);
+    transform: translate3d(var(--flow-start, 24px), 0, 0);
   }
 
   to {
-    transform: translate3d(-18vw, 0, 0);
+    transform: translate3d(var(--flow-end, -18vw), 0, 0);
   }
 }
 
 @keyframes furry-flow-right {
   from {
-    transform: translate3d(-20vw, 0, 0);
+    transform: translate3d(var(--flow-start, -18vw), 0, 0);
   }
 
   to {
-    transform: translate3d(-6vw, 0, 0);
+    transform: translate3d(var(--flow-end, 24px), 0, 0);
   }
 }
 
@@ -1293,8 +1335,9 @@ figure.highlight.is-collapsed .mui-code-scroll {
   }
 
   .home-dog-showcase {
-    min-height: 138vh;
-    padding-top: 3.5rem;
+    min-height: 122vh;
+    padding-bottom: 0.5rem;
+    padding-top: 3rem;
   }
 
   .dog-showcase-sticky {
@@ -1313,7 +1356,15 @@ figure.highlight.is-collapsed .mui-code-scroll {
 
   .furry-flow-section,
   .furry-reveal-section {
-    min-height: 128vh;
+    min-height: 112vh;
+  }
+
+  .furry-flow-section {
+    padding-top: 1rem;
+  }
+
+  .furry-reveal-section {
+    padding-bottom: 0.75rem;
   }
 
   .flow-viewport,
@@ -1331,6 +1382,10 @@ figure.highlight.is-collapsed .mui-code-scroll {
   .reveal-stage::before {
     border-radius: 24px;
     width: 90vw;
+  }
+
+  .reveal-center-note {
+    max-width: 68vw;
   }
 
   .reveal-tile {
