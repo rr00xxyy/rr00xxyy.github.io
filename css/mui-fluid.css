@@ -472,6 +472,15 @@ body.home-page #board {
   margin: 0;
 }
 
+.links-heading {
+  color: #0f172a;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  line-height: 1.05;
+  margin: 0 0 1.8rem;
+  text-align: center;
+}
+
 .links .card {
   background: transparent !important;
   border: 0 !important;
