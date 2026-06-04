@@ -8,7 +8,7 @@
     <link href="/2026/05/25/DEF-CON-CTF-2026-QUALS/"/>
     <url>/2026/05/25/DEF-CON-CTF-2026-QUALS/</url>
     
-    <content type="html"><![CDATA[<p>嗯，毫无游戏体验的一场比赛，几乎做不出任何一道题目</p><p>可恶的kuroko跑去联队了，只留下大一小登在<code>W4terDr0p</code>打，最后也是不出所料地溃败了，怒拿第<code>69</code>名</p><p><img src="/images/148.png" alt="如图"></p><p>赛后反思：</p><p>为什么会这样呢？</p><p>几万行的冗杂代码，找不到的gadget，LLM烧光了所有的token寻找漏洞，我也确实拼尽全力在尝试调试利用链了，却依旧无法做出任何一道题目</p><p>也许只能等WP出来再复盘反思了…</p><p>暂时有点迷茫，梳理一下最近的主线任务：</p><p>1.备战六级(额额额)，期末考试(一定要过啊喂)</p><p>2.暑假拿下驾照，学游泳，和高中同学reunion，travel，参加<strong>福瑞展</strong></p><p>支线任务：</p><p>1.继续深入pwn，加强逆向能力，学习进阶shellcode，heap，kernel，fuzz，IoT，同时并行学习web</p><p>2.研究论文，了解AI在CTF&#x2F;真实世界中的能力边界与如何利用MCP，skill，RAG，prompt等技术提升LLM在CTF&#x2F;特定安全场景下的能力</p><p>3.随机vibe coding一些有意思的项目</p><p>大致如此…</p><p>明年见？</p>]]></content>
+    <content type="html"><![CDATA[<p>嗯，毫无游戏体验的一场比赛，几乎做不出任何一道题目</p><p>可恶的kuroko跑去联队了，只留下大一小登在<code>W4terDr0p</code>打，最后也是不出所料地溃败了，怒拿第<code>69</code>名</p><p><img src="/images/148.png" alt="如图"></p><p>为什么会这样呢。。。</p><p>看不懂的代码，找不到的gadget，LLM燃尽了，我也燃尽了，却依旧做不出任何一道题目。。。</p><p>等WP吧。。。</p><p>暂时有点迷茫，梳理一下最近的主线任务：</p><p>1.备战六级(额额额)</p><p>2.期末考试(一定要过啊喂)</p><p>3.暑假参加<strong>福瑞展</strong></p><p>支线任务：</p><p>1.随缘<code>pwn pwn</code></p><p>2.研究研究论文，了解了解AI在CTF&#x2F;real world中的能力边界以及如何利用MCP，skill，RAG等技术提升LLM在CTF&#x2F;特定安全场景下的能力</p><p>3.随机vibe coding一些有意思的项目</p><p>大致如此…</p><p>明年见？</p>]]></content>
     
     
     <categories>
@@ -23,10 +23,6 @@
       <tag>heap</tag>
       
       <tag>lua</tag>
-      
-      <tag>kernel</tag>
-      
-      <tag>pwn</tag>
       
       <tag>os</tag>
       
@@ -48,7 +44,11 @@
       
       <tag>survey</tag>
       
+      <tag>kernel</tag>
+      
       <tag>gadget</tag>
+      
+      <tag>pwn</tag>
       
       <tag>reverse</tag>
       
@@ -73,7 +73,7 @@
     <link href="/2026/05/21/BugBounty-OnlyBug-NoBounty/"/>
     <url>/2026/05/21/BugBounty-OnlyBug-NoBounty/</url>
     
-    <content type="html"><![CDATA[<p>From CTF to bug bounty, what’s different, what stays the same?</p><p>Here’s my experience so far.</p><p>At first, I was just trying to move from the “CTF intended environment” into the real world.</p><p>So I started with <strong>GitHub PRs</strong>.</p><p>Luckily, I found 2 security issues in a 2.9k-star project and submitted 2 PRs.</p><p>The maintainer patiently reviewed my code, we went back and forth a few times, and eventually both got merged!</p><p><img src="/images/142.png" alt="screenshot"></p><p>I got the cute Pull Shark badge.</p><p>Well… I am a furry after all. 🦈</p><p><img src="/images/147.png" alt="screenshot"></p><p>Honestly, it was such a great open-source collaboration experience.</p><p>But then came the real question:</p><p>How do I actually make money from this? 😭</p><p>So I jumped into <code>Hacker0x01</code> programs and <code>Google OSS VRP</code>.</p><p>(At the time I ignored domestic <code>SRC</code> platforms because I thought the payouts were too low. Looking back… yeah, that was probably stupid.)</p><p>I mainly focused on open-source projects because <code>LLMs</code> can genuinely give a huge advantage there.</p><p>Unfortunately, 6 reports on <strong>Hacker0x01</strong>:</p><ul><li><p>2 informative</p></li><li><p>4 <code>duplicate</code></p></li></ul><p><img src="/images/143.png" alt="screenshot"></p><p>And 2 reports for <strong>Google OSS VRP</strong>:</p><ul><li><p>1 duplicate</p></li><li><p>1 “intended behavior”</p></li></ul><p><img src="/images/144.png" alt="screenshot"></p><p>That part really hit me hard.</p><p><img src="/images/145.png" alt="screenshot"></p><p><img src="/images/146.png" alt="screenshot"></p><p>At that moment I could only say:</p><p>what the fuck! 😭</p><p>Still, even without rewards, I learned a lot.</p><p>Here are the 3 biggest lessons I’ve learned so far:</p><p>1.Understand the <strong>security boundary</strong>. Bugs usually live at the <strong>edges</strong>, not in the <code>middle</code>.</p><p>2.Check <strong>GitHub issues</strong> first. Duplicate reports are soul-crushing!</p><p>3.Make sure the bug actually has impact. Some vulnerabilities only work in super specific configs… or only survive in theory.</p><p>Anyway, bye.</p><p>Back to my own journey.</p>]]></content>
+    <content type="html"><![CDATA[<p>From CTF to bug bounty, what’s different, what stays the same?</p><p>Here’s my experience.</p><p>At first, I was just trying to move from the CTF intended environment into the real world.</p><p>So I started with <strong>GitHub PRs</strong>.</p><p>Luckily, I found 2 security issues in a 2.9k-star project and submitted 2 PRs.</p><p>The maintainer patiently reviewed my code, we went back and forth a few times, and eventually both got merged!</p><p><img src="/images/142.png" alt="screenshot"></p><p>I got the cute Pull Shark.</p><p>Nice Furry! 🦈</p><p><img src="/images/147.png" alt="screenshot"></p><p>Great experience.</p><p>Then I jumped into <code>Hacker0x01</code> programs and <code>Google OSS VRP</code>.</p><p>ps: Why not SRC?…</p><p>I mainly focused on open-source projects because <code>LLMs</code> can genuinely give a huge advantage there.</p><p>Unfortunately, 6 reports on <strong>Hacker0x01</strong>:</p><ul><li><p>2 informative</p></li><li><p>4 <code>duplicate</code></p></li></ul><p><img src="/images/143.png" alt="screenshot"></p><p>And 2 reports for <strong>Google OSS VRP</strong>:</p><ul><li><p>1 duplicate</p></li><li><p>1 intended behavior</p></li></ul><p><img src="/images/144.png" alt="screenshot"></p><p>That part really hit me hard.</p><p><img src="/images/145.png" alt="screenshot"></p><p><img src="/images/146.png" alt="screenshot"></p><p>what the fuck…</p><p>However, even without rewards, I learned a lot.</p><p>1.Understand the <strong>security boundary</strong>.</p><p>2.Check <strong>GitHub issues</strong> first.</p><p>3.Make sure the bug actually has impact. Some vulnerabilities only work in specific configs or only survive in theory.</p><p>hhh</p><p>See you…</p>]]></content>
     
     
     <categories>
@@ -138,11 +138,11 @@
     
     <tags>
       
-      <tag>CPU</tag>
-      
       <tag>heap</tag>
       
       <tag>lua</tag>
+      
+      <tag>CPU</tag>
       
       <tag>meltdown</tag>
       
@@ -220,13 +220,13 @@
     
     <tags>
       
-      <tag>PTE</tag>
-      
-      <tag>Dirty Pageflags</tag>
-      
       <tag>kernel</tag>
       
       <tag>pwn</tag>
+      
+      <tag>PTE</tag>
+      
+      <tag>Dirty Pageflags</tag>
       
       <tag>root</tag>
       
@@ -365,11 +365,11 @@
       
       <tag>ret2libc</tag>
       
-      <tag>栈风水</tag>
-      
       <tag>magic-gadget</tag>
       
       <tag>partial overwrite</tag>
+      
+      <tag>栈风水</tag>
       
       <tag>ret2syscall</tag>
       
@@ -1076,9 +1076,9 @@
       
       <tag>LeetCode</tag>
       
-      <tag>双指针</tag>
-      
       <tag>数据结构</tag>
+      
+      <tag>双指针</tag>
       
       <tag>链表</tag>
       
@@ -1300,9 +1300,9 @@
     
     <tags>
       
-      <tag>ret2GOT</tag>
-      
       <tag>fmt</tag>
+      
+      <tag>ret2GOT</tag>
       
     </tags>
     
