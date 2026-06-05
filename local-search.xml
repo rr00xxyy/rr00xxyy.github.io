@@ -24,6 +24,18 @@
       
       <tag>lua</tag>
       
+      <tag>kernel</tag>
+      
+      <tag>pwn</tag>
+      
+      <tag>web</tag>
+      
+      <tag>crypto</tag>
+      
+      <tag>misc</tag>
+      
+      <tag>reverse</tag>
+      
       <tag>os</tag>
       
       <tag>操作系统</tag>
@@ -44,19 +56,7 @@
       
       <tag>survey</tag>
       
-      <tag>kernel</tag>
-      
       <tag>gadget</tag>
-      
-      <tag>pwn</tag>
-      
-      <tag>reverse</tag>
-      
-      <tag>crypto</tag>
-      
-      <tag>web</tag>
-      
-      <tag>misc</tag>
       
       <tag>KoTH</tag>
       
@@ -181,11 +181,9 @@
       
       <tag>pwn</tag>
       
-      <tag>reverse</tag>
+      <tag>web</tag>
       
       <tag>crypto</tag>
-      
-      <tag>web</tag>
       
       <tag>misc</tag>
       
@@ -194,6 +192,8 @@
       <tag>forensics</tag>
       
       <tag>ppc</tag>
+      
+      <tag>reverse</tag>
       
       <tag>pentest</tag>
       
@@ -220,13 +220,13 @@
     
     <tags>
       
-      <tag>kernel</tag>
-      
-      <tag>pwn</tag>
-      
       <tag>PTE</tag>
       
       <tag>Dirty Pageflags</tag>
+      
+      <tag>kernel</tag>
+      
+      <tag>pwn</tag>
       
       <tag>root</tag>
       
@@ -1300,9 +1300,9 @@
     
     <tags>
       
-      <tag>fmt</tag>
-      
       <tag>ret2GOT</tag>
+      
+      <tag>fmt</tag>
       
     </tags>
     
