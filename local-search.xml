@@ -1300,9 +1300,9 @@
     
     <tags>
       
-      <tag>ret2GOT</tag>
-      
       <tag>fmt</tag>
+      
+      <tag>ret2GOT</tag>
       
     </tags>
     
@@ -1383,13 +1383,13 @@
       
       <tag>ORW</tag>
       
+      <tag>内存布局</tag>
+      
       <tag>SROP</tag>
       
       <tag>ret2libc</tag>
       
       <tag>寄存器</tag>
-      
-      <tag>内存布局</tag>
       
     </tags>
     
@@ -1416,9 +1416,9 @@
       
       <tag>栈迁移</tag>
       
-      <tag>ret2libc</tag>
-      
       <tag>内存布局</tag>
+      
+      <tag>ret2libc</tag>
       
     </tags>
     
@@ -1443,9 +1443,9 @@
     
     <tags>
       
-      <tag>内存布局</tag>
-      
       <tag>gdb</tag>
+      
+      <tag>内存布局</tag>
       
     </tags>
     

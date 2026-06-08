@@ -236,6 +236,11 @@ body.home-page #board {
   margin-top: 0;
 }
 
+.home-showcase-blank {
+  background: #fff;
+  min-height: clamp(18rem, 42vh, 30rem);
+}
+
 .home-dog-showcase {
   background:
     linear-gradient(180deg, #f7f9fc 0%, #ffffff 28%, #eef6ff 100%);
