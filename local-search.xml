@@ -4,6 +4,55 @@
   
   
   <entry>
+    <title>docker</title>
+    <link href="/2026/06/08/docker/"/>
+    <url>/2026/06/08/docker/</url>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>第一次接触<code>docker</code>，也是在CTF中，题目的附件中给出了<code>Dockerfile</code>(or <code>docker-compose.yml</code>)，一开始并不知道有什么用，后面才知道本地调试时要<code>docker build -t xxx .</code>构建一个镜像，再<code>docker run -it xxx</code>启动一个容器，以保证本地与远程的环境一致</p><p>故以此为引，开始<code>docker</code>的学习</p><h2 id="由来"><a href="#由来" class="headerlink" title="由来"></a>由来</h2><p>不论是开发还是CTF，都会遇到一个问题，你本地能运行的代码，别人那里不一定可以，你本地能打通的exp，别人也许一运行就EOF了，要么依赖版本不同，要么系统库存在差异，总之，在部署和运行上，环境不一致带来了很大的麻烦</p><p>一开始的解决方案是<strong>虚拟机</strong>(<code>VM</code>)，但是每个<code>VM</code>都要装一个完整的操作系统，几个<code>GB</code>起步，启动慢，占资源，迁移也麻烦，为了隔离一个可能只有几十<code>MB</code>甚至<code>KB</code>的小应用，硬要扛着几<code>GB</code>的系统内核，怎么看都不划算</p><p>于是，<code>docker</code>诞生了，其不模拟硬件，也不装完整系统，而是直接用<strong>宿主机</strong>的内核，只把<code>应用 + 依赖</code>打包成一个镜像，然后跑起来就是一个容器</p><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>那么，什么是<strong>镜像</strong>，什么是<strong>容器</strong>呢？</p><h3 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h3><p><strong>镜像</strong>相当于一个<strong>只读</strong>的模板，它把代码，运行环境，依赖库，配置文件等等全部打包在一起，你可以编写<code>Dockerfile</code>以拉取或创建一个特定的镜像</p><div class="note note-info">            <p><code>Dockerfile</code>背后的<strong>层缓存</strong>是什么？</p> <p>构建镜像时，<code>docker</code>会复用之前已经构建过的，未发生变化的层，而不是重新执行该层的指令</p> <p>待补充</p>           </div><h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p><strong>容器</strong>就是镜像的运行实例，当执行<code>docker run</code>时，镜像就变成了一个活着的容器</p><p>容器启动时，<code>docker</code>会在镜像的<code>只读层</code>上面叠一层<code>可写层</code>，你在容器里做的所有修改(写文件，装软件，改配置啊等等)都落在这层上，容器一删，这层可写层也就没了，但原始镜像依然完好，这就是<strong>写时复制</strong>技术(<code>Copy-on-Write</code>)</p><p>关键：容器本质上是一个被限制住的<strong>进程</strong>，<code>docker</code>并没有启动一个新内核，它只是让一个进程看起来像是运行在一个独立的系统里，你在宿主机上执行<code>ps aux</code>依然能看到这个进程，只不过它被包了一层壳而已</p><p>额那这层壳是什么呢</p><h4 id="1-Namespace"><a href="#1-Namespace" class="headerlink" title="1.Namespace"></a>1.Namespace</h4><p><code>Namespace</code>让进程只能看到自己的那一份<code>系统资源视图</code>，实现了<strong>隔离</strong>：</p><ul><li><p>PID namespace：容器内的进程以为自己的<code>PID</code>是$1$，看不到宿主机上的其它进程</p></li><li><p>NET namespace：容器有自己独立的网络栈(网卡，路由表，<code>iptables</code>规则)</p></li><li><p>MNT namespace：容器有自己独立的文件系统挂载点</p></li><li><p>UTS namespace：容器可以有独立的<code>主机名</code>和<code>域名</code></p></li><li><p>IPC namespace：容器有自己的进程间通信资源(共享内存，消息队列)</p></li><li><p>USER namespace：容器内可以有自己独立的用户<code>ID</code>映射</p></li></ul><h4 id="2-Cgroups"><a href="#2-Cgroups" class="headerlink" title="2.Cgroups"></a>2.Cgroups</h4><p><strong>Cgroups</strong>(<code>Control Groups</code>)负责给进程划定资源上限：</p><ul><li><p><code>CPU</code>配额(比如最多用$2$个核心)</p></li><li><p>内存限制(超过则触发<code>OOM Killer</code>)</p></li><li><p>磁盘<code>I/O</code>读写速率限制</p></li><li><p>网络带宽限制</p></li><li><p>进程数量限制</p></li></ul><h4 id="3-rootfs"><a href="#3-rootfs" class="headerlink" title="3.rootfs"></a>3.rootfs</h4><p>通过<code>chroot</code>，容器进程的<code>/</code>不再是宿主机的<code>/</code>，而是镜像里打包好的那一套文件系统(如Ubuntu，Alpine的根文件系统)，于是，容器内执行<code>/bin/bash</code>用的是镜像里的<code>bash</code>，而不是宿主机上的<code>bash</code>，容器内看到的<code>/etc</code>，<code>/var</code>也都是与宿主机隔离的</p><p>容器启动时，没有内核引导，没有<code>init</code>系统，也没有硬件探测，本质上只是<code>fork</code>一个进程，然后在<code>exec</code>之前设置好<code>Namespace</code>，<code>Cgroups</code>，<code>rootfs</code>，所以容器启动是毫秒级的</p><p>且容器里最终运行的还是一个普通的进程，即一个应用，一个服务，没有这个进程，容器就会立刻退出</p><h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h2><h3 id="沙箱-sandbox"><a href="#沙箱-sandbox" class="headerlink" title="沙箱(sandbox)"></a>沙箱(sandbox)</h3><p>沙箱(<code>sandbox</code>)是一种安全隔离机制，它的目标是：让一个进程只能访问<strong>被允许</strong>的资源，其余的一切都接触不到，哪怕这个进程被攻击者控制了，也无法逃逸到宿主系统</p><p>在<code>docker</code>中沙箱由几种机制组合而成，首先便是上述的<code>Namespace</code>与<code>Cgroups</code>，其次还有：</p><h4 id="Capabilities"><a href="#Capabilities" class="headerlink" title="Capabilities"></a>Capabilities</h4><p>容器里的<code>root</code>不是拥有完整宿主机权限的<code>root</code>，<code>docker</code>默认只保留一小组必要<code>capabilities</code>，并丢弃<code>CAP_SYS_ADMIN</code>，<code>CAP_SYS_MODULE</code>等高危能力</p><h4 id="Seccomp"><a href="#Seccomp" class="headerlink" title="Seccomp"></a>Seccomp</h4><p><code>docker</code>默认<code>seccomp profile</code>是<code>syscall allowlist</code>，大约拦截$40$多个危险或不必要的<strong>系统调用</strong>，例如模块加载，重启，部分<code>namespace</code>操作等</p><h3 id="逃逸"><a href="#逃逸" class="headerlink" title="逃逸"></a>逃逸</h3><p><code>虚拟机</code>的沙箱依赖<code>硬件</code>辅助虚拟化(如<code>Intel VT-x</code>)和独立的<code>Guest</code>内核，隔离强度高，但开销大</p><p>而<code>docker</code>的沙箱则是内核层面的软件隔离，更轻量，但容器本质上还是共享着宿主机的内核，一旦内核本身存在漏洞，攻击者就有可能逃逸出沙箱，影响宿主机…</p><p>待补充</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>kernel</tag>
+      
+      <tag>docker</tag>
+      
+      <tag>namespace</tag>
+      
+      <tag>cgroups</tag>
+      
+      <tag>rootfs</tag>
+      
+      <tag>seccomp</tag>
+      
+      <tag>capability</tag>
+      
+      <tag>chroot</tag>
+      
+      <tag>dockerfile</tag>
+      
+      <tag>sandbox</tag>
+      
+      <tag>逃逸</tag>
+      
+      <tag>漏洞</tag>
+      
+      <tag>安全</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>DEF-CON-CTF-2026-QUALS</title>
     <link href="/2026/05/25/DEF-CON-CTF-2026-QUALS/"/>
     <url>/2026/05/25/DEF-CON-CTF-2026-QUALS/</url>
@@ -23,18 +72,6 @@
       <tag>heap</tag>
       
       <tag>lua</tag>
-      
-      <tag>kernel</tag>
-      
-      <tag>pwn</tag>
-      
-      <tag>web</tag>
-      
-      <tag>crypto</tag>
-      
-      <tag>misc</tag>
-      
-      <tag>reverse</tag>
       
       <tag>os</tag>
       
@@ -56,7 +93,19 @@
       
       <tag>survey</tag>
       
+      <tag>kernel</tag>
+      
       <tag>gadget</tag>
+      
+      <tag>pwn</tag>
+      
+      <tag>reverse</tag>
+      
+      <tag>crypto</tag>
+      
+      <tag>web</tag>
+      
+      <tag>misc</tag>
       
       <tag>KoTH</tag>
       
@@ -181,9 +230,11 @@
       
       <tag>pwn</tag>
       
-      <tag>web</tag>
+      <tag>reverse</tag>
       
       <tag>crypto</tag>
+      
+      <tag>web</tag>
       
       <tag>misc</tag>
       
@@ -192,8 +243,6 @@
       <tag>forensics</tag>
       
       <tag>ppc</tag>
-      
-      <tag>reverse</tag>
       
       <tag>pentest</tag>
       
@@ -220,13 +269,13 @@
     
     <tags>
       
-      <tag>PTE</tag>
-      
-      <tag>Dirty Pageflags</tag>
-      
       <tag>kernel</tag>
       
       <tag>pwn</tag>
+      
+      <tag>PTE</tag>
+      
+      <tag>Dirty Pageflags</tag>
       
       <tag>root</tag>
       
@@ -1018,9 +1067,9 @@
     
     <tags>
       
-      <tag>动态规划</tag>
-      
       <tag>LeetCode</tag>
+      
+      <tag>动态规划</tag>
       
     </tags>
     
@@ -1134,11 +1183,11 @@
     
     <tags>
       
-      <tag>LeetCode</tag>
-      
       <tag>哈希表</tag>
       
       <tag>性能优化</tag>
+      
+      <tag>LeetCode</tag>
       
     </tags>
     
