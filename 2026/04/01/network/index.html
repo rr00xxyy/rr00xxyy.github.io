@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,15 +19,15 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="网络前言: 最近无论是打ctf还是日常学习，生活，娱乐 都离不开科学上网 我遇到了许多网络上的问题 包括但不限于  VPN的原理是什么?  netcat(nc)原理?  WebSocketReflectorX(学长前辈们开发的ctf题目服务器连接工具)原理是什么?  为什么我明明开着VPN，但是在终端(wsl，cmd)中还是无法科学上网，使用curl ip.sb命令后发现ip依旧在广东?  我在V">
+    <meta name="description" content="网络 前言: 最近无论是打ctf还是日常学习，生活，娱乐 都离不开科学上网 我遇到了许多网络上的问题 包括但不限于   VPN的原理是什么?   netcat(nc)原理?   WebSocketReflectorX(学长前辈们开发的ctf题目服务器连接工具)原理是什么?   为什么我明明开着VPN，但是在终端(wsl，cmd)中还是无法科学上网，使用curl ip.sb命令后发现ip依旧在广东?">
 <meta property="og:type" content="article">
 <meta property="og:title" content="network">
 <meta property="og:url" content="https://rr00xxyy.github.io/2026/04/01/network/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="网络前言: 最近无论是打ctf还是日常学习，生活，娱乐 都离不开科学上网 我遇到了许多网络上的问题 包括但不限于  VPN的原理是什么?  netcat(nc)原理?  WebSocketReflectorX(学长前辈们开发的ctf题目服务器连接工具)原理是什么?  为什么我明明开着VPN，但是在终端(wsl，cmd)中还是无法科学上网，使用curl ip.sb命令后发现ip依旧在广东?  我在V">
+<meta property="og:description" content="网络 前言: 最近无论是打ctf还是日常学习，生活，娱乐 都离不开科学上网 我遇到了许多网络上的问题 包括但不限于   VPN的原理是什么?   netcat(nc)原理?   WebSocketReflectorX(学长前辈们开发的ctf题目服务器连接工具)原理是什么?   为什么我明明开着VPN，但是在终端(wsl，cmd)中还是无法科学上网，使用curl ip.sb命令后发现ip依旧在广东?">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-04-01T13:04:02.000Z">
-<meta property="article:modified_time" content="2026-04-16T09:04:44.540Z">
+<meta property="article:modified_time" content="2026-06-28T18:34:38.700Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="ARP">
 <meta property="article:tag" content="DNS">
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          917 字
+          856 字
         
       </span>
     
@@ -279,37 +279,39 @@
             
               <div class="markdown-body">
                 
-                <h1 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h1><p>前言:</p>
+                <h1>网络</h1>
+<p>前言:</p>
 <p>最近无论是打ctf还是日常学习，生活，娱乐</p>
 <p>都离不开科学上网</p>
 <p>我遇到了许多网络上的问题</p>
 <p>包括但不限于</p>
 <ul>
-<li><p><strong>VPN</strong>的原理是什么?</p>
+<li>
+<p><strong>VPN</strong>的原理是什么?</p>
 </li>
-<li><p><strong>netcat</strong>(<code>nc</code>)原理?</p>
+<li>
+<p><strong>netcat</strong>(<code>nc</code>)原理?</p>
 </li>
-<li><p><code>WebSocketReflectorX</code>(学长前辈们开发的ctf题目服务器连接工具)原理是什么?</p>
+<li>
+<p><code>WebSocketReflectorX</code>(学长前辈们开发的ctf题目服务器连接工具)原理是什么?</p>
 </li>
-<li><p>为什么我明明开着<code>VPN</code>，但是在终端(<code>wsl</code>，<code>cmd</code>)中还是无法科学上网，使用<code>curl ip.sb</code>命令后发现ip依旧在广东?</p>
+<li>
+<p>为什么我明明开着<code>VPN</code>，但是在终端(<code>wsl</code>，<code>cmd</code>)中还是无法科学上网，使用<code>curl ip.sb</code>命令后发现ip依旧在广东?</p>
 </li>
-<li><p>我在<code>VMware</code>虚拟机中的<code>ubuntu</code>网络又是怎么来的?</p>
-</li>
-<li><p>为什么深圳校区和广州校区同时连校园网可以在局域网下联机玩<code>mc</code>?</p>
-</li>
-<li><p><strong>GitHub SSH keys</strong>是什么?</p>
-</li>
-<li><p><strong>git</strong>原理?</p>
+<li>
+<p>为什么深圳校区和广州校区同时连校园网可以在局域网下联机玩<code>mc</code>?</p>
 </li>
 </ul>
 <p>我都比较茫然</p>
 <p>因此，现在开始<strong>网络</strong>的学习</p>
 <p>以解决问题为导向</p>
 <p>顺便学习基础知识</p>
-<h2 id="网络模型与基础"><a href="#网络模型与基础" class="headerlink" title="网络模型与基础"></a>网络模型与基础</h2><p>先来学习一下<strong>分层协议栈</strong></p>
+<h2 id="网络模型与基础">网络模型与基础</h2>
+<p>先来学习一下<strong>分层协议栈</strong></p>
 <p>这是一切的基础</p>
-<h3 id="TCP-IP四层模型"><a href="#TCP-IP四层模型" class="headerlink" title="TCP&#x2F;IP四层模型"></a>TCP&#x2F;IP四层模型</h3><p>实际上教学常用<strong>OSI七层模型</strong></p>
-<p>但是真正理解起来还是<strong>TCP&#x2F;IP四层模型</strong>比较实用</p>
+<h3 id="TCP-IP四层模型">TCP/IP四层模型</h3>
+<p>实际上教学常用<strong>OSI七层模型</strong></p>
+<p>但是真正理解起来还是<strong>TCP/IP四层模型</strong>比较实用</p>
 <p>如下:</p>
 <ul>
 <li><code>应用层</code></li>
@@ -318,10 +320,12 @@
 <li><code>数据链路层</code></li>
 </ul>
 <p>ps:其实应该还有一层<code>物理层</code>?</p>
-<h4 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h4><p>典型协议有<code>HTTP</code> <code>DNS</code> <code>SMTP</code> <code>FTP</code> <code>SSH</code>等等</p>
+<h4 id="应用层">应用层</h4>
+<p>典型协议有<code>HTTP</code> <code>DNS</code> <code>SMTP</code> <code>FTP</code> <code>SSH</code>等等</p>
 <p>定义应用数据的<strong>语义</strong>和<strong>格式</strong>，提供<strong>面向用户或服务的应用协议</strong></p>
 <p>即用户看得见的内容，如浏览器的网页等</p>
-<h4 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h4><p>典型协议 <code>TCP</code> <code>UDP</code></p>
+<h4 id="传输层">传输层</h4>
+<p>典型协议 <code>TCP</code> <code>UDP</code></p>
 <p>提供<strong>端到端进程之间的数据传输服务</strong></p>
 <p>控制可靠性，顺序性，重传，流量与拥塞控制</p>
 <p>关键元素为<code>PORT</code>，即<strong>端口号</strong>，</p>
@@ -332,19 +336,23 @@
 <p>而UDP则为<code>Datagram</code>(数据报)</p>
 <p>先总览一下</p>
 <p>后续再展开对TCP的深度理解</p>
-<h4 id="网络层"><a href="#网络层" class="headerlink" title="网络层"></a>网络层</h4><p>即<code>IP协议</code>所在层</p>
+<h4 id="网络层">网络层</h4>
+<p>即<code>IP协议</code>所在层</p>
 <p>进行<strong>跨网段的全局寻址与路由转发</strong>，将数据包从<code>源主机</code>递送到<code>目标主机</code></p>
 <p>数据单位为<code>Packet</code>(包)</p>
-<h4 id="数据链路层"><a href="#数据链路层" class="headerlink" title="数据链路层"></a>数据链路层</h4><p>典型协议有 <code>Ethernet</code> <code>WiFi</code> <code>ARP</code></p>
+<h4 id="数据链路层">数据链路层</h4>
+<p>典型协议有 <code>Ethernet</code> <code>WiFi</code> <code>ARP</code></p>
 <p><strong>在同一物理链路或局域网段内提供可靠的帧传输</strong>，包括寻址，成帧，差错检测和介质访问控制</p>
 <p>数据单位为<code>Frame</code>(帧)</p>
 <p>关键元素为<code>48</code>位的<strong>MAC地址</strong></p>
-<h4 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h4><p><strong>提供比特流的物理传输机制</strong>，定义信号的物理表示方式，介质，调制，同步和接口标准</p>
+<h4 id="物理层">物理层</h4>
+<p><strong>提供比特流的物理传输机制</strong>，定义信号的物理表示方式，介质，调制，同步和接口标准</p>
 <p>数据单位为<code>bit</code>(比特)</p>
 <p>通过电信号(<code>网线</code>)或无线电波(<code>WiFi</code>)传输bit流</p>
 <p>额</p>
 <p>先忽略具体细节吧</p>
-<h4 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h4><p>待补充</p>
+<h4 id="总览">总览</h4>
+<p>待补充</p>
 
                 
               </div>
@@ -447,7 +455,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年4月16日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -598,7 +606,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

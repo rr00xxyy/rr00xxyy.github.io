@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,15 +19,15 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前言第一次接触docker，也是在CTF中，题目的附件中给出了Dockerfile(or docker-compose.yml)，一开始并不知道有什么用，后面才知道本地调试时要docker build -t xxx .构建一个镜像，再docker run -it xxx启动一个容器，以保证本地与远程的环境一致 故以此为引，开始docker的学习 由来不论是开发还是CTF，都会遇到一个问题，你本地能">
+    <meta name="description" content="前言 第一次接触docker，也是在CTF中，题目的附件中给出了Dockerfile(or docker-compose.yml)，一开始并不知道有什么用，后面才知道本地调试时要docker build -t xxx .构建一个镜像，再docker run -it xxx启动一个容器，以保证本地与远程的环境一致 故以此为引，开始docker的学习 由来 不论是开发还是CTF，都会遇到一个问题，你本">
 <meta property="og:type" content="article">
 <meta property="og:title" content="docker">
 <meta property="og:url" content="https://rr00xxyy.github.io/2026/06/08/docker/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="前言第一次接触docker，也是在CTF中，题目的附件中给出了Dockerfile(or docker-compose.yml)，一开始并不知道有什么用，后面才知道本地调试时要docker build -t xxx .构建一个镜像，再docker run -it xxx启动一个容器，以保证本地与远程的环境一致 故以此为引，开始docker的学习 由来不论是开发还是CTF，都会遇到一个问题，你本地能">
+<meta property="og:description" content="前言 第一次接触docker，也是在CTF中，题目的附件中给出了Dockerfile(or docker-compose.yml)，一开始并不知道有什么用，后面才知道本地调试时要docker build -t xxx .构建一个镜像，再docker run -it xxx启动一个容器，以保证本地与远程的环境一致 故以此为引，开始docker的学习 由来 不论是开发还是CTF，都会遇到一个问题，你本">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-06-08T12:30:16.000Z">
-<meta property="article:modified_time" content="2026-06-08T13:47:15.051Z">
+<meta property="article:modified_time" content="2026-06-28T18:18:34.458Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="capability">
 <meta property="article:tag" content="cgroups">
@@ -231,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          8.9k 字
         
       </span>
     
@@ -242,7 +242,7 @@
         
         
         
-          17 分钟
+          75 分钟
         
       </span>
     
@@ -284,58 +284,566 @@
             
               <div class="markdown-body">
                 
-                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>第一次接触<code>docker</code>，也是在CTF中，题目的附件中给出了<code>Dockerfile</code>(or <code>docker-compose.yml</code>)，一开始并不知道有什么用，后面才知道本地调试时要<code>docker build -t xxx .</code>构建一个镜像，再<code>docker run -it xxx</code>启动一个容器，以保证本地与远程的环境一致</p>
+                <h2 id="前言">前言</h2>
+<p>第一次接触<code>docker</code>，也是在CTF中，题目的附件中给出了<code>Dockerfile</code>(or <code>docker-compose.yml</code>)，一开始并不知道有什么用，后面才知道本地调试时要<code>docker build -t xxx .</code>构建一个镜像，再<code>docker run -it xxx</code>启动一个容器，以保证本地与远程的环境一致</p>
 <p>故以此为引，开始<code>docker</code>的学习</p>
-<h2 id="由来"><a href="#由来" class="headerlink" title="由来"></a>由来</h2><p>不论是开发还是CTF，都会遇到一个问题，你本地能运行的代码，别人那里不一定可以，你本地能打通的exp，别人也许一运行就EOF了，要么依赖版本不同，要么系统库存在差异，总之，在部署和运行上，环境不一致带来了很大的麻烦</p>
+<h2 id="由来">由来</h2>
+<p>不论是开发还是CTF，都会遇到一个问题，你本地能运行的代码，别人那里不一定可以，你本地能打通的exp，别人也许一运行就EOF了，要么依赖版本不同，要么系统库存在差异，总之，在部署和运行上，环境不一致带来了很大的麻烦</p>
 <p>一开始的解决方案是<strong>虚拟机</strong>(<code>VM</code>)，但是每个<code>VM</code>都要装一个完整的操作系统，几个<code>GB</code>起步，启动慢，占资源，迁移也麻烦，为了隔离一个可能只有几十<code>MB</code>甚至<code>KB</code>的小应用，硬要扛着几<code>GB</code>的系统内核，怎么看都不划算</p>
-<p>于是，<code>docker</code>诞生了，其不模拟硬件，也不装完整系统，而是直接用<strong>宿主机</strong>的内核，只把<code>应用 + 依赖</code>打包成一个镜像，然后跑起来就是一个容器</p>
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>那么，什么是<strong>镜像</strong>，什么是<strong>容器</strong>呢？</p>
-<h3 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h3><p><strong>镜像</strong>相当于一个<strong>只读</strong>的模板，它把代码，运行环境，依赖库，配置文件等等全部打包在一起，你可以编写<code>Dockerfile</code>以拉取或创建一个特定的镜像</p>
+<p>于是，<code>docker</code>诞生了</p>
+<h2 id="概念">概念</h2>
+<p>什么是<strong>镜像</strong>，什么是<strong>容器</strong>？</p>
+<h3 id="镜像">镜像</h3>
+<p><strong>镜像</strong>相当于一个<strong>只读</strong>的模板，它把代码，运行环境，依赖库，配置文件等等全部打包在一起，你可以编写<code>Dockerfile</code>以拉取或创建一个特定的镜像</p>
 <div class="note note-info">
             <p><code>Dockerfile</code>背后的<strong>层缓存</strong>是什么？</p> <p>构建镜像时，<code>docker</code>会复用之前已经构建过的，未发生变化的层，而不是重新执行该层的指令</p> <p>待补充</p> 
           </div>
-
-<h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><p><strong>容器</strong>就是镜像的运行实例，当执行<code>docker run</code>时，镜像就变成了一个活着的容器</p>
+<h3 id="容器">容器</h3>
+<p><strong>容器</strong>就是镜像的运行实例，当执行<code>docker run</code>时，镜像就变成了一个活着的容器</p>
 <p>容器启动时，<code>docker</code>会在镜像的<code>只读层</code>上面叠一层<code>可写层</code>，你在容器里做的所有修改(写文件，装软件，改配置啊等等)都落在这层上，容器一删，这层可写层也就没了，但原始镜像依然完好，这就是<strong>写时复制</strong>技术(<code>Copy-on-Write</code>)</p>
 <p>关键：容器本质上是一个被限制住的<strong>进程</strong>，<code>docker</code>并没有启动一个新内核，它只是让一个进程看起来像是运行在一个独立的系统里，你在宿主机上执行<code>ps aux</code>依然能看到这个进程，只不过它被包了一层壳而已</p>
 <p>额那这层壳是什么呢</p>
-<h4 id="1-Namespace"><a href="#1-Namespace" class="headerlink" title="1.Namespace"></a>1.Namespace</h4><p><code>Namespace</code>让进程只能看到自己的那一份<code>系统资源视图</code>，实现了<strong>隔离</strong>：</p>
+<h4 id="1-Namespace">1.Namespace</h4>
+<p><code>Namespace</code>让进程只能看到自己的那一份<code>系统资源视图</code>，实现了<strong>隔离</strong>：</p>
 <ul>
-<li><p>PID namespace：容器内的进程以为自己的<code>PID</code>是$1$，看不到宿主机上的其它进程</p>
+<li>
+<p>PID namespace：容器内的进程以为自己的<code>PID</code>是
+    <span id="mjx-bb19db6">
+      <style>
+      #mjx-bb19db6{
+        display:contents;
+        mjx-assistive-mml {
+          user-select: text !important;
+          clip: auto !important;
+          color: rgba(0,0,0,0);
+        }
+        
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line], svg[data-table] > g > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame], svg[data-table] > g > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed, svg[data-table] > g > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted, svg[data-table] > g > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > g > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
+  stroke-width: 3;
+}
+
+g[data-mml-node="xypic"] path {
+  stroke-width: inherit;
+}
+
+.MathJax g[data-mml-node="xypic"] path {
+  stroke-width: inherit;
+}
+
+      }
+      </style>
+      <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.131ex" height="1.507ex" role="img" focusable="false" viewBox="0 -666 500 666" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>1</mn></math></mjx-assistive-mml></mjx-container>
+    </span>
+  ，看不到宿主机上的其它进程</p>
 </li>
-<li><p>NET namespace：容器有自己独立的网络栈(网卡，路由表，<code>iptables</code>规则)</p>
+<li>
+<p>NET namespace：容器有自己独立的网络栈(网卡，路由表，<code>iptables</code>规则)</p>
 </li>
-<li><p>MNT namespace：容器有自己独立的文件系统挂载点</p>
+<li>
+<p>MNT namespace：容器有自己独立的文件系统挂载点</p>
 </li>
-<li><p>UTS namespace：容器可以有独立的<code>主机名</code>和<code>域名</code></p>
+<li>
+<p>UTS namespace：容器可以有独立的<code>主机名</code>和<code>域名</code></p>
 </li>
-<li><p>IPC namespace：容器有自己的进程间通信资源(共享内存，消息队列)</p>
+<li>
+<p>IPC namespace：容器有自己的进程间通信资源(共享内存，消息队列)</p>
 </li>
-<li><p>USER namespace：容器内可以有自己独立的用户<code>ID</code>映射</p>
+<li>
+<p>USER namespace：容器内可以有自己独立的用户<code>ID</code>映射</p>
 </li>
 </ul>
-<h4 id="2-Cgroups"><a href="#2-Cgroups" class="headerlink" title="2.Cgroups"></a>2.Cgroups</h4><p><strong>Cgroups</strong>(<code>Control Groups</code>)负责给进程划定资源上限：</p>
+<h4 id="2-Cgroups">2.Cgroups</h4>
+<p><strong>Cgroups</strong>(<code>Control Groups</code>)负责给进程划定资源上限：</p>
 <ul>
-<li><p><code>CPU</code>配额(比如最多用$2$个核心)</p>
+<li>
+<p><code>CPU</code>配额(比如最多用
+    <span id="mjx-2e50f0a8">
+      <style>
+      #mjx-2e50f0a8{
+        display:contents;
+        mjx-assistive-mml {
+          user-select: text !important;
+          clip: auto !important;
+          color: rgba(0,0,0,0);
+        }
+        
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line], svg[data-table] > g > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame], svg[data-table] > g > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed, svg[data-table] > g > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted, svg[data-table] > g > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > g > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
+  stroke-width: 3;
+}
+
+g[data-mml-node="xypic"] path {
+  stroke-width: inherit;
+}
+
+.MathJax g[data-mml-node="xypic"] path {
+  stroke-width: inherit;
+}
+
+      }
+      </style>
+      <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: 0;" xmlns="http://www.w3.org/2000/svg" width="1.131ex" height="1.507ex" role="img" focusable="false" viewBox="0 -666 500 666" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>2</mn></math></mjx-assistive-mml></mjx-container>
+    </span>
+  个核心)</p>
 </li>
-<li><p>内存限制(超过则触发<code>OOM Killer</code>)</p>
+<li>
+<p>内存限制(超过则触发<code>OOM Killer</code>)</p>
 </li>
-<li><p>磁盘<code>I/O</code>读写速率限制</p>
+<li>
+<p>磁盘<code>I/O</code>读写速率限制</p>
 </li>
-<li><p>网络带宽限制</p>
+<li>
+<p>网络带宽限制</p>
 </li>
-<li><p>进程数量限制</p>
+<li>
+<p>进程数量限制</p>
 </li>
 </ul>
-<h4 id="3-rootfs"><a href="#3-rootfs" class="headerlink" title="3.rootfs"></a>3.rootfs</h4><p>通过<code>chroot</code>，容器进程的<code>/</code>不再是宿主机的<code>/</code>，而是镜像里打包好的那一套文件系统(如Ubuntu，Alpine的根文件系统)，于是，容器内执行<code>/bin/bash</code>用的是镜像里的<code>bash</code>，而不是宿主机上的<code>bash</code>，容器内看到的<code>/etc</code>，<code>/var</code>也都是与宿主机隔离的</p>
+<h4 id="3-rootfs">3.rootfs</h4>
+<p>通过<code>chroot</code>，容器进程的<code>/</code>不再是宿主机的<code>/</code>，而是镜像里打包好的那一套文件系统(如Ubuntu，Alpine的根文件系统)，于是，容器内执行<code>/bin/bash</code>用的是镜像里的<code>bash</code>，而不是宿主机上的<code>bash</code>，容器内看到的<code>/etc</code>，<code>/var</code>也都是与宿主机隔离的</p>
 <p>容器启动时，没有内核引导，没有<code>init</code>系统，也没有硬件探测，本质上只是<code>fork</code>一个进程，然后在<code>exec</code>之前设置好<code>Namespace</code>，<code>Cgroups</code>，<code>rootfs</code>，所以容器启动是毫秒级的</p>
 <p>且容器里最终运行的还是一个普通的进程，即一个应用，一个服务，没有这个进程，容器就会立刻退出</p>
-<h2 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h2><h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h2><h3 id="沙箱-sandbox"><a href="#沙箱-sandbox" class="headerlink" title="沙箱(sandbox)"></a>沙箱(sandbox)</h3><p>沙箱(<code>sandbox</code>)是一种安全隔离机制，它的目标是：让一个进程只能访问<strong>被允许</strong>的资源，其余的一切都接触不到，哪怕这个进程被攻击者控制了，也无法逃逸到宿主系统</p>
+<h2 id="网络">网络</h2>
+<h2 id="架构">架构</h2>
+<h2 id="安全">安全</h2>
+<h3 id="沙箱-sandbox">沙箱(sandbox)</h3>
+<p>沙箱(<code>sandbox</code>)是一种安全隔离机制，它的目标是：让一个进程只能访问<strong>被允许</strong>的资源，其余的一切都接触不到，哪怕这个进程被攻击者控制了，也无法逃逸到宿主系统</p>
 <p>在<code>docker</code>中沙箱由几种机制组合而成，首先便是上述的<code>Namespace</code>与<code>Cgroups</code>，其次还有：</p>
-<h4 id="Capabilities"><a href="#Capabilities" class="headerlink" title="Capabilities"></a>Capabilities</h4><p>容器里的<code>root</code>不是拥有完整宿主机权限的<code>root</code>，<code>docker</code>默认只保留一小组必要<code>capabilities</code>，并丢弃<code>CAP_SYS_ADMIN</code>，<code>CAP_SYS_MODULE</code>等高危能力</p>
-<h4 id="Seccomp"><a href="#Seccomp" class="headerlink" title="Seccomp"></a>Seccomp</h4><p><code>docker</code>默认<code>seccomp profile</code>是<code>syscall allowlist</code>，大约拦截$40$多个危险或不必要的<strong>系统调用</strong>，例如模块加载，重启，部分<code>namespace</code>操作等</p>
-<h3 id="逃逸"><a href="#逃逸" class="headerlink" title="逃逸"></a>逃逸</h3><p><code>虚拟机</code>的沙箱依赖<code>硬件</code>辅助虚拟化(如<code>Intel VT-x</code>)和独立的<code>Guest</code>内核，隔离强度高，但开销大</p>
-<p>而<code>docker</code>的沙箱则是内核层面的软件隔离，更轻量，但容器本质上还是共享着宿主机的内核，一旦内核本身存在漏洞，攻击者就有可能逃逸出沙箱，影响宿主机…</p>
+<h4 id="Capabilities">Capabilities</h4>
+<p>容器里的<code>root</code>不是拥有完整宿主机权限的<code>root</code>，<code>docker</code>默认只保留一小组必要<code>capabilities</code>，并丢弃<code>CAP_SYS_ADMIN</code>，<code>CAP_SYS_MODULE</code>等高危能力</p>
+<h4 id="Seccomp">Seccomp</h4>
+<p><code>docker</code>默认<code>seccomp profile</code>是<code>syscall allowlist</code>，大约拦截
+    <span id="mjx-2b2d626">
+      <style>
+      #mjx-2b2d626{
+        display:contents;
+        mjx-assistive-mml {
+          user-select: text !important;
+          clip: auto !important;
+          color: rgba(0,0,0,0);
+        }
+        
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line], svg[data-table] > g > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame], svg[data-table] > g > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed, svg[data-table] > g > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted, svg[data-table] > g > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > g > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
+  stroke-width: 3;
+}
+
+g[data-mml-node="xypic"] path {
+  stroke-width: inherit;
+}
+
+.MathJax g[data-mml-node="xypic"] path {
+  stroke-width: inherit;
+}
+
+      }
+      </style>
+      <mjx-container class="MathJax" jax="SVG" style="position: relative;"><svg style="vertical-align: -0.05ex;" xmlns="http://www.w3.org/2000/svg" width="2.262ex" height="1.581ex" role="img" focusable="false" viewBox="0 -677 1000 699" aria-hidden="true"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mn"><path data-c="34" d="M462 0Q444 3 333 3Q217 3 199 0H190V46H221Q241 46 248 46T265 48T279 53T286 61Q287 63 287 115V165H28V211L179 442Q332 674 334 675Q336 677 355 677H373L379 671V211H471V165H379V114Q379 73 379 66T385 54Q393 47 442 46H471V0H462ZM293 211V545L74 212L183 211H293Z"></path><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z" transform="translate(500,0)"></path></g></g></g></svg><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>40</mn></math></mjx-assistive-mml></mjx-container>
+    </span>
+  多个危险或不必要的<strong>系统调用</strong>，例如模块加载，重启，部分<code>namespace</code>操作等</p>
+<h3 id="逃逸">逃逸</h3>
+<p><code>虚拟机</code>的沙箱依赖<code>硬件</code>辅助虚拟化(如<code>Intel VT-x</code>)和独立的<code>Guest</code>内核，隔离强度高，但开销大</p>
+<p>而<code>docker</code>的沙箱则是内核层面的软件隔离，更轻量，但容器本质上还是共享着宿主机的内核，一旦内核本身存在漏洞，攻击者就有可能逃逸出沙箱，影响宿主机...</p>
 <p>待补充</p>
 
                 
@@ -464,7 +972,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年6月8日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -609,7 +1117,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

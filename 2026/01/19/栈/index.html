@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,17 +19,17 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="栈(LIFO)此栈非彼栈… 20.有效的括号 解： 后进先出 1234567891011121314151617181920class Solution &#123;public:    bool isValid(string s) &#123;        stack&lt;char&gt; stk;        for(char c : s) &#123;            if(c">
+    <meta name="description" content="栈(LIFO) 20.有效的括号  解： 后进先出 1234567891011121314151617181920class Solution &#123;public:    bool isValid(string s) &#123;        stack&lt;char&gt; stk;        for(char c : s) &#123;            if(c &#x3D;&#x3D; &amp;#">
 <meta property="og:type" content="article">
 <meta property="og:title" content="栈">
 <meta property="og:url" content="https://rr00xxyy.github.io/2026/01/19/%E6%A0%88/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="栈(LIFO)此栈非彼栈… 20.有效的括号 解： 后进先出 1234567891011121314151617181920class Solution &#123;public:    bool isValid(string s) &#123;        stack&lt;char&gt; stk;        for(char c : s) &#123;            if(c">
+<meta property="og:description" content="栈(LIFO) 20.有效的括号  解： 后进先出 1234567891011121314151617181920class Solution &#123;public:    bool isValid(string s) &#123;        stack&lt;char&gt; stk;        for(char c : s) &#123;            if(c &#x3D;&#x3D; &amp;#">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/26.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/67.png">
 <meta property="article:published_time" content="2026-01-19T04:31:58.000Z">
-<meta property="article:modified_time" content="2026-04-15T16:38:55.872Z">
+<meta property="article:modified_time" content="2026-06-28T18:00:50.277Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="数据结构">
@@ -277,16 +277,16 @@
             
               <div class="markdown-body">
                 
-                <h1 id="栈-LIFO"><a href="#栈-LIFO" class="headerlink" title="栈(LIFO)"></a>栈(LIFO)</h1><p>此栈非彼栈…</p>
-<h2 id="20-有效的括号"><a href="#20-有效的括号" class="headerlink" title="20.有效的括号"></a>20.有效的括号</h2><p><img src="/images/26.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+                <h1>栈(LIFO)</h1>
+<h2 id="20-有效的括号">20.有效的括号</h2>
+<p><img src="/images/26.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>解：</p>
 <p><code>后进先出</code></p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">isValid</span><span class="hljs-params">(string s)</span> </span>&#123;<br>        stack&lt;<span class="hljs-type">char</span>&gt; stk;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">char</span> c : s) &#123;<br>            <span class="hljs-keyword">if</span>(c == <span class="hljs-string">&#x27;(&#x27;</span> || c == <span class="hljs-string">&#x27;[&#x27;</span> || c == <span class="hljs-string">&#x27;&#123;&#x27;</span>)&#123;<br>                stk.<span class="hljs-built_in">push</span>(c);<br>            &#125;<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(c == <span class="hljs-string">&#x27;)&#x27;</span> &amp;&amp; !stk.<span class="hljs-built_in">empty</span>() &amp;&amp; stk.<span class="hljs-built_in">top</span>() == <span class="hljs-string">&#x27;(&#x27;</span>)&#123;<br>                stk.<span class="hljs-built_in">pop</span>();<br>            &#125;<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(c == <span class="hljs-string">&#x27;]&#x27;</span> &amp;&amp; !stk.<span class="hljs-built_in">empty</span>() &amp;&amp; stk.<span class="hljs-built_in">top</span>() == <span class="hljs-string">&#x27;[&#x27;</span>)&#123;<br>                stk.<span class="hljs-built_in">pop</span>();<br>            &#125;<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(c == <span class="hljs-string">&#x27;&#125;&#x27;</span> &amp;&amp; !stk.<span class="hljs-built_in">empty</span>() &amp;&amp; stk.<span class="hljs-built_in">top</span>() == <span class="hljs-string">&#x27;&#123;&#x27;</span>)&#123;<br>                stk.<span class="hljs-built_in">pop</span>();<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> stk.<span class="hljs-built_in">empty</span>();<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<h2 id="155-最小栈"><a href="#155-最小栈" class="headerlink" title="155.最小栈"></a>155.最小栈</h2><p><img src="/images/67.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<h2 id="155-最小栈">155.最小栈</h2>
+<p><img src="/images/67.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>解:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">MinStack</span> &#123;<br><span class="hljs-keyword">private</span>:<br>    stack&lt;<span class="hljs-type">int</span>&gt; st;<br>    stack&lt;<span class="hljs-type">int</span>&gt; minSt; <br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">MinStack</span>() &#123;&#125;<br>    <br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">push</span><span class="hljs-params">(<span class="hljs-type">int</span> val)</span> </span>&#123;<br>        st.<span class="hljs-built_in">push</span>(val);<br>        <span class="hljs-keyword">if</span> (minSt.<span class="hljs-built_in">empty</span>() || val &lt;= minSt.<span class="hljs-built_in">top</span>()) &#123;<br>            minSt.<span class="hljs-built_in">push</span>(val);<br>        &#125;<br>    &#125;<br>    <br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">pop</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">if</span>(st.<span class="hljs-built_in">top</span>() == minSt.<span class="hljs-built_in">top</span>()) &#123;<br>            minSt.<span class="hljs-built_in">pop</span>();<br>        &#125;<br>        st.<span class="hljs-built_in">pop</span>();<br>    &#125;<br>    <br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">top</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> st.<span class="hljs-built_in">top</span>();<br>    &#125;<br>    <br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">getMin</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> minSt.<span class="hljs-built_in">top</span>();<br>    &#125;<br>&#125;;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Your MinStack object will be instantiated and called as such:</span><br><span class="hljs-comment"> * MinStack* obj = new MinStack();</span><br><span class="hljs-comment"> * obj-&gt;push(val);</span><br><span class="hljs-comment"> * obj-&gt;pop();</span><br><span class="hljs-comment"> * int param_3 = obj-&gt;top();</span><br><span class="hljs-comment"> * int param_4 = obj-&gt;getMin();</span><br><span class="hljs-comment"> */</span><br></code></pre></td></tr></table></figure>
-
 
                 
               </div>
@@ -364,7 +364,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年4月16日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -515,7 +515,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

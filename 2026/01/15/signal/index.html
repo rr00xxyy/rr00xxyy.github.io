@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -282,36 +282,35 @@
 <p>经过查阅资料发现，原来这两样东西完全是不同的机制。</p>
 <p>第一种情况，在进程进行上下文切换时，例如从进程A切换至进程B，进程A的寄存器此时保存在内核栈，待进程A重新被调度时，才会从内核栈恢复寄存器，重新进入进程A，此时用户不可控。</p>
 <p>第二种情况，也就是本文的主题，即linux系统的信号处理机制</p>
-<p>信号在硬件层面发生异常&#x2F;中断时，内核会向进程发送<strong>信号</strong>，通知用户进程发生了某种事情</p>
+<p>信号在硬件层面发生异常/中断时，内核会向进程发送<strong>信号</strong>，通知用户进程发生了某种事情</p>
 <p>常见如:</p>
 <ul>
-<li><p>除数为零(异常) -&gt; SIGFPE</p>
+<li>
+<p>除数为零(异常) -&gt; SIGFPE</p>
 </li>
-<li><p>非法内存访问(异常) -&gt; SIGSEGV 也就是pwn手经常看到的<code>segmentation fault</code></p>
+<li>
+<p>非法内存访问(异常) -&gt; SIGSEGV 也就是pwn手经常看到的<code>segmentation fault</code></p>
 </li>
-<li><p>当你按下<code>Ctrl+C</code>时(产生键盘中断) -&gt; SIGINT</p>
+<li>
+<p>当你按下<code>Ctrl+C</code>时(产生键盘中断) -&gt; SIGINT</p>
 </li>
 </ul>
 <p>那么，内核如何发送这个信号到用户进程呢，本质是在用户态调用了一个<code>signal handler</code>函数，想象一下，用户进程正在愉快地执行，此时发生了某种事件，于是内核决定发送信号，CPU此时立即进入内核态(trap)，此时内核要保存被打断的寄存器，这便是第一种情况<code>受限直接执行</code>的一部分，但是这些寄存器只是暂时保存在内核栈，不是最终保存位置，我们接着看。</p>
 <p>接下来，内核判断是否要处理信号，内核在一系列判断后，如果确定要发送这个<code>signal handler</code>，于是进入<code>signal delivery path</code>，接下来便是关键步骤:内核<strong>伪造</strong>用户态调用栈</p>
 <p>内核会在用户栈上分配一个<code>sigframe</code>，简化后大致如下所示</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">rt_sigframe</span> &#123;</span><br>    <span class="hljs-type">char</span> pretcode[<span class="hljs-number">8</span>];   <br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ucontext</span> <span class="hljs-title">uc</span>;</span>   <br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">siginfo</span> <span class="hljs-title">info</span>;</span><br>&#125;;<br></code></pre></td></tr></table></figure>
-
 <p>这些分别代表什么？我们只需要关注两样东西</p>
 <p>首先，<code>char pretcode[8];</code>，这个地址通常是glibc提供的<code>trampoline</code>，我们不妨叫它<code>rt_sigreturn_trampoline</code>，指令你应该很熟悉</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs asm">mov rax, SYS_rt_sigreturn  //linux x86-64下即是15<br>syscall<br></code></pre></td></tr></table></figure>
-
 <p>然后，<code>ucontext</code>见下</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ucontext</span> &#123;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span>  uc_flags;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ucontext</span> *<span class="hljs-title">uc_link</span>;</span><br>    <span class="hljs-type">stack_t</span>        uc_stack;<br>    <span class="hljs-type">sigset_t</span>       uc_sigmask;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sigcontext</span> <span class="hljs-title">uc_mcontext</span>;</span>  <span class="hljs-comment">// 想我了吗?</span><br>&#125;;<br></code></pre></td></tr></table></figure>
-
 <p>看到<code>sigcontext</code>了吗，这便是SROP中利用的关键，保存着所有的寄存器</p>
 <p>代码如下</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sigcontext</span> &#123;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r8;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r9;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r10;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r11;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r12;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r13;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r14;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> r15;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rdi;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rsi;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rbp;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rbx;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rdx;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rax;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rcx;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rsp;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> rip;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> eflags;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> cs;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> gs;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> fs;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">short</span> __pad0;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> err;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> trapno;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> oldmask;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> cr2;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> _<span class="hljs-title">fpstate</span> *<span class="hljs-title">fpstate</span>;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> reserved1[<span class="hljs-number">8</span>];<br>&#125;;<br></code></pre></td></tr></table></figure>
-
 <p>内核在用户栈伪造了这个<code>sigframe</code>后将<code>rip</code>设置为<code>handler</code>(即原执行流变为执行信号处理函数)，将<code>rsp</code>设置为<code>rt_sigreturn_trampoline</code>，在执行完信号处理函数后，因为<code>handler</code>函数的最后一条指令通常是<code>ret</code>，因此，<code>pop rip</code>，执行<code>rt_sigreturn_trampoline</code></p>
 <p>系统再次进入内核态，无条件地信任它自己在用户栈设置的<code>sigframe</code>，从<code>sigcontext</code>中恢复所有保存的寄存器，程序恢复至被中断前的执行点</p>
 <p>总结一下全过程:</p>
-<p>1.用户代码正常运行，突然，发生程序异常&#x2F;硬件中断等”事故”</p>
+<p>1.用户代码正常运行，突然，发生程序异常/硬件中断等&quot;事故&quot;</p>
 <p>2.CPU进入内核态并保存寄存器到<code>pt_regs</code>(内核栈中的一个结构体，保存关键寄存器)</p>
 <p>3.内核决定要运行<code>handler</code>:在用户栈写<code>rt_sigframe</code>(把<code>pt_regs</code>的快照写到<code>uc_mcontext</code>)，然后修改<code>pt_regs</code>使得<code>rip=handler</code>,<code>rsp=rt_sigframe</code>, 并设置<code>handler</code>参数寄存器</p>
 <p>4.内核执行<code>return-to-user</code>(<strong>iretq</strong>)，CPU恢复并开始执行<code>handler</code>(看起来像是<code>normal call</code>)</p>
@@ -543,7 +542,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

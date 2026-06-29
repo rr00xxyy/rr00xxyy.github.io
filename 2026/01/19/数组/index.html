@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,12 +19,12 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="数组以后再写… 53.最大子数组和Kadane算法 DP + 贪心  很好理解 解: 123456789101112class Solution &#123;public:    int maxSubArray(vector&lt;int&gt;&amp; nums) &#123;        int cur &#x3D; nums[0];        int ans &#x3D; nums[0];">
+    <meta name="description" content="数组 53.最大子数组和 Kadane算法 DP + 贪心  解: 123456789101112class Solution &#123;public:    int maxSubArray(vector&lt;int&gt;&amp; nums) &#123;        int cur &#x3D; nums[0];        int ans &#x3D; nums[0];        for(int">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数组">
 <meta property="og:url" content="https://rr00xxyy.github.io/2026/01/19/%E6%95%B0%E7%BB%84/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="数组以后再写… 53.最大子数组和Kadane算法 DP + 贪心  很好理解 解: 123456789101112class Solution &#123;public:    int maxSubArray(vector&lt;int&gt;&amp; nums) &#123;        int cur &#x3D; nums[0];        int ans &#x3D; nums[0];">
+<meta property="og:description" content="数组 53.最大子数组和 Kadane算法 DP + 贪心  解: 123456789101112class Solution &#123;public:    int maxSubArray(vector&lt;int&gt;&amp; nums) &#123;        int cur &#x3D; nums[0];        int ans &#x3D; nums[0];        for(int">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/73.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/74.png">
@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://rr00xxyy.github.io/images/78.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/82.png">
 <meta property="article:published_time" content="2026-01-19T04:33:53.000Z">
-<meta property="article:modified_time" content="2026-04-15T16:41:25.667Z">
+<meta property="article:modified_time" content="2026-06-28T17:59:12.349Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="数组">
 <meta name="twitter:card" content="summary_large_image">
@@ -278,45 +278,40 @@
             
               <div class="markdown-body">
                 
-                <h1 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h1><p>以后再写…</p>
-<h2 id="53-最大子数组和"><a href="#53-最大子数组和" class="headerlink" title="53.最大子数组和"></a>53.最大子数组和</h2><p><strong>Kadane算法</strong></p>
+                <h1>数组</h1>
+<h2 id="53-最大子数组和">53.最大子数组和</h2>
+<p><strong>Kadane算法</strong></p>
 <p><code>DP</code> + <code>贪心</code></p>
 <p><img src="/images/73.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<p>很好理解</p>
 <p>解:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">maxSubArray</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-type">int</span> cur = nums[<span class="hljs-number">0</span>];<br>        <span class="hljs-type">int</span> ans = nums[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt; nums.<span class="hljs-built_in">size</span>(); i++) &#123;<br>            cur = <span class="hljs-built_in">max</span>(nums[i], cur + nums[i]);<br>            ans = <span class="hljs-built_in">max</span>(ans, cur);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<h2 id="56-合并区间"><a href="#56-合并区间" class="headerlink" title="56.合并区间"></a>56.合并区间</h2><p><img src="/images/74.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<h2 id="56-合并区间">56.合并区间</h2>
+<p><img src="/images/74.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>先按区间起点<code>排序</code>，然后维护一个结果数组，每次只需要判断当前区间是否和结果数组最后一个区间重叠，重叠就合并，不重叠就加入新区间</p>
 <div class="note note-success">
             <p>注意<strong>auto</strong>的使用</p> 
           </div>
-
 <p>解:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; <span class="hljs-built_in">merge</span>(vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt;&amp; intervals) &#123;<br>        <span class="hljs-keyword">if</span>(intervals.<span class="hljs-built_in">empty</span>()) <span class="hljs-keyword">return</span> &#123;&#125;;<br><br>        <span class="hljs-comment">// 按区间起点排序</span><br>        <span class="hljs-built_in">sort</span>(intervals.<span class="hljs-built_in">begin</span>(), intervals.<span class="hljs-built_in">end</span>());<br><br>        vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; res;<br>        res.<span class="hljs-built_in">push_back</span>(intervals[<span class="hljs-number">0</span>]);<br><br>        <span class="hljs-comment">// 扫描并合并</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt; intervals.<span class="hljs-built_in">size</span>(); i++) &#123;<br>            <span class="hljs-keyword">auto</span>&amp; last = res.<span class="hljs-built_in">back</span>();<br>            <span class="hljs-keyword">auto</span>&amp; cur = intervals[i];<br><br>            <span class="hljs-keyword">if</span>(cur[<span class="hljs-number">0</span>] &lt;= last[<span class="hljs-number">1</span>]) &#123;<br>                <span class="hljs-comment">// 有重叠 合并</span><br>                last[<span class="hljs-number">1</span>] = <span class="hljs-built_in">max</span>(last[<span class="hljs-number">1</span>], cur[<span class="hljs-number">1</span>]);<br>            &#125;<span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-comment">// 无重叠 加入新区间</span><br>                res.<span class="hljs-built_in">push_back</span>(cur);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<h2 id="189-轮转数组"><a href="#189-轮转数组" class="headerlink" title="189.轮转数组"></a>189.轮转数组</h2><p><img src="/images/77.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<p>非常easy</p>
+<h2 id="189-轮转数组">189.轮转数组</h2>
+<p><img src="/images/77.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>解法1:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">rotate</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        k %= n;<br>        <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">res</span><span class="hljs-params">(n)</span></span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>            res[(i + k) % n] = nums[i];<br>        &#125;<br>        nums = res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
 <p>解法2:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">reverse</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>&#123;<br>        <span class="hljs-keyword">while</span> (l &lt; r) &#123;<br>            <span class="hljs-built_in">swap</span>(nums[l++], nums[r--]);<br>        &#125;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">rotate</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        k %= n;<br>        <span class="hljs-built_in">reverse</span>(nums, <span class="hljs-number">0</span>, n - <span class="hljs-number">1</span>);<br>        <span class="hljs-built_in">reverse</span>(nums, <span class="hljs-number">0</span>, k - <span class="hljs-number">1</span>);<br>        <span class="hljs-built_in">reverse</span>(nums, k, n - <span class="hljs-number">1</span>);<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<h2 id="238-除了自身以外数组的乘积"><a href="#238-除了自身以外数组的乘积" class="headerlink" title="238.除了自身以外数组的乘积"></a>238.除了自身以外数组的乘积</h2><p><img src="/images/78.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<h2 id="238-除了自身以外数组的乘积">238.除了自身以外数组的乘积</h2>
+<p><img src="/images/78.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>解法1:</p>
 <p><code>前缀积</code> + <code>后缀积</code></p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">productExceptSelf</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">prefix</span><span class="hljs-params">(n)</span>, <span class="hljs-title">suffix</span><span class="hljs-params">(n)</span>, <span class="hljs-title">ans</span><span class="hljs-params">(n)</span></span>;<br><br>        prefix[<span class="hljs-number">0</span>] = <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt; n; i++) &#123;<br>            prefix[i] = prefix[i - <span class="hljs-number">1</span>] * nums[i - <span class="hljs-number">1</span>];<br>        &#125;<br>        suffix[n - <span class="hljs-number">1</span>] = <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = n - <span class="hljs-number">2</span>; i &gt;= <span class="hljs-number">0</span>; i--) &#123;<br>            suffix[i] = suffix[i + <span class="hljs-number">1</span>] * nums[i + <span class="hljs-number">1</span>];<br>        &#125;<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>            ans[i] = prefix[i] * suffix[i];<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
 <p>解法2:</p>
 <p><code>滚动后缀积</code></p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">productExceptSelf</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">ans</span><span class="hljs-params">(n)</span></span>;<br><br>        ans[<span class="hljs-number">0</span>] = <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt; n; i++) &#123;<br>            ans[i] = ans[i - <span class="hljs-number">1</span>] * nums[i - <span class="hljs-number">1</span>];<br>        &#125;<br><br>        <span class="hljs-type">int</span> right = <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = n - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i--) &#123;<br>            ans[i] *= right;<br>            right *= nums[i];<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<h2 id="41-缺失的第一个正数"><a href="#41-缺失的第一个正数" class="headerlink" title="41.缺失的第一个正数"></a>41.缺失的第一个正数</h2><p><img src="/images/82.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<h2 id="41-缺失的第一个正数">41.缺失的第一个正数</h2>
+<p><img src="/images/82.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>解:</p>
-<p>数学思考</p>
+<p>思考...</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">firstMissingPositive</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>            <span class="hljs-keyword">while</span>(nums[i] &gt;= <span class="hljs-number">1</span> &amp;&amp; nums[i] &lt;= n &amp;&amp; nums[nums[i] - <span class="hljs-number">1</span>] != nums[i]) &#123;<br>                <span class="hljs-built_in">swap</span>(nums[i], nums[nums[i] - <span class="hljs-number">1</span>]);<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>            <span class="hljs-keyword">if</span>(nums[i] != i + <span class="hljs-number">1</span>) &#123;<br>                <span class="hljs-keyword">return</span> i + <span class="hljs-number">1</span>;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> n + <span class="hljs-number">1</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
 
                 
               </div>
@@ -384,7 +379,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年4月16日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -535,7 +530,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,19 +19,19 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="双指针慢慢写… 283.移动零 解法: 123456789101112131415class Solution &#123;public:    void moveZeroes(vector&lt;int&gt;&amp; nums) &#123;        int slow &#x3D; 0; &#x2F;&#x2F;快慢双指针        for(int fast &#x3D; 0;fast &lt; nums.size();">
+    <meta name="description" content="双指针 283.移动零  解法: 123456789101112131415class Solution &#123;public:    void moveZeroes(vector&lt;int&gt;&amp; nums) &#123;        int slow &#x3D; 0; &#x2F;&#x2F;快慢双指针        for(int fast &#x3D; 0;fast &lt; nums.size();fas">
 <meta property="og:type" content="article">
 <meta property="og:title" content="双指针">
 <meta property="og:url" content="https://rr00xxyy.github.io/2026/01/19/%E5%8F%8C%E6%8C%87%E9%92%88/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="双指针慢慢写… 283.移动零 解法: 123456789101112131415class Solution &#123;public:    void moveZeroes(vector&lt;int&gt;&amp; nums) &#123;        int slow &#x3D; 0; &#x2F;&#x2F;快慢双指针        for(int fast &#x3D; 0;fast &lt; nums.size();">
+<meta property="og:description" content="双指针 283.移动零  解法: 123456789101112131415class Solution &#123;public:    void moveZeroes(vector&lt;int&gt;&amp; nums) &#123;        int slow &#x3D; 0; &#x2F;&#x2F;快慢双指针        for(int fast &#x3D; 0;fast &lt; nums.size();fas">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/20.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/21.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/22.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/25.png">
 <meta property="article:published_time" content="2026-01-19T01:03:25.000Z">
-<meta property="article:modified_time" content="2026-04-15T16:40:19.306Z">
+<meta property="article:modified_time" content="2026-06-28T17:59:41.260Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="LeetCode">
 <meta property="article:tag" content="双指针">
@@ -279,24 +279,24 @@
             
               <div class="markdown-body">
                 
-                <h1 id="双指针"><a href="#双指针" class="headerlink" title="双指针"></a>双指针</h1><p>慢慢写…</p>
-<h2 id="283-移动零"><a href="#283-移动零" class="headerlink" title="283.移动零"></a>283.移动零</h2><p><img src="/images/20.png" srcset="/img/loading.gif" lazyload alt="如图所示"></p>
+                <h1>双指针</h1>
+<h2 id="283-移动零">283.移动零</h2>
+<p><img src="/images/20.png" srcset="/img/loading.gif" lazyload alt="如图所示"></p>
 <p>解法:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">moveZeroes</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-type">int</span> slow = <span class="hljs-number">0</span>; <span class="hljs-comment">//快慢双指针</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> fast = <span class="hljs-number">0</span>;fast &lt; nums.<span class="hljs-built_in">size</span>();fast++)&#123;<br>            <span class="hljs-keyword">if</span>(nums[fast] != <span class="hljs-number">0</span>)&#123;<br>                nums[slow] = nums[fast];<br>                slow++;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = slow;j &lt; nums.<span class="hljs-built_in">size</span>();j++)&#123;<br>            nums[j] = <span class="hljs-number">0</span>;<br>        &#125;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<h2 id="11-盛最多水的容器"><a href="#11-盛最多水的容器" class="headerlink" title="11.盛最多水的容器"></a>11.盛最多水的容器</h2><p><img src="/images/21.png" srcset="/img/loading.gif" lazyload alt="如图所示"></p>
+<h2 id="11-盛最多水的容器">11.盛最多水的容器</h2>
+<p><img src="/images/21.png" srcset="/img/loading.gif" lazyload alt="如图所示"></p>
 <p>解法:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">maxArea</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; height)</span> </span>&#123;<br>        <span class="hljs-type">int</span> l = <span class="hljs-number">0</span>,r = height.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span>(l &lt; r)&#123;<br>            <span class="hljs-type">int</span> h = <span class="hljs-built_in">min</span>(height[l], height[r]);<br>            <span class="hljs-type">int</span> area = h * (r - l);<br>            ans = <span class="hljs-built_in">max</span>(ans, area);<br><br>            <span class="hljs-keyword">if</span>(height[l] &lt; height[r])&#123;<br>                l++;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                r--;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<h2 id="15-三数之和"><a href="#15-三数之和" class="headerlink" title="15.三数之和"></a>15.三数之和</h2><p><img src="/images/22.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<h2 id="15-三数之和">15.三数之和</h2>
+<p><img src="/images/22.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>解:</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; <span class="hljs-built_in">threeSum</span>(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums) &#123;<br>        vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; res;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">if</span>(n &lt; <span class="hljs-number">3</span>)&#123;<br>            <span class="hljs-keyword">return</span> res;<br>        &#125;<br>        <span class="hljs-built_in">sort</span>(nums.<span class="hljs-built_in">begin</span>(),nums.<span class="hljs-built_in">end</span>());<br><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n - <span class="hljs-number">2</span>; i++)&#123;<br>            <span class="hljs-type">int</span> l = i + <span class="hljs-number">1</span>;<br>            <span class="hljs-type">int</span> r = n - <span class="hljs-number">1</span>;<br>            <span class="hljs-comment">//i去重 思考...</span><br>            <span class="hljs-keyword">if</span>(i &gt; <span class="hljs-number">0</span> &amp;&amp; nums[i] == nums[i - <span class="hljs-number">1</span>]) <span class="hljs-keyword">continue</span>;<br>            <span class="hljs-keyword">while</span>(l &lt; r)&#123;<br>                <span class="hljs-type">int</span> sum = nums[i] + nums[l] + nums[r];<br>                <span class="hljs-keyword">if</span>(sum == <span class="hljs-number">0</span>)&#123;<br>                    res.<span class="hljs-built_in">push_back</span>(&#123;nums[i],nums[l],nums[r]&#125;);<br>                    <span class="hljs-comment">//l r去重 思索...</span><br>                    <span class="hljs-keyword">while</span>(l &lt; r &amp;&amp; nums[l] == nums[l + <span class="hljs-number">1</span>]) l++;<br>                    <span class="hljs-keyword">while</span>(l &lt; r &amp;&amp; nums[r] == nums[r - <span class="hljs-number">1</span>]) r--;<br>                    l++;<br>                    r--;<br>                &#125;<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(sum &lt; <span class="hljs-number">0</span>)&#123;<br>                    l++;<br>                &#125;<span class="hljs-keyword">else</span>&#123;<br>                    r--;<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<h2 id="42-接雨水"><a href="#42-接雨水" class="headerlink" title="42.接雨水"></a>42.接雨水</h2><p><img src="/images/25.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<h2 id="42-接雨水">42.接雨水</h2>
+<p><img src="/images/25.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>解：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">trap</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; height)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = height.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-type">int</span> left = <span class="hljs-number">0</span>, right = n - <span class="hljs-number">1</span>;<br>        <span class="hljs-type">int</span> leftmax = <span class="hljs-number">0</span>, rightmax = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span>(left &lt; right)&#123;<br>            <span class="hljs-keyword">if</span>(height[left] &lt; height[right])&#123;<br>                <span class="hljs-keyword">if</span>(height[left] &gt;= leftmax)&#123;<br>                    leftmax = height[left];<br>                &#125;<span class="hljs-keyword">else</span>&#123;<br>                    ans += leftmax - height[left]; <span class="hljs-comment">//思考...</span><br>                &#125;<br>                left++;<br>            &#125;<span class="hljs-keyword">else</span>&#123;<br>                <span class="hljs-keyword">if</span>(height[right] &gt;= rightmax)&#123;<br>                    rightmax = height[right];<br>                &#125;<span class="hljs-keyword">else</span>&#123;<br>                    ans += rightmax - height[right]; <span class="hljs-comment">//同理...</span><br>                &#125;<br>                right--;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-
-<p>思索…</p>
+<p>思索...</p>
 
                 
               </div>
@@ -374,7 +374,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年4月16日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -525,7 +525,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

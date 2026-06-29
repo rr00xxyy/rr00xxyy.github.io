@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/666.jpg">
-  <link rel="icon" href="/img/666.jpg">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/roxy.jpg">
+  <link rel="icon" href="/img/roxy.jpg">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -19,12 +19,12 @@
   <meta name="author" content="roxy">
   <meta name="keywords" content="">
   
-    <meta name="description" content="OS随记最近接触了许多关于OS的知识点 但是感觉十分之混乱 没有体系化 所以这篇blog我将记录下来一些内容 仅供参考…              部分由ai生成 部分为自己的理解 其实ai用来教学 还是很不错的              进程与线程你知道程序是怎么跑起来的吗? Unix进程控制接口fork() -&gt; 创建子进程 复制当前进程，生成一个几乎完全相同的子进程，父进程返回子进程P">
+    <meta name="description" content="OS随记 说了，是随记 进程与线程 Unix进程控制接口 fork() -&gt; 创建子进程 复制当前进程，生成一个几乎完全相同的子进程，父进程返回子进程PID，子进程返回0 123456pid_t pid &#x3D; fork();if (pid &#x3D;&#x3D; 0) &#123;    printf(&quot;I am the child\n&quot;);&#125; else &#123;    pri">
 <meta property="og:type" content="article">
 <meta property="og:title" content="OS随记">
 <meta property="og:url" content="https://rr00xxyy.github.io/2026/03/25/OS%E9%9A%8F%E8%AE%B0/index.html">
 <meta property="og:site_name" content="roxy&#39;s blog">
-<meta property="og:description" content="OS随记最近接触了许多关于OS的知识点 但是感觉十分之混乱 没有体系化 所以这篇blog我将记录下来一些内容 仅供参考…              部分由ai生成 部分为自己的理解 其实ai用来教学 还是很不错的              进程与线程你知道程序是怎么跑起来的吗? Unix进程控制接口fork() -&gt; 创建子进程 复制当前进程，生成一个几乎完全相同的子进程，父进程返回子进程P">
+<meta property="og:description" content="OS随记 说了，是随记 进程与线程 Unix进程控制接口 fork() -&gt; 创建子进程 复制当前进程，生成一个几乎完全相同的子进程，父进程返回子进程PID，子进程返回0 123456pid_t pid &#x3D; fork();if (pid &#x3D;&#x3D; 0) &#123;    printf(&quot;I am the child\n&quot;);&#125; else &#123;    pri">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/94.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/93.png">
@@ -38,7 +38,7 @@
 <meta property="og:image" content="https://rr00xxyy.github.io/images/90.png">
 <meta property="og:image" content="https://rr00xxyy.github.io/images/5.jpg">
 <meta property="article:published_time" content="2026-03-25T10:54:36.000Z">
-<meta property="article:modified_time" content="2026-04-15T15:34:21.738Z">
+<meta property="article:modified_time" content="2026-06-28T18:50:51.393Z">
 <meta property="article:author" content="roxy">
 <meta property="article:tag" content="I&#x2F;O">
 <meta property="article:tag" content="内存管理">
@@ -237,7 +237,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          14k 字
+          13k 字
         
       </span>
     
@@ -248,7 +248,7 @@
         
         
         
-          118 分钟
+          113 分钟
         
       </span>
     
@@ -290,49 +290,41 @@
             
               <div class="markdown-body">
                 
-                <h1 id="OS随记"><a href="#OS随记" class="headerlink" title="OS随记"></a>OS随记</h1><p>最近接触了许多关于OS的知识点</p>
-<p>但是感觉十分之混乱</p>
-<p>没有<code>体系化</code></p>
-<p>所以这篇blog我将记录下来一些内容</p>
-<p>仅供参考…</p>
-<div class="note note-danger">
-            <p>部分由<code>ai</code>生成</p> <p>部分为自己的理解</p> <p>其实<code>ai</code>用来教学</p> <p>还是很不错的</p> 
-          </div>
-
-<h2 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h2><p>你知道程序是怎么跑起来的吗?</p>
-<h3 id="Unix进程控制接口"><a href="#Unix进程控制接口" class="headerlink" title="Unix进程控制接口"></a>Unix进程控制接口</h3><p><code>fork()</code> -&gt; 创建子进程</p>
+                <h1>OS随记</h1>
+<p>说了，是随记</p>
+<h2 id="进程与线程">进程与线程</h2>
+<h3 id="Unix进程控制接口">Unix进程控制接口</h3>
+<p><code>fork()</code> -&gt; 创建子进程</p>
 <p>复制当前进程，生成一个几乎完全相同的子进程，父进程返回子进程<code>PID</code>，子进程返回0</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">pid_t</span> pid = fork();<br><span class="hljs-keyword">if</span> (pid == <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;I am the child\n&quot;</span>);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;I am the parent, child pid=%d\n&quot;</span>, pid);<br>&#125;<br></code></pre></td></tr></table></figure>
-
 <p><code>exec()</code> -&gt; 执行新程序</p>
 <p>用另一个程序替换当前进程的内存空间，PID不变，但代码，数据，堆栈全部被新程序替换</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c">execl(<span class="hljs-string">&quot;/bin/ls&quot;</span>, <span class="hljs-string">&quot;ls&quot;</span>, <span class="hljs-string">&quot;-l&quot;</span>, <span class="hljs-literal">NULL</span>);  <span class="hljs-comment">// 子进程执行 ls</span><br>perror(<span class="hljs-string">&quot;exec failed&quot;</span>);              <span class="hljs-comment">// exec 失败才会执行</span><br></code></pre></td></tr></table></figure>
-
 <p><code>wait()</code> -&gt; 等待子进程</p>
 <p>父进程等待子进程结束，获取其退出状态</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> status;<br><span class="hljs-type">pid_t</span> pid = wait(&amp;status);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;child %d exited with code %d\n&quot;</span>, pid, WEXITSTATUS(status));<br></code></pre></td></tr></table></figure>
-
 <p>用以防止<code>僵尸进程</code>(Zombie Process)</p>
 <p><code>exit()</code> -&gt; 终止进程</p>
 <p>进程主动退出，返回一个状态码给父进程</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Exiting...\n&quot;</span>);<br><span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>);  <span class="hljs-comment">// 0 表示正常退出</span><br></code></pre></td></tr></table></figure>
-
 <p><code>kill()</code> -&gt; 给进程发送信号</p>
 <p>可以用来<code>终止</code>或<code>通知</code>其它进程</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">kill(pid, SIGTERM);  <span class="hljs-comment">// 给 pid 发送终止信号</span><br></code></pre></td></tr></table></figure>
-
 <div class="note note-primary">
-            <p>tips:kill并不一定真的杀掉进程，取决于进程是否捕获&#x2F;忽略该信号</p> 
+            <p>tips:kill并不一定真的杀掉进程，取决于进程是否捕获/忽略该信号</p> 
           </div>
-
 <p><img src="/images/94.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<h3 id="进程状态机"><a href="#进程状态机" class="headerlink" title="进程状态机"></a>进程状态机</h3><p>进程在<code>生命周期</code>中有三种核心状态</p>
+<h3 id="进程状态机">进程状态机</h3>
+<p>进程在<code>生命周期</code>中有三种核心状态</p>
 <ul>
-<li><p>就绪(Ready) -&gt; 等待CPU</p>
+<li>
+<p>就绪(Ready) -&gt; 等待CPU</p>
 </li>
-<li><p>运行(Running) -&gt; 正在执行</p>
+<li>
+<p>运行(Running) -&gt; 正在执行</p>
 </li>
-<li><p>阻塞(Blocked) -&gt; 等待I&#x2F;O或事件</p>
+<li>
+<p>阻塞(Blocked) -&gt; 等待I/O或事件</p>
 </li>
 </ul>
 <p><img src="/images/93.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
@@ -341,7 +333,8 @@
 <p>实操:</p>
 <p>使用<code>top</code>命令查看系统当前的进程列表和资源占用</p>
 <p><img src="/images/95.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<h3 id="进程-vs-线程"><a href="#进程-vs-线程" class="headerlink" title="进程 vs 线程"></a>进程 vs 线程</h3><p><img src="/images/91.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
+<h3 id="进程-vs-线程">进程 vs 线程</h3>
+<p><img src="/images/91.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p><strong>进程</strong>是资源分配的基本单位</p>
 <p><strong>线程</strong>是CPU调度的基本单位</p>
 <p>依照我的理解，比如你启动了浏览器，这就作为一个进程开始运行，而浏览器中的各种功能模块，比如界面刷新，页面渲染，网络请求，JavaScript执行，视频解码等等，又是其中的线程</p>
@@ -354,7 +347,6 @@
 <div class="note note-info">
             <p>区别一下<strong>并行</strong>与<strong>并发</strong></p> 
           </div>
-
 <p>进程与线程有如下核心区别:</p>
 <p>1.每个进程拥有独立的内存空间，文件描述符等资源，创建和切换的成本很高，而同一进程内的多个线程共享这些资源，创建和切换的开销要小得多</p>
 <p>2.进程之间是相互隔离的，一个进程崩溃通常不会影响其他进程，但线程之间没有这种隔离，一个线程的崩溃往往会导致整个进程退出</p>
@@ -362,8 +354,8 @@
 <div class="note note-success">
             <p>进程间切换的开销来自哪里?</p> <p>1.每个进程拥有独立的<code>页表</code>，切换进程时，操作系统必须加载新进程的页表，这会导致CPU内部的TLB(<code>地址转换缓存</code>)失效，在切换初期，CPU访问内存会因无法命中<code>缓存</code>而变慢，这种性能损耗是进程切换的主要成本，而同一进程内的线程共享页表，切换时无需刷新TLB</p> <p>2.进程切换通常涉及系统调用，CPU需要从用户态切换到内核态(权限最高的核心态)，完成现场保护(保存寄存器，栈指针，程序计数器等)后再切回，虽然线程切换通常也要经过内核，但它不涉及内存地址空间的更换，内核只需调度执行流即可~</p> <p>3.<strong>CPU缓存污染</strong>，新进程会占用大量CPU的L1，L2，L3缓存，导致原进程的<code>热数据</code>被逐出，当原进程再次被调度时，需要重新从RAM加载数据，产生额外的延迟，线程切换由于共享内存地址空间，缓存数据的<code>复用率</code>更高!</p> 
           </div>
-
-<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>上下文切换(Context Switch) -&gt; CPU从一个进程&#x2F;线程切换到另一个的过程</p>
+<h3 id="协程">协程</h3>
+<p>上下文切换(Context Switch) -&gt; CPU从一个进程/线程切换到另一个的过程</p>
 <p>保存当前进程的所有寄存器状态到<code>PCB</code>，加载目标进程的<code>PCB</code>恢复寄存器，切换<code>内存映射</code>(修改<code>CR3</code>寄存器刷<code>TLB</code>)</p>
 <p>上下文切换有<strong>开销</strong></p>
 <p>这就是为什么线程比进程切换快(不需要切换地址空间)</p>
@@ -373,7 +365,7 @@
 <p>其本质上是一段可以挂起(暂停)并恢复执行的函数</p>
 <p>当你调用一个协程时，它可以执行到一半，遇到yield(或await)主动让出CPU，稍后再从让出的地方继续执行</p>
 <p>协程的<code>栈</code>很小(可动态增长，初始只需几KB)</p>
-<p>协程切换只在用户态，保存&#x2F;恢复少量寄存器即可，开销极小</p>
+<p>协程切换只在用户态，保存/恢复少量寄存器即可，开销极小</p>
 <p>当协程等待网络IO或磁盘IO时，主动让出，调度器立刻执行其它就绪<strong>协程</strong>，充分利用CPU</p>
 <p>协程让<code>同步编程</code>的风格实现了<strong>异步非阻塞</strong>的性能</p>
 <p>协程通常依赖于一个用户态<code>调度器</code>(比如Go的goroutine调度器，Python<code>asyncio</code>的事件循环)</p>
@@ -382,37 +374,43 @@
 <p>当等待的事件完成(如socket可读)，调度器将其重新标记为就绪</p>
 <p>关键:协程无法利用<code>多核</code><strong>并行</strong>执行(除非配合多线程)</p>
 <p>它主要用于<strong>高并发</strong><code>IO密集型任务</code>，而不是CPU密集型计算</p>
-<p>对于CPU密集型，需要结合多进程或多线程…</p>
-<h3 id="多进程-vs-多线程"><a href="#多进程-vs-多线程" class="headerlink" title="多进程 vs 多线程"></a>多进程 vs 多线程</h3><p>当要构建<code>稳定可靠</code>且具有<strong>隔离性</strong>的系统时采用<code>多进程</code></p>
+<p>对于CPU密集型，需要结合多进程或多线程...</p>
+<h3 id="多进程-vs-多线程">多进程 vs 多线程</h3>
+<p>当要构建<code>稳定可靠</code>且具有<strong>隔离性</strong>的系统时采用<code>多进程</code></p>
 <ul>
-<li><p><strong>强隔离需求</strong>，比如Chrome浏览器的每个标签页，分布式系统中的微服务，一个子进程崩溃，主进程和其他子进程不受影响，不会导致整个程序挂掉</p>
+<li>
+<p><strong>强隔离需求</strong>，比如Chrome浏览器的每个标签页，分布式系统中的微服务，一个子进程崩溃，主进程和其他子进程不受影响，不会导致整个程序挂掉</p>
 </li>
-<li><p><strong>高安全性</strong>，进程间拥有独立的地址空间，一个进程很难非法访问另一个进程的数据，更适合处理敏感数据</p>
+<li>
+<p><strong>高安全性</strong>，进程间拥有独立的地址空间，一个进程很难非法访问另一个进程的数据，更适合处理敏感数据</p>
 </li>
-<li><p><strong>计算密集型任务</strong>，需要充分利用多核CPU时(如视频解码，科学计算)，Python由于GIL(全局解释器锁)的限制，多线程无法利用多核，此时通常使用多进程</p>
+<li>
+<p><strong>计算密集型任务</strong>，需要充分利用多核CPU时(如视频解码，科学计算)，Python由于GIL(全局解释器锁)的限制，多线程无法利用多核，此时通常使用多进程</p>
 </li>
 </ul>
 <div class="note note-info">
             <p><strong>GIL</strong>是CPython为了<code>线程安全</code>加的全局锁，它使得Python多线程无法在多个CPU核上真正<code>并行</code>执行CPU密集任务，但对IO密集任务影响不大</p> 
           </div>
-
 <p>而当首要目标是<code>高并发</code>和<code>低延迟通信</code>时，<strong>多线程</strong>则更为合适</p>
 <ul>
-<li><p><strong>大量I&#x2F;O操作</strong>，文件读写，网络请求，数据库交互等，线程在等待I&#x2F;O时可以快速切换，且共享内存无需IPC(进程间通信)机制，开发效率高</p>
+<li>
+<p><strong>大量I/O操作</strong>，文件读写，网络请求，数据库交互等，线程在等待I/O时可以快速切换，且共享内存无需IPC(进程间通信)机制，开发效率高</p>
 </li>
-<li><p><strong>需要频繁共享数据</strong>，比如<code>生产者-消费者模式</code>，线程间直接读写共享内存比进程间通信(管道，消息队列等)快得多</p>
+<li>
+<p><strong>需要频繁共享数据</strong>，比如<code>生产者-消费者模式</code>，线程间直接读写共享内存比进程间通信(管道，消息队列等)快得多</p>
 </li>
-<li><p><strong>资源敏感场景</strong>，如果需要创建成千上万个执行单元，线程占用的内存和创建开销远小于进程…</p>
+<li>
+<p><strong>资源敏感场景</strong>，如果需要创建成千上万个执行单元，线程占用的内存和创建开销远小于进程...</p>
 </li>
 </ul>
-<h3 id="进程间通信-IPC"><a href="#进程间通信-IPC" class="headerlink" title="进程间通信(IPC)"></a>进程间通信(IPC)</h3><p>进程各自拥有独立的地址空间，数据不共享，因此操作系统需要提供专门的机制以实现进程间通信，开销相对较大</p>
+<h3 id="进程间通信-IPC">进程间通信(IPC)</h3>
+<p>进程各自拥有独立的地址空间，数据不共享，因此操作系统需要提供专门的机制以实现进程间通信，开销相对较大</p>
 <p>1.管道(pipe)</p>
 <p><img src="/images/pipe.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>分<code>匿名管道</code>(父子进程间，单向)和<code>命名管道</code>(无亲缘关系进程间，支持双向)</p>
 <p><strong>匿名管道</strong></p>
 <p>示例:</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">grep <span class="hljs-string">&quot;error&quot;</span> log.txt | less<br></code></pre></td></tr></table></figure>
-
 <p><code>grep</code>进程的输出没有直接打印到屏幕，而是流入<code>less</code>进程作为输入</p>
 <p><strong>管道</strong>其实是内核在内存中开辟的一块固定大小的<code>缓冲区</code>(通常4KB or 64KB)</p>
 <p>写端:一个进程将数据写入这块缓冲区</p>
@@ -446,29 +444,29 @@
 <p>最灵活的方式，支持跨机通信(如<code>网络编程</code>)，也可用于本机进程通信(Unix Domain Socket)</p>
 <p><code>Socket</code>是一个抽象的编程接口，由操作系统提供</p>
 <p>其设计哲学是<code>网络也是文件</code></p>
-<p>Unix:一切皆文件</p>
 <p>你创建一个Socket，系统返回一个<strong>文件描述符</strong></p>
-<p>收发数据时，用read&#x2F;write或专用的send&#x2F;recv，操作方式和读写文件非常相似</p>
+<p>收发数据时，用read/write或专用的send/recv，操作方式和读写文件非常相似</p>
 <p>区别在于，普通文件读写的是磁盘数据，Socket读写的是<code>网络数据包</code></p>
 <p>通过<code>IP地址</code>和<code>端口号</code>定位对方的进程</p>
 <p>支持TCP和UDP</p>
 <div class="note note-info">
-            <p>模型:</p> <p>服务端:</p> <p>socket() 创建套接字</p> <p>bind() 绑定IP和端口</p> <p>listen() 进入监听状态，等待客户端连接</p> <p>accept() 接受一个客户端连接，返回一个新的套接字用于通信</p> <p>read() &#x2F; write() 收发数据</p> <p>close() 关闭连接</p> <p>客户端:</p> <p>socket() 创建套接字</p> <p>connect() 连接到服务器的IP和端口</p> <p>read() &#x2F; write() 收发数据</p> <p>close() 关闭连接</p> 
+            <p>模型:</p> <p>服务端:</p> <p>socket() 创建套接字</p> <p>bind() 绑定IP和端口</p> <p>listen() 进入监听状态，等待客户端连接</p> <p>accept() 接受一个客户端连接，返回一个新的套接字用于通信</p> <p>read() / write() 收发数据</p> <p>close() 关闭连接</p> <p>客户端:</p> <p>socket() 创建套接字</p> <p>connect() 连接到服务器的IP和端口</p> <p>read() / write() 收发数据</p> <p>close() 关闭连接</p> 
           </div>
-
-<h3 id="线程间通信"><a href="#线程间通信" class="headerlink" title="线程间通信"></a>线程间通信</h3><p>1.共享变量</p>
+<h3 id="线程间通信">线程间通信</h3>
+<p>1.共享变量</p>
 <p>最简单直接的方式，但必须配合同步机制防止数据竞争</p>
 <p>2.<code>互斥锁</code></p>
 <p>保护<strong>临界区</strong>，保证同一时刻只有一个线程访问资源</p>
 <p>3.<code>读写锁</code></p>
 <p>允许多个读线程并发，但写线程独占</p>
 <p>4.<strong>条件变量</strong></p>
-<p>常与互斥锁配合，用于让线程在某个条件满足时(如队列非空)再继续执行，实现等待&#x2F;通知机制</p>
+<p>常与互斥锁配合，用于让线程在某个条件满足时(如队列非空)再继续执行，实现等待/通知机制</p>
 <p>5.信号量</p>
 <p>与进程间类似，但通常用于线程计数同步</p>
 <p>6.ThreadLocal</p>
 <p>并非用于通信，而是用于隔离，为每个线程提供变量的独立副本，避免共享冲突</p>
-<h3 id="PCB-进程控制块"><a href="#PCB-进程控制块" class="headerlink" title="PCB(进程控制块)"></a>PCB(进程控制块)</h3><p><code>PCB</code>是操作系统用来描述和管理<code>进程</code>的数据结构</p>
+<h3 id="PCB-进程控制块">PCB(进程控制块)</h3>
+<p><code>PCB</code>是操作系统用来描述和管理<code>进程</code>的数据结构</p>
 <p>每个进程对应一个PCB</p>
 <p>其中存储着存储PID，进程状态，程序计数器，寄存器值，内存映射，打开的文件列表，优先级等等</p>
 <p>进程切换的本质就是保存当前PCB，加载下一个PCB</p>
@@ -481,53 +479,57 @@
 <p>每个进程在<code>/proc</code>下有一个数字目录，目录名就是PID</p>
 <p>目录里的文件对应<code>task_struct</code>的各个字段</p>
 <p><img src="/images/96.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<p>ps:我在wsl上运行的</p>
 <p>使用<code>ps aux</code>命令列出进程信息</p>
 <p>本质:</p>
 <p>读取<code>/proc</code>目录下每个PID目录 -&gt; 解析信息 -&gt; 排版输出</p>
 <p><img src="/images/97.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
-<h3 id="僵尸进程-孤儿进程"><a href="#僵尸进程-孤儿进程" class="headerlink" title="僵尸进程&amp;孤儿进程"></a>僵尸进程&amp;孤儿进程</h3><p><strong>僵尸进程</strong>:子进程退出后父进程未回收</p>
+<h3 id="僵尸进程-孤儿进程">僵尸进程&amp;孤儿进程</h3>
+<p><strong>僵尸进程</strong>:子进程退出后父进程未回收</p>
 <p>当一个进程结束(调用exit或被信号终止)，它会释放大部分资源(内存，文件描述符等)，但内核会保留一个最小的数据结构，即进程控制块(PCB)中的进程描述符</p>
 <p>其中包含进程ID(PID)，退出状态，运行时间等信息，直到父进程通过<code>wait</code>或<code>waitpid</code>读取它的退出状态</p>
 <p>因此在父进程读取之前，这个进程就处于<code>僵尸状态</code></p>
 <div class="note note-success">
             <p>ps aux | grep Z 找僵尸进程</p> 
           </div>
-
 <p>此时子进程已退出但父进程没调用wait()，PCB还挂着</p>
 <p>僵尸进程不占用内存，CPU，只占用PCB中极小的内存(通常几十字节)</p>
 <p>但僵尸进程的PID会被保留，如果大量僵尸进程积累，可能会耗尽PID资源，导致新进程无法创建</p>
-<p>且无法通过<code>kill -9</code>杀死僵尸进程，因为它已经死了，唯一的方法是终止其父进程，让init(PID 1)接管并wait…</p>
+<p>且无法通过<code>kill -9</code>杀死僵尸进程，因为它已经死了，唯一的方法是终止其父进程，让init(PID 1)接管并wait...</p>
 <p><strong>孤儿进程</strong>:父进程先于子进程退出(orphan)</p>
 <p>当一个父进程比子进程先终止时，该子进程就变成了孤儿进程</p>
 <p>它没有父进程，会被系统的init进程(PID 1)或<code>subreaper</code>进程自动收养</p>
 <p><code>init</code>会周期性调用<code>wait</code>，因此孤儿进程终止时不会变成僵尸，会被自动回收</p>
 <p>本身没有危害，是正常的设计</p>
-<h2 id="调度与并发"><a href="#调度与并发" class="headerlink" title="调度与并发"></a>调度与并发</h2><h3 id="CPU调度算法"><a href="#CPU调度算法" class="headerlink" title="CPU调度算法"></a>CPU调度算法</h3><p><code>FCFS</code>(先来先服务):简单但长任务饿死短任务</p>
+<h2 id="调度与并发">调度与并发</h2>
+<h3 id="CPU调度算法">CPU调度算法</h3>
+<p><code>FCFS</code>(先来先服务):简单但长任务饿死短任务</p>
 <p><code>SJF</code>(短作业优先):平均等待时间最短但可能饿死长任务</p>
 <p><code>Round Robin</code>(时间片轮转):最公平，Linux默认</p>
 <p><code>多级反馈队列</code>:新进程进高优先级队列，运行太久降级，兼顾响应速度和吞吐量</p>
 <p>Linux的CFS调度器，Nginx的工作进程调度，Go的goroutine调度器都是这些思想的变体</p>
 <p>个人感觉此处无需多言</p>
 <p>略</p>
-<h3 id="竞态条件-Race-Condition"><a href="#竞态条件-Race-Condition" class="headerlink" title="竞态条件(Race Condition)"></a>竞态条件(Race Condition)</h3><p>多线程对共享资源的访问顺序影响结果</p>
+<h3 id="竞态条件-Race-Condition">竞态条件(Race Condition)</h3>
+<p>多线程对共享资源的访问顺序影响结果</p>
 <p>例子:</p>
 <p>两个线程同时执行<code>x = x + 1</code></p>
 <p>读到同一个旧值，各自加1后写回，结果只加了1次</p>
-<p>竞态条件的可怕之处是它大多数时候不出现，偶尔才触发，极难复现</p>
 <p>待补充</p>
-<h3 id="互斥锁-Mutex-自旋锁-Spinlock"><a href="#互斥锁-Mutex-自旋锁-Spinlock" class="headerlink" title="互斥锁(Mutex)&#x2F;自旋锁(Spinlock)"></a>互斥锁(Mutex)&#x2F;自旋锁(Spinlock)</h3><p>保护共享资源的基本同步原语</p>
+<h3 id="互斥锁-Mutex-自旋锁-Spinlock">互斥锁(Mutex)/自旋锁(Spinlock)</h3>
+<p>保护共享资源的基本同步原语</p>
 <p>Mutex:拿不到锁就睡眠，让出CPU，等待唤醒</p>
 <p>自旋锁:拿不到锁就一直循环检查(忙等待)，不让出CPU</p>
 <p>短临界区就用自旋锁(避免睡眠唤醒开销)</p>
 <p>长临界区则用Mutex(避免浪费CPU)</p>
 <p>Linux内核大量使用自旋锁</p>
-<h3 id="读写锁-RWLock"><a href="#读写锁-RWLock" class="headerlink" title="读写锁(RWLock)"></a>读写锁(RWLock)</h3><p>区分读和写，允许多个读者并发，写者独占</p>
+<h3 id="读写锁-RWLock">读写锁(RWLock)</h3>
+<p>区分读和写，允许多个读者并发，写者独占</p>
 <p>读多写少时可以提升并发度</p>
 <p>但是写者可能被读者饿死(取决于实现)</p>
 <p>且读写锁本身开销略大于互斥锁</p>
 <p>待补充</p>
-<h3 id="死锁-Deadlock"><a href="#死锁-Deadlock" class="headerlink" title="死锁(Deadlock)"></a>死锁(Deadlock)</h3><p>多个进程互相等待对方持有的资源，永远无法推进</p>
+<h3 id="死锁-Deadlock">死锁(Deadlock)</h3>
+<p>多个进程互相等待对方持有的资源，永远无法推进</p>
 <p>死锁成立必须同时满足四个条件:</p>
 <p>1.互斥(资源不能共享)</p>
 <p>2.持有并等待(拿着A等B)</p>
@@ -536,17 +538,16 @@
 <p>破坏任意一个条件即可预防死锁</p>
 <p><code>银行家算法</code></p>
 <p>待补充</p>
-<h3 id="信号量-Semaphore"><a href="#信号量-Semaphore" class="headerlink" title="信号量(Semaphore)"></a>信号量(Semaphore)</h3><p>比Mutex更通用的<code>同步</code>机制，可控制资源数量</p>
+<h3 id="信号量-Semaphore">信号量(Semaphore)</h3>
+<p>比Mutex更通用的<code>同步</code>机制，可控制资源数量</p>
 <p><strong>信号量</strong>是一个整数值，加上两个<code>原子操作</code>:P(wait)和V(signal)</p>
 <p>它的值代表可用的资源数量</p>
 <p>P操作:尝试获取一个资源(wait)</p>
 <p>逻辑:</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs text">如果信号量值 &gt; 0:<br>    值减1，继续执行<br>否则:<br>    阻塞当前线程/进程<br></code></pre></td></tr></table></figure>
-
 <p>V操作:释放一个资源(signal)</p>
 <p>逻辑:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs test">值加1<br>如果有其它线程/进程在等待这个信号量，唤醒其中一个<br></code></pre></td></tr></table></figure>
-
 <p>这两个操作是<strong>原子</strong>的，不会被中断，保证了<code>并发</code>正确性</p>
 <p>易知，二元信号量其实就等价于<code>Mutex</code></p>
 <p>当信号量的初始值设为N(N &gt; 1)时，它表示有N个相同的资源可以同时使用，这就是<strong>计数信号量</strong></p>
@@ -555,18 +556,19 @@
 <p>V操作:释放一个资源，值加1，如果之前有线程在等待，就唤醒一个</p>
 <p>经典问题:生产者-消费者，读者-写者，哲学家就餐</p>
 <p>待补充</p>
-<h3 id="条件变量-Condition-Variable"><a href="#条件变量-Condition-Variable" class="headerlink" title="条件变量(Condition Variable)"></a>条件变量(Condition Variable)</h3><p>让线程等待某个条件成立的<code>同步</code>机制</p>
+<h3 id="条件变量-Condition-Variable">条件变量(Condition Variable)</h3>
+<p>让线程等待某个条件成立的<code>同步</code>机制</p>
 <p>配合Mutex使用</p>
 <p>wait():原子地释放锁并睡眠</p>
-<p>signal()&#x2F;broadcast():唤醒等待的线程</p>
+<p>signal()/broadcast():唤醒等待的线程</p>
 <p>正确使用必须在while循环里检查条件(防止虚假唤醒)</p>
 <p>示例:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;pthread.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><br><span class="hljs-type">int</span> buffer = <span class="hljs-number">0</span>;          <span class="hljs-comment">// 共享缓冲区</span><br><span class="hljs-type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;<br><span class="hljs-type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;<br><br><span class="hljs-type">void</span> *<span class="hljs-title function_">producer</span><span class="hljs-params">(<span class="hljs-type">void</span> *arg)</span> &#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) &#123;<br>        pthread_mutex_lock(&amp;mutex);<br>        buffer = i;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Produced: %d\n&quot;</span>, i);<br>        pthread_cond_signal(&amp;cond);   <span class="hljs-comment">// 唤醒消费者</span><br>        pthread_mutex_unlock(&amp;mutex);<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>&#125;<br><br><span class="hljs-type">void</span> *<span class="hljs-title function_">consumer</span><span class="hljs-params">(<span class="hljs-type">void</span> *arg)</span> &#123;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++) &#123;<br>        pthread_mutex_lock(&amp;mutex);<br>        <span class="hljs-keyword">while</span> (buffer == <span class="hljs-number">-1</span>) &#123;        <span class="hljs-comment">// 假设 -1 表示无数据</span><br>            pthread_cond_wait(&amp;cond, &amp;mutex);<br>        &#125;<br>        <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Consumed: %d\n&quot;</span>, buffer);<br>        buffer = <span class="hljs-number">-1</span>;<br>        pthread_mutex_unlock(&amp;mutex);<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>Java的wait()&#x2F;notify()，Python的threading.Condition都是这个机制</p>
+<p>Java的wait()/notify()，Python的threading.Condition都是这个机制</p>
 <p>待补充</p>
-<h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><p>pwn梦开始的地方…</p>
-<h3 id="虚拟地址空间"><a href="#虚拟地址空间" class="headerlink" title="虚拟地址空间"></a>虚拟地址空间</h3><p>在没有虚拟内存的早期系统中</p>
+<h2 id="内存管理">内存管理</h2>
+<h3 id="虚拟地址空间">虚拟地址空间</h3>
+<p>在没有虚拟内存的早期系统中</p>
 <p>程序直接操作物理内存地址(实模式)</p>
 <p>显然，这样会带来严重问题</p>
 <p>比如:</p>
@@ -583,7 +585,8 @@
 <p><img src="/images/90.png" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>两个进程的地址<code>0x400000</code>指向的物理地址完全不同</p>
 <p>这是进程隔离的基础，一个进程崩溃不会影响其它进程</p>
-<h3 id="分页-Paging-页表"><a href="#分页-Paging-页表" class="headerlink" title="分页(Paging)&amp;页表"></a>分页(Paging)&amp;页表</h3><p>把虚拟地址空间和物理内存都切成固定大小的页(通常<code>4KB</code>)</p>
+<h3 id="分页-Paging-页表">分页(Paging)&amp;页表</h3>
+<p>把虚拟地址空间和物理内存都切成固定大小的页(通常<code>4KB</code>)</p>
 <p><strong>页表</strong>记录虚拟页到物理页帧的映射</p>
 <p>CPU访问内存时，<code>MMU</code>自动查页表完成地址翻译</p>
 <p><code>多级页表</code>(x86-64用4级)节省页表内存</p>
@@ -591,13 +594,9 @@
 <p>未使用的虚拟地址范围不会产生任何页表内存开销</p>
 <p>待补充</p>
 <p><strong>TLB</strong>(<code>快表</code>)是页表的硬件<code>缓存</code></p>
-<p>命中率99%+</p>
-<p>miss了才查内存页表</p>
-<p><code>mmap()</code></p>
-<p>待补充</p>
 <p>进程切换慢的原因之一便是要刷新TLB</p>
-<p><code>huge page</code>能提升性能</p>
-<h3 id="缺页异常-Page-Fault"><a href="#缺页异常-Page-Fault" class="headerlink" title="缺页异常(Page Fault)"></a>缺页异常(Page Fault)</h3><p>访问一个虚拟地址，但其对应的物理页不在内存中</p>
+<h3 id="缺页异常-Page-Fault">缺页异常(Page Fault)</h3>
+<p>访问一个虚拟地址，但其对应的物理页不在内存中</p>
 <p>三种情况:</p>
 <p>1.页在磁盘(swap)，从磁盘换入</p>
 <p>物理内存不足时，内核会把一些不常用的页面换出到磁盘的<code>swap</code>分区(或<code>swap</code>文件)</p>
@@ -613,7 +612,7 @@
 <p>流程:</p>
 <p>进程首次访问该虚拟地址(如<code>*p = 1</code>)</p>
 <p>缺页异常发生，因为<code>PTE</code>是空的(不存在)</p>
-<p>内核检查该地址是否落在进程的某个<code>VMA</code>范围内，且访问权限(读&#x2F;写)合法</p>
+<p>内核检查该地址是否落在进程的某个<code>VMA</code>范围内，且访问权限(读/写)合法</p>
 <p>如果不合法转为情况3(非法访问)</p>
 <p>如果合法</p>
 <p>那么，内核分配一个物理页帧，通常初始化为全零(对于匿名内存)</p>
@@ -624,7 +623,8 @@
 <p>或者虽然地址在<code>VMA</code>内但访问权限不匹配(比如尝试写入只读的代码段)</p>
 <p>内核向进程发送<code>SIGSEGV</code>信号(Segmentation Fault!)</p>
 <p>core dumped!</p>
-<h3 id="写时复制技术-Copy-on-Write，CoW"><a href="#写时复制技术-Copy-on-Write，CoW" class="headerlink" title="写时复制技术(Copy-on-Write，CoW)"></a>写时复制技术(Copy-on-Write，CoW)</h3><p><code>CoW</code>是一种优化技术，用于延迟复制物理内存，直到真正需要修改时</p>
+<h3 id="写时复制技术-Copy-on-Write，CoW">写时复制技术(Copy-on-Write，CoW)</h3>
+<p><code>CoW</code>是一种优化技术，用于延迟复制物理内存，直到真正需要修改时</p>
 <p>它依赖缺页异常来捕获<code>首次写入</code></p>
 <p>实例:</p>
 <p><code>fork()</code>为什么快?</p>
@@ -637,32 +637,34 @@
 <p>2.读操作:如果父子进程都只是读取数据，不会发生任何复制，效率极高</p>
 <p>3.写操作:当其中一个进程(例如子进程)尝试写入某个共享页时:</p>
 <ul>
-<li><p><code>CPU</code>触发缺页异常(因为页表项是只读的，而写操作需要写权限)</p>
+<li>
+<p><code>CPU</code>触发缺页异常(因为页表项是只读的，而写操作需要写权限)</p>
 </li>
-<li><p>内核检查异常地址:发现这是<code>CoW</code>页面(通过<code>PTE</code>中的特殊标志或<code>VMA</code>标志)</p>
+<li>
+<p>内核检查异常地址:发现这是<code>CoW</code>页面(通过<code>PTE</code>中的特殊标志或<code>VMA</code>标志)</p>
 </li>
-<li><p>内核复制该物理页到一个新的物理页帧</p>
+<li>
+<p>内核复制该物理页到一个新的物理页帧</p>
 </li>
-<li><p>更新触发写入的进程的页表，将新页帧映射到该虚拟地址，并标记为可写</p>
+<li>
+<p>更新触发写入的进程的页表，将新页帧映射到该虚拟地址，并标记为可写</p>
 </li>
-<li><p>另一个进程的页表仍然指向原物理页(仍是<strong>只读</strong>)</p>
+<li>
+<p>另一个进程的页表仍然指向原物理页(仍是<strong>只读</strong>)</p>
 </li>
-<li><p>异常返回后，重新执行写入指令，此时写入的便是新复制的页面</p>
+<li>
+<p>异常返回后，重新执行写入指令，此时写入的便是新复制的页面</p>
 </li>
 </ul>
 <p>此后，父子进程各自拥有独立的物理页，修改互不影响</p>
 <p>极大节省了<code>内存</code>和<code>时间</code></p>
 <p>待补充</p>
-<h3 id="栈vs堆"><a href="#栈vs堆" class="headerlink" title="栈vs堆"></a>栈vs堆</h3><p>两种内存分配区域，管理方式完全不同</p>
+<h3 id="栈vs堆">栈vs堆</h3>
+<p>两种内存分配区域，管理方式完全不同</p>
 <p><strong>栈</strong>:自动管理，函数返回时自动释放，分配极快(只移动<code>栈指针</code>)，大小有限(默认<code>8MB</code>)</p>
-<p><strong>堆</strong>:手动(C&#x2F;C++)或<code>GC</code>管理，大小几乎无限，但是分配慢(要找合适的空闲块)</p>
-<p>栈溢出(StackOverflow)</p>
-<p>C&#x2F;C++堆<strong>内存泄漏</strong></p>
-<p>待补充</p>
-<p>C里用<code>malloc/free</code>管理堆</p>
-<p><code>Java/Python</code>的<strong>对象</strong>都在堆上</p>
-<p><code>Rust</code>的所有权系统本质上就是让编译器自动管理堆</p>
-<h3 id="内存分配器-malloc原理"><a href="#内存分配器-malloc原理" class="headerlink" title="内存分配器(malloc原理)"></a>内存分配器(malloc原理)</h3><p>malloc如何在堆上找到合适的空闲内存块?</p>
+<p><strong>堆</strong>:手动(C/C++)或<code>GC</code>管理，大小几乎无限，但是分配慢(要找合适的空闲块)</p>
+<h3 id="内存分配器-malloc原理">内存分配器(malloc原理)</h3>
+<p>malloc如何在堆上找到合适的空闲内存块?</p>
 <p>使用空闲链表:维护一个空闲块链表</p>
 <p><code>first-fit/best-fit</code>策略找合适大小</p>
 <p>例子:glibc的<code>ptmalloc</code></p>
@@ -671,18 +673,20 @@
 <p>内核需要频繁地创建和销毁大量固定大小的数据结构(如<code>task_struct</code>，<code>inode</code>，<code>dentry</code>等)</p>
 <p>如果直接使用通用的<code>伙伴系统</code>(<code>buddy system</code>)以<strong>页</strong>(通常<code>4KB</code>)为单位分配，会造成两个严重问题:</p>
 <ul>
-<li><p><strong>内部碎片</strong>:一个几十字节的结构体占用一个完整的页框，浪费大量内存</p>
+<li>
+<p><strong>内部碎片</strong>:一个几十字节的结构体占用一个完整的页框，浪费大量内存</p>
 </li>
-<li><p><strong>外部碎片</strong>:频繁分配和释放不同大小的页框会导致页级别碎片，难以分配<strong>连续</strong>的大页</p>
+<li>
+<p><strong>外部碎片</strong>:频繁分配和释放不同大小的页框会导致页级别碎片，难以分配<strong>连续</strong>的大页</p>
 </li>
 </ul>
 <p>为了解决这些问题，Linux内核引入了<code>slab</code>分配器</p>
 <p>其核心思想是:预先分配一组固定大小的对象池，将对象缓存起来，按需分配和回收，避免直接与伙伴系统交互，从而消除碎片，提高性能</p>
 <p>待补充</p>
-<p><code>tcmalloc</code>(Google)和<code>jemalloc</code>(Firefox&#x2F;Redis)高性能分配器，用<strong>线程本地缓存</strong>减少<strong>锁</strong>竞争</p>
-<p>内存碎片问题</p>
+<p><code>tcmalloc</code>(Google)和<code>jemalloc</code>(Firefox/Redis)高性能分配器，用<strong>线程本地缓存</strong>减少<strong>锁</strong>竞争</p>
 <p>待补充</p>
-<h3 id="垃圾回收-GC，Garbage-Collection-算法"><a href="#垃圾回收-GC，Garbage-Collection-算法" class="headerlink" title="垃圾回收(GC，Garbage Collection)算法"></a>垃圾回收(GC，Garbage Collection)算法</h3><p>自动回收<strong>不再使用的内存</strong>的机制</p>
+<h3 id="垃圾回收-GC，Garbage-Collection-算法">垃圾回收(GC，Garbage Collection)算法</h3>
+<p>自动回收<strong>不再使用的内存</strong>的机制</p>
 <p><code>引用计数</code>:Python用，无法处理<code>循环引用</code></p>
 <p><strong>标记-清除</strong>:从根节点遍历，未标记的就是垃圾</p>
 <p>能正确处理循环引用</p>
@@ -691,9 +695,8 @@
 <div class="note note-danger">
             <p><code>Stop-the-world</code>是<code>GC</code>的大问题，Java曾经因此引发生产事故</p> 
           </div>
-
 <p><strong>分代回收</strong>:<code>新生代</code>(大多数对象很快死亡)用复制算法，<code>老年代</code>则用<code>标记-整理</code></p>
-<p>JVM的G1&#x2F;ZGC，Go的三色标记都是这些思想的组合</p>
+<p>JVM的G1/ZGC，Go的三色标记都是这些思想的组合</p>
 <p><strong>三色标记</strong>(<code>Tri-color Marking</code>)</p>
 <p>三色标记是一种并发标记算法，可以在程序运行时(不暂停)进行大部分标记工作</p>
 <p>将对象分为三种颜色:</p>
@@ -703,15 +706,20 @@
 <p>标记过程:从根开始，将对象标记为灰色，然后逐步处理灰色对象，将其引用的白色对象变为灰色，自身变为黑色，最后白色对象就是垃圾</p>
 <p><img src="/images/5.jpg" srcset="/img/loading.gif" lazyload alt="如图"></p>
 <p>待补充</p>
-<h2 id="文件系统与I-O"><a href="#文件系统与I-O" class="headerlink" title="文件系统与I&#x2F;O"></a>文件系统与I&#x2F;O</h2><h3 id="inode-文件描述符"><a href="#inode-文件描述符" class="headerlink" title="inode&amp;文件描述符"></a>inode&amp;文件描述符</h3><p><strong>inode</strong>是文件的元数据，<strong>文件描述符</strong>是进程访问文件的句柄</p>
+<h2 id="文件系统与I-O">文件系统与I/O</h2>
+<h3 id="inode-文件描述符">inode&amp;文件描述符</h3>
+<p><strong>inode</strong>是文件的元数据，<strong>文件描述符</strong>是进程访问文件的句柄</p>
 <p>inode存储文件大小，权限，时间戳，数据块位置等等，就是不存文件名(文件名存在目录里)</p>
 <p>文件描述符(<code>fd</code>)是个整数，指向内核的文件表项，再指向inode</p>
 <ul>
-<li><p>0 &#x3D; stdin</p>
+<li>
+<p>0 = stdin</p>
 </li>
-<li><p>1 &#x3D; stdout</p>
+<li>
+<p>1 = stdout</p>
 </li>
-<li><p>2 &#x3D; stderr</p>
+<li>
+<p>2 = stderr</p>
 </li>
 </ul>
 <p>使用<code>lsof</code>命令可以列出所有进程打开的fd</p>
@@ -721,8 +729,9 @@
 <p>操作系统通过文件名找到inode号，再通过inode找到散落在磁盘各处的数据块</p>
 <p><code>ls -i</code>看inode号</p>
 <p><code>ulimit -n</code>设置最大fd数量</p>
-<h3 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h3><h4 id="硬链接"><a href="#硬链接" class="headerlink" title="硬链接"></a>硬链接</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ln</span> 源文件 硬链接名    <span class="hljs-comment"># 创建硬链接</span><br></code></pre></td></tr></table></figure>
-
+<h3 id="链接">链接</h3>
+<h4 id="硬链接">硬链接</h4>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ln</span> 源文件 硬链接名    <span class="hljs-comment"># 创建硬链接</span><br></code></pre></td></tr></table></figure>
 <p>硬链接的本质是多个文件名指向同一个inode</p>
 <p>在文件系统中，inode才是文件的<code>本体</code></p>
 <p>当你创建一个硬链接时，并没有创建新文件，只是给这个inode多贴了一个标签</p>
@@ -730,15 +739,16 @@
 <p>因此修改任意一个文件名下的内容，其它文件名下看到的内容都会变(因为其实是同一份数据)</p>
 <p>删除原文件时，文件并不会被真正删除，只是链接计数减1</p>
 <p>只有当计数归零时，磁盘空间才会被释放</p>
-<h4 id="软链接"><a href="#软链接" class="headerlink" title="软链接"></a>软链接</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ln</span> -s 源文件 软链接名  <span class="hljs-comment"># 创建软链接</span><br></code></pre></td></tr></table></figure>
-
+<h4 id="软链接">软链接</h4>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ln</span> -s 源文件 软链接名  <span class="hljs-comment"># 创建软链接</span><br></code></pre></td></tr></table></figure>
 <p>软链接(符号链接)是一个独立的文件，它有自己的inode，但这个文件的内容是另一个文件的路径</p>
 <p>自己的理解:</p>
 <p>其实可以把它看作一个<code>指针</code>?</p>
 <p>操作系统读取软链接时，会<code>重定向</code>到它所指向的路径去读取真正的文件</p>
 <p>因此修改软链接的内容，实际上就是在修改原文件的内容</p>
 <p>而如果删除了原文件，软链接依然存在，但它会失效，变成一个<code>悬空链接</code>(<strong>dangling pointer</strong>)</p>
-<h3 id="I-O"><a href="#I-O" class="headerlink" title="I&#x2F;O"></a>I&#x2F;O</h3><p>I&#x2F;O(Input&#x2F;Output)是<code>内存</code>与<code>外设</code>(磁盘，网卡，键盘等)之间的数据拷贝过程</p>
+<h3 id="I-O">I/O</h3>
+<p>I/O(Input/Output)是<code>内存</code>与<code>外设</code>(磁盘，网卡，键盘等)之间的数据拷贝过程</p>
 <p>从CPU的视角来看，IO很慢</p>
 <p>于是为了效率，操作系统引入了分层机制:</p>
 <p><code>阻塞</code>与<code>非阻塞</code>:</p>
@@ -763,16 +773,16 @@
 <p>poll:与<code>select</code>类似，但使用链表管理<code>fd</code>，无最大数量限制，但仍需遍历</p>
 <p><strong>epoll</strong>(<code>Linux</code>特有):基于事件驱动，只返回有事件发生的<code>fd</code>，无需遍历全部，效率与活跃连接数相关</p>
 <p>支持边缘触发(ET)和水平触发(LT)</p>
-<p>是Nginx&#x2F;Redis单线程处理万级并发的核心</p>
-<p>Node.js的事件循环本质便是I&#x2F;O多路复用</p>
-<p><code>异步I/O</code>(<code>aio</code>&#x2F;<strong>io_uring</strong>):应用程序发起<code>I/O</code>操作后立即返回，不等待数据</p>
+<p>是Nginx/Redis单线程处理万级并发的核心</p>
+<p><code>异步I/O</code>(<code>aio</code>/<strong>io_uring</strong>):应用程序发起<code>I/O</code>操作后立即返回，不等待数据</p>
 <p>当内核完成数据拷贝(从内核到用户空间)后，通过信号，回调函数或<code>io_uring</code>的完成队列通知应用程序</p>
-<p>传统异步I&#x2F;O:AIO</p>
+<p>传统异步I/O:AIO</p>
 <p>略</p>
-<p>现代异步I&#x2F;O:<strong>io_uring</strong>(Linux5.1+)</p>
+<p>现代异步I/O:<strong>io_uring</strong>(Linux5.1+)</p>
 <p>待补充</p>
-<h3 id="缓冲区I-O-vs-直接I-O"><a href="#缓冲区I-O-vs-直接I-O" class="headerlink" title="缓冲区I&#x2F;O vs 直接I&#x2F;O"></a>缓冲区I&#x2F;O vs 直接I&#x2F;O</h3><p>读写磁盘是否经过操作系统的<strong>页缓存</strong></p>
-<p>缓冲I&#x2F;O(默认):读写都经过内核页缓存(page cache)，读命中缓存直接返回，写先写缓存再异步刷盘</p>
+<h3 id="缓冲区I-O-vs-直接I-O">缓冲区I/O vs 直接I/O</h3>
+<p>读写磁盘是否经过操作系统的<strong>页缓存</strong></p>
+<p>缓冲I/O(默认):读写都经过内核页缓存(page cache)，读命中缓存直接返回，写先写缓存再异步刷盘</p>
 <p>读操作:进程发起<code>read()</code>，内核首先在页缓存(page cache)中查找，如果数据已在缓存中，直接返回，否则，从磁盘读取到页缓存，再复制到用户空间</p>
 <p>写操作:进程发起<code>write()</code>，内核将数据写入页缓存，立即返回(认为已写完)，实际写入磁盘由内核后续<strong>异步</strong>完成(通过<code>pdflush</code>或后台线程)</p>
 <p>利用内存作为磁盘的缓存，加速重复读操作，写操作延迟低(不需要等待磁盘完成)</p>
@@ -780,9 +790,9 @@
 <p><strong>不可控的刷盘时机</strong>:应用程序调用<code>write()</code>后，数据何时真正落盘不可控，对要求<strong>持久性</strong>的数据库来说，可能导致事务日志未及时落盘，违反<code>ACID</code>的<code>Durability</code>(持久性)</p>
 <p><code>内核通用策略不一定最优</code>:内核的预读，回写策略是为通用负载设计的，无法针对特定应用(如<code>B+Tree</code>随机写，顺序日志写)做精细优化</p>
 <p>待补充</p>
-<p>直接I&#x2F;O(O_DIRECT标志):绕过页缓存，直接读写磁盘</p>
+<p>直接I/O(O_DIRECT标志):绕过页缓存，直接读写磁盘</p>
 <p>每次读写都需要<code>磁盘I/O</code>(没有内核自动缓存)，对随机读密集型负载可能变慢</p>
-<p>数据库(<code>MySQL InnoDB</code>，<code>PostgreSQL</code>)用直接I&#x2F;O</p>
+<p>数据库(<code>MySQL InnoDB</code>，<code>PostgreSQL</code>)用直接I/O</p>
 <p><code>fsync(int fd)</code>系统调用的作用?</p>
 <p>强制将指定文件在页缓存中所有已修改的数据(包括文件元数据)立即写入磁盘，并且会等待磁盘完成写入后才返回</p>
 <p><code>fdatasync()</code>类似，但只同步数据内容，不同步元数据(如修改时间)，通常更快一些</p>
@@ -792,41 +802,37 @@
 <p>日志写入必须先于数据页的刷盘，也就是说，日志落盘后，数据库才认为事务提交成功，数据页可以在之后<strong>异步</strong>写入磁盘</p>
 <p>系统崩溃后重启时，数据库会重放日志中尚未应用到数据页的操作，将数据恢复到崩溃前的状态</p>
 <p>待补充</p>
-<h3 id="零拷贝-Zero-Copy-技术"><a href="#零拷贝-Zero-Copy-技术" class="headerlink" title="零拷贝(Zero-Copy)技术"></a>零拷贝(Zero-Copy)技术</h3><p>把文件数据发送给网络，不经过用户空间的技术</p>
+<h3 id="零拷贝-Zero-Copy-技术">零拷贝(Zero-Copy)技术</h3>
+<p>把文件数据发送给网络，不经过用户空间的技术</p>
 <p>传统路径:磁盘 -&gt; 内核缓冲区 -&gt; 用户缓冲区 -&gt; 内核socket缓冲区 -&gt; 网卡，4次拷贝</p>
 <p><code>sendfile()</code>系统调用:磁盘 -&gt; 内核缓冲区 -&gt; 网卡，2次拷贝，且不进入用户空间</p>
 <p><code>Nginx</code>，<code>Kafka</code>的高性能文件传输都依赖<code>sendfile</code></p>
-<p>Java的FileChannel.transferTo()就是对<code>sendfile</code>的<strong>封装</strong>(抽象)</p>
-<p><code>Kafka</code>为什么能处理百万级消息?</p>
-<p><code>零拷贝</code>+<code>顺序写磁盘</code></p>
 <p>待补充</p>
-<h3 id="epoll原理"><a href="#epoll原理" class="headerlink" title="epoll原理"></a>epoll原理</h3><p>Linux最高效的I&#x2F;O事件通知机制</p>
+<h3 id="epoll原理">epoll原理</h3>
+<p>Linux最高效的I/O事件通知机制</p>
 <p>复习一下</p>
 <p>select:每次调用把全部fd从用户态拷贝到内核，<code>O(n)</code>扫描，最多1024个fd</p>
 <p>poll:去掉fd数量限制，但还是<code>O(n)</code>扫描</p>
 <p><strong>epoll</strong>:内核维护就绪列表，只返回有事件的fd，<code>O(1)</code></p>
-<p><code>edge-triggered</code>(ET) vs <code>level-triggered</code>(LT)是<strong>epoll</strong>的两种工作模式，ET性能更高但编程更难</p>
-<p>Redis，Nginx底层都用epoll</p>
-<hr>
-<p>怎么这么复杂</p>
-<p>好多内容…</p>
-<p>毕竟是几十年发展的历史(maybe)</p>
-<p>慢慢来吧</p>
-<p>累了</p>
-<p>先休息一会儿…</p>
+<p><code>edge-triggered</code>(ET) vs <code>level-triggered</code>(LT)是<strong>epoll</strong>的两种工作模式</p>
+<p>待补充</p>
 <hr>
 <p>可以忽略</p>
 <p>自言自语几句</p>
 <p>最近，我时常发问，学习这些内容的<strong>意义</strong>是什么?</p>
 <p>我尝试询问ai，翻阅论坛，其给出的回答不外乎:</p>
 <ul>
-<li><p>这些底层知识构成了真正理解计算机系统，解决复杂生产问题的基石</p>
+<li>
+<p>这些底层知识构成了真正理解计算机系统，解决复杂生产问题的基石</p>
 </li>
-<li><p>在实际工作中，它们无处不在</p>
+<li>
+<p>在实际工作中，它们无处不在</p>
 </li>
-<li><p>这些知识让你超越<code>调包侠</code>层次</p>
+<li>
+<p>这些知识让你超越<code>调包侠</code>层次</p>
 </li>
-<li><p>面试官非常看重这种对底层原理的理解</p>
+<li>
+<p>面试官非常看重这种对底层原理的理解</p>
 </li>
 </ul>
 <p>这些千篇一律的回答真的是我想要的吗</p>
@@ -973,7 +979,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>更新于</div>
-          <div>2026年4月15日</div>
+          <div>2026年6月29日</div>
         </div>
       
       
@@ -1124,7 +1130,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-      <span class="footer-quote">No furry, no life!</span>
+      <span class="footer-quote">nice to meet you</span>
     </div>
   
   
