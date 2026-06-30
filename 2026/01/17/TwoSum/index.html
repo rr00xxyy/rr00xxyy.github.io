@@ -288,9 +288,9 @@
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">twoSum</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> target)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n =nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++)&#123;<br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = i + <span class="hljs-number">1</span>; j &lt; n; j++)&#123;<br>                <span class="hljs-keyword">if</span>(nums[i] + nums[j] == target)&#123;<br>                    <span class="hljs-keyword">return</span> &#123;i, j&#125;;<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> &#123;&#125;;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 <p><img src="/images/15.png" srcset="/img/loading.gif" lazyload alt="6"></p>
 <p>虽然空间复杂度为<code>O(1)</code>，但是这样的话引入了很多无意义比较，比如某个<code>nums[i]</code>可能很小，却和很多不可能匹配的数相加，浪费了许多时间，因此时间复杂度达到了
-    <span id="mjx-324f0d4">
+    <span id="mjx-de1f0e98">
       <style>
-      #mjx-324f0d4{
+      #mjx-de1f0e98{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -456,9 +456,9 @@ g[data-mml-node="xypic"] path {
 <p><img src="/images/16.png" srcset="/img/loading.gif" lazyload alt="6"></p>
 <p>此时空间复杂度是<code>O(n)</code></p>
 <p>可以看到确实快了一些，但是还不够，排序的时间复杂度为
-    <span id="mjx-a68ceae8">
+    <span id="mjx-33845888">
       <style>
-      #mjx-a68ceae8{
+      #mjx-33845888{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;

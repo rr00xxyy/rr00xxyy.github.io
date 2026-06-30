@@ -281,9 +281,9 @@
 <p>稳定</p>
 <p>复杂度:</p>
 <p>时间 
-    <span id="mjx-6090cf2">
+    <span id="mjx-9b3548d8">
       <style>
-      #mjx-6090cf2{
+      #mjx-9b3548d8{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -443,9 +443,9 @@ g[data-mml-node="xypic"] path {
     </span>
   </p>
 <p>空间 
-    <span id="mjx-89a8b038">
+    <span id="mjx-efde8ac8">
       <style>
-      #mjx-89a8b038{
+      #mjx-efde8ac8{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -610,9 +610,9 @@ g[data-mml-node="xypic"] path {
 <p>每次找最小值放到前面</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">selectionSort</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>    <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) &#123;<br>        <span class="hljs-type">int</span> minIndex = i;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = i + <span class="hljs-number">1</span>; j &lt; n; j++) &#123;<br>            <span class="hljs-keyword">if</span>(nums[j] &lt; nums[minIndex]) &#123;<br>                minIndex = j;<br>            &#125;<br>        &#125;<br>        <span class="hljs-built_in">swap</span>(nums[i], nums[minIndex]);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>复杂度依旧
-    <span id="mjx-7af67d28">
+    <span id="mjx-498a7518">
       <style>
-      #mjx-7af67d28{
+      #mjx-498a7518{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -776,9 +776,9 @@ g[data-mml-node="xypic"] path {
 <p>像打扑克牌一样不断插入到已排序部分</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">insertionSort</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt; nums.<span class="hljs-built_in">size</span>(); i++) &#123;<br>        <span class="hljs-type">int</span> key = nums[i];<br>        <span class="hljs-type">int</span> j = i - <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">while</span>(j &gt;= <span class="hljs-number">0</span> &amp;&amp; nums[j] &gt; key) &#123;<br>            nums[j + <span class="hljs-number">1</span>] = nums[j];<br>            j--;<br>        &#125;<br>        nums[j + <span class="hljs-number">1</span>] = key;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>复杂度依旧
-    <span id="mjx-fdb8b6c">
+    <span id="mjx-0311a3f8">
       <style>
-      #mjx-fdb8b6c{
+      #mjx-0311a3f8{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -939,9 +939,9 @@ g[data-mml-node="xypic"] path {
   </p>
 <p>但如果<code>数组基本有序</code></p>
 <p>则为
-    <span id="mjx-c7380fc8">
+    <span id="mjx-7d6e04f">
       <style>
-      #mjx-c7380fc8{
+      #mjx-7d6e04f{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -1106,9 +1106,9 @@ g[data-mml-node="xypic"] path {
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> l, <span class="hljs-type">int</span> mid, <span class="hljs-type">int</span> r)</span> </span>&#123;<br>    vector&lt;<span class="hljs-type">int</span>&gt; temp;<br>    <span class="hljs-type">int</span> i = l, j = mid + <span class="hljs-number">1</span>;<br><br>    <span class="hljs-keyword">while</span>(i &lt;= mid &amp;&amp; j &lt;= r) &#123;<br>        <span class="hljs-keyword">if</span>(nums[i] &lt; nums[j]) &#123;<br>            temp.<span class="hljs-built_in">push_back</span>(nums[i++]);<br>        &#125;<span class="hljs-keyword">else</span> &#123;<br>            temp.<span class="hljs-built_in">push_back</span>(nums[j++]);<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">while</span>(i &lt;= mid) temp.<span class="hljs-built_in">push_back</span>(nums[i++]);<br>    <span class="hljs-keyword">while</span>(j &lt;= r) temp.<span class="hljs-built_in">push_back</span>(nums[j++]);<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k = <span class="hljs-number">0</span>; k &lt; temp.<span class="hljs-built_in">size</span>(); k++) &#123;<br>        nums[l + k] = temp[k];<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">mergeSort</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>&#123;<br>    <span class="hljs-keyword">if</span>(l &gt;= r) <span class="hljs-keyword">return</span>;<br>    <span class="hljs-type">int</span> mid = (l + r) / <span class="hljs-number">2</span>;<br>    <br>    <span class="hljs-built_in">mergeSort</span>(nums, l, mid);<br>    <span class="hljs-built_in">mergeSort</span>(nums, mid + <span class="hljs-number">1</span>, r);<br><br>    <span class="hljs-built_in">merge</span>(nums, l, mid, r);<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>复杂度:</p>
 <p>时间 
-    <span id="mjx-a08b6bd">
+    <span id="mjx-d9967a">
       <style>
-      #mjx-a08b6bd{
+      #mjx-d9967a{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -1268,9 +1268,9 @@ g[data-mml-node="xypic"] path {
     </span>
   </p>
 <p>空间 
-    <span id="mjx-c53d9918">
+    <span id="mjx-eadc63">
       <style>
-      #mjx-c53d9918{
+      #mjx-eadc63{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -1434,9 +1434,9 @@ g[data-mml-node="xypic"] path {
 <p>经典</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">partition</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>&#123;<br>    <span class="hljs-type">int</span> pivot = nums[r];<br>    <span class="hljs-type">int</span> i = l;<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = l; j &lt; r; j++) &#123;<br>        <span class="hljs-keyword">if</span>(nums[j] &lt; pivot) &#123;<br>            <span class="hljs-built_in">swap</span>(nums[i], nums[j]);<br>            i++;<br>        &#125;<br>    &#125;<br>    <span class="hljs-built_in">swap</span>(nums[i], nums[r]);<br>    <span class="hljs-keyword">return</span> i;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">quickSort</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>&#123;<br>    <span class="hljs-keyword">if</span>(l &gt;= r) <span class="hljs-keyword">return</span>;<br><br>    <span class="hljs-type">int</span> p = <span class="hljs-built_in">partition</span>(nums, l, r);<br><br>    <span class="hljs-built_in">quickSort</span>(nums, l, p - <span class="hljs-number">1</span>);<br>    <span class="hljs-built_in">quickSort</span>(nums, p + <span class="hljs-number">1</span>, r);<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>平均 
-    <span id="mjx-34575eb">
+    <span id="mjx-0b40d938">
       <style>
-      #mjx-34575eb{
+      #mjx-0b40d938{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -1596,9 +1596,9 @@ g[data-mml-node="xypic"] path {
     </span>
   </p>
 <p>最坏 
-    <span id="mjx-1a063d6">
+    <span id="mjx-4cf36f4">
       <style>
-      #mjx-1a063d6{
+      #mjx-4cf36f4{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -1762,9 +1762,9 @@ g[data-mml-node="xypic"] path {
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">heapify</span><span class="hljs-params">(nums&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> n, <span class="hljs-type">int</span> i)</span> </span>&#123;<br>    <span class="hljs-type">int</span> largest = i;<br>    <span class="hljs-type">int</span> l = <span class="hljs-number">2</span> * i + <span class="hljs-number">1</span>;<br>    <span class="hljs-type">int</span> r = <span class="hljs-number">2</span> * i + <span class="hljs-number">2</span>;<br>    <span class="hljs-keyword">if</span>(l &lt; n &amp;&amp; nums[l] &gt; nums[largest]) &#123;<br>        largest = l;<br>    &#125;<br>    <span class="hljs-keyword">if</span>(r &lt; n &amp;&amp; nums[r] &gt; nums[largest]) &#123;<br>        largest = r;<br>    &#125;<br>    <span class="hljs-keyword">if</span>(largest != i) &#123;<br>        <span class="hljs-built_in">swap</span>(nums[i], nums[largest]);<br>        <span class="hljs-built_in">heapify</span>(nums, n, largest);<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">heapSort</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>    <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = n / <span class="hljs-number">2</span> - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i--) &#123;<br>        <span class="hljs-built_in">heapify</span>(nums, n, i);<br>    &#125;<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = n - <span class="hljs-number">1</span>; i &gt; <span class="hljs-number">0</span>; i--) &#123;<br>        <span class="hljs-built_in">swap</span>(nums[<span class="hljs-number">0</span>], nums[i]);<br>        <span class="hljs-built_in">heapify</span>(nums, i, <span class="hljs-number">0</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>复杂度:</p>
 <p>时间 
-    <span id="mjx-ae496a88">
+    <span id="mjx-466becd8">
       <style>
-      #mjx-ae496a88{
+      #mjx-466becd8{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
@@ -1924,9 +1924,9 @@ g[data-mml-node="xypic"] path {
     </span>
   </p>
 <p>空间 
-    <span id="mjx-35bba43">
+    <span id="mjx-5d2c753">
       <style>
-      #mjx-35bba43{
+      #mjx-5d2c753{
         display:contents;
         mjx-assistive-mml {
           user-select: text !important;
