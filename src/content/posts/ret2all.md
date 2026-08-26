@@ -9,6 +9,10 @@ description: "一道溢出的痕，一场检测的困，一次极致的栈，一
 ---
 题目来自`LilCTF2025`的一道pwn题，名为`ret2all`
 
+链接：https://gz.imxbt.cn/games/30
+
+官方WP：https://lil-house.feishu.cn/wiki/JqIEw4fTPiHcRnkSazacGBTNng6
+
 如作者所言
 
 一道溢出的痕，一场检测的困，一次极致的栈，一个落寞的人
@@ -23,7 +27,7 @@ description: "一道溢出的痕，一场检测的困，一次极致的栈，一
 
 要让每个不懂逆向的小pwn手都能看懂题目意思，这才是纯粹的pwn
 
-来看看题目吧
+下面是题目
 
 首先是main函数
 
