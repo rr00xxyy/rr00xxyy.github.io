@@ -11,9 +11,7 @@ description: "kernel exploitation"
 
 今天学习了一种kernel exploitation技术，名为**Dirty Pageflags**
 
-参考:
-
-https://ptr-yudai.hatenablog.com/entry/2025/09/14/180326
+[跳转链接](https://ptr-yudai.hatenablog.com/entry/2025/09/14/180326)
 
 ## 前置知识
 

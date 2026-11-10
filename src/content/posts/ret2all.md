@@ -9,9 +9,9 @@ description: "一道溢出的痕，一场检测的困，一次极致的栈，一
 ---
 题目来自`LilCTF2025`的一道pwn题，名为`ret2all`
 
-链接：https://gz.imxbt.cn/games/30
+[跳转链接](https://gz.imxbt.cn/games/30)
 
-官方WP：https://lil-house.feishu.cn/wiki/JqIEw4fTPiHcRnkSazacGBTNng6
+[官方WP](https://lil-house.feishu.cn/wiki/JqIEw4fTPiHcRnkSazacGBTNng6)
 
 如作者所言
 
