@@ -82,6 +82,15 @@ const isActive = (path: string) => {
             {t.nav.posts}
           </a>
         </li>
+        <li class="col-span-2">
+          <a
+            href={getRelativeLocaleUrl(locale, "about")}
+            class:list={{ "active-nav": isActive("/about") }}
+            aria-current={isActive("/about") ? "page" : undefined}
+          >
+            {t.nav.about}
+          </a>
+        </li>
         {
           features.showArchives && (
             <li class="col-span-2">

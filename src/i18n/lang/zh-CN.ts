@@ -4,6 +4,7 @@ export default {
   nav: {
     home: "首页",
     posts: "文章",
+    about: "关于",
     archives: "归档",
     search: "搜索",
   },

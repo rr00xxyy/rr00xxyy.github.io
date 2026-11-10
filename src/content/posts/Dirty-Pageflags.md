@@ -11,7 +11,7 @@ description: "kernel exploitation"
 
 今天学习了一种kernel exploitation技术，名为**Dirty Pageflags**
 
-[跳转链接](https://ptr-yudai.hatenablog.com/entry/2025/09/14/180326)
+[学习](https://ptr-yudai.hatenablog.com/entry/2025/09/14/180326)
 
 ## 前置知识
 
@@ -334,7 +334,7 @@ CMD_DELETE -> 释放`obj_array[index]`并清空数组项，**但不清除selecte
 
 便能完成利用并提权
 
-### 具体exploit
+### 具体利用
 
 我们先定义下列函数:
 

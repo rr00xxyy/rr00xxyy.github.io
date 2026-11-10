@@ -4,6 +4,7 @@ import PostLayout from "@/layouts/PostLayout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Datetime from "@/components/Datetime.astro";
+import TableOfContents from "@/components/TableOfContents.astro";
 import { getPostSlug, getPostUrl } from "@/utils/getPostPaths";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { toTransitionName } from "@/utils/toTransitionName";
@@ -69,7 +70,7 @@ const {
   hideEditPost,
 } = post.data;
 
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 
 let ogImageUrl: string | undefined;
 
@@ -103,6 +104,8 @@ const ogImage = ogImageUrl
   <Header />
 
   <BackButton />
+
+  <TableOfContents {headings} />
 
   <main
     id="main-content"
